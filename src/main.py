@@ -2,7 +2,7 @@ import sys
 import gi
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
-from gi.repository import Gtk, Adw, Gio, Gdk
+from gi.repository import Gtk, Adw, Gio
 
 class MainWindow(Gtk.ApplicationWindow):
     def __init__(self, *args, **kwargs):
@@ -14,23 +14,7 @@ class MyApp(Adw.Application):
         super().__init__(**kwargs)
         self.connect('activate', self.on_activate)
 
-    def load_css(self):
-        css_provider = Gtk.CssProvider()
-        css_provider.load_from_data(b"""
-        .custom-button {
-            background-color: #333333;
-            color: #ffffff;
-        }
-        """)
-        Gtk.StyleContext.add_provider_for_display(
-            Gdk.Display.get_default(),
-            css_provider,
-            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
-        )
-
     def on_activate(self, app):
-        self.load_css()
-
         # Check if the application already has a window
         if not app.get_active_window():
             # Create main application window
@@ -108,14 +92,14 @@ class MyApp(Adw.Application):
         # Set the stack's visible page based on the selected tab
         stack.set_visible_child_name(page_name)
 
-        # Deactivate other buttons in the tabs box and activate the selected one
+        # Deactivate other buttons' highlight in the tabs box and activate the selected one
         child = tabs_box.get_first_child()
         while child:
-            child.remove_css_class("custom-button")
+            child.remove_css_class("suggested-action")
             child = child.get_next_sibling()
 
-        # Add custom style to the selected button
-        button.add_css_class("custom-button")
+        # Add "suggested-action" style to the selected button for visual feedback
+        button.add_css_class("suggested-action")
 
     def on_create_button_clicked(self, button):
         # Pop-up window on create button click
