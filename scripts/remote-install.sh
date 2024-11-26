@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
-CLOUDSURGE_SERVER=""
-CLOUDSURGE_SERVER_PASSWORD=""
+SERVER=""
+SERVER_PASSWORD=""
+KEY_FILE=""
 
 # Formatting
 GREEN=$(tput setaf 2)
@@ -18,11 +19,23 @@ usage() {
     Remotely install and setup everything needed for CloudSurge.
 
     Options:
-      -s, --server    server address (something like user@127.0.0.1)
-      -p, --password  password for the server
+      -s, --server   server address (something like user@127.0.0.1)
+      -k, --keyfile  key file to use for ssh
 
-      -h, --help      display this help
+      -h, --help     display this help
 EOF
+}
+
+run() {
+  if [[ -z $KEY_FILE ]]; then
+    ssh -q "$SERVER" "$1"
+  else
+    ssh -q -i "$KEY_FILE" "$SERVER" "$1"
+  fi
+}
+
+runs() {
+  run "echo $SERVER_PASSWORD | sudo -S $1"
 }
 
 if [[ -z "$@" ]]; then
@@ -30,7 +43,7 @@ if [[ -z "$@" ]]; then
   exit 1
 fi
 
-TEMP=$(getopt -o s:p:h --long server:,password:,help -n "$0" -- "$@")
+TEMP=$(getopt -o s:k:h --long server:,keyfile:,help -n "$0" -- "$@")
 
 if [ $? != 0 ]; then
   echo "Terminating..." >&2
@@ -43,12 +56,12 @@ unset TEMP
 while true; do
   case "$1" in
   -s | --server)
-    CLOUDSURGE_SERVER=$2
+    SERVER=$2
     shift 2
     continue
     ;;
-  -p | --password)
-    CLOUDSURGE_SERVER_PASSWORD=$2
+  -k | --keyfile)
+    KEY_FILE=$2
     shift 2
     continue
     ;;
@@ -66,39 +79,46 @@ while true; do
   esac
 done
 
-if [[ -z $CLOUDSURGE_SERVER ]]; then
+if [[ -z $SERVER ]]; then
   echo "${RED}${BOLD}Please set a server with -s/--server${RESET}" >&2
   exit 1
 fi
 
-if [[ -z $CLOUDSURGE_SERVER_PASSWORD ]]; then
-  echo "${RED}${BOLD}Please set a server password with -p/--password${RESET}" >&2
+read -s -p "Enter password for Server: " SERVER_PASSWORD
+echo
+
+echo "${BOLD}${YELLOW}Checking password...${RESET}"
+if ! runs "echo" &>/dev/null; then
+  echo "${RED}${BOLD}Connection failed! Is the password correct?${RESET}" >&2
   exit 1
 fi
 
-if ! command apt &>/dev/null; then
+if ! run "command -v apt &> /dev/null"; then
   echo "${BOLD}${RED}Linux distribution is not Debian!${RESET}" >&2
   echo "${BOLD}${RED}Exiting...${RESET}" >&2
   exit 1
 fi
 
-echo "${BOLD}${GREEN}Updating system${RESET}"
-apt update
-apt upgrade -y
+echo "${BOLD}${GREEN}Updating system...${RESET}"
+sleep 1
+runs "apt update -y"
 
-if ! command pipx &>/dev/null; then
+echo "${BOLD}${GREEN}Upgrading system...${RESET}"
+sleep 1
+runs "apt upgrade -y"
+
+if ! run "command -v pipx &> /dev/null"; then
   echo "${BOLD}${YELLOW}pipx was not found${RESET}"
   echo "${BOLD}${YELLOW}Installing pipx...${RESET}"
-  echo apt install pipx -y
-  echo "${BOLD}${GREEN}pipx installed successfully${RESET}"
+  sleep 1
+  runs "apt install pipx -y" &&
+    echo "${BOLD}${GREEN}pipx installed successfully${RESET}"
+  run "pipx ensurepath" &&
+    echo "${BOLD}${GREEN}Added paths...${RESET}"
 fi
 
-pipx ensurepath
-pipx install gns3-server
-
-if command gns3server &>/dev/null; then
-  echo "${BOLD}${GREEN}gns3server installed successfully${RESET}"
-else
-  echo "${BOLD}${RED}gns3server failed to install${RESET}" >&2
-  exit 1
+if ! run "command -v gns3server"; then
+  echo "${BOLD}${GREEN}Installing gns3server...${RESET}"
+  run "pipx install gns3-server" &&
+    echo "${BOLD}${GREEN}gns3server installed successfully${RESET}"
 fi
