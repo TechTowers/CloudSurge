@@ -2,6 +2,7 @@
 
 SERVER=""
 SERVER_PASSWORD=""
+GNS3_PATH="\$HOME/.local/bin/gns3server"
 KEY_FILE=""
 
 # Formatting
@@ -36,6 +37,34 @@ run() {
 
 runs() {
   run "echo $SERVER_PASSWORD | sudo -S $1"
+}
+
+install_gns3() {
+  if command -v gns3 &>/dev/null; then
+    GNS3_VERSION=$(gns3 --version)
+  fi
+
+  if run "[[ -x $GNS3_PATH ]]"; then
+    GNS3_SERVER_VERSION=$(run "$GNS3_PATH --version")
+  fi
+
+  if [[ -n $GNS3_VERSION && -n $GNS3_SERVER_VERSION ]]; then
+    if [[ "$GNS3_VERSION" == "$GNS3_SERVER_VERSION" ]]; then
+      return 0
+    else
+      echo "${BOLD}${RED}Version mismatch between Client and Server! Installing the right version...${RESET}"
+      run "pipx install gns3-server==$GNS3_VERSION --force" &&
+        echo "${BOLD}${GREEN}Installed gns3server${RESET}"
+    fi
+  elif [[ -n $GNS3_VERSION && -z $GNS3_SERVER_VERSION ]]; then
+    echo "${BOLD}${GREEN}Installing gns3server matching your local gns3 installation...${RESET}"
+    run "pipx install gns3-server==$GNS3_VERSION --force" &&
+      echo "${BOLD}${GREEN}Installed gns3server $GNS3_SERVER_VERSION${RESET}"
+  else
+    echo "${BOLD}${GREEN}Installing gns3server...${RESET}"
+    run "pipx install gns3-server --force" &&
+      echo "${BOLD}${GREEN}Installed gns3server${RESET}"
+  fi
 }
 
 if [[ -z "$@" ]]; then
@@ -117,8 +146,4 @@ if ! run "command -v pipx &> /dev/null"; then
     echo "${BOLD}${GREEN}Added paths...${RESET}"
 fi
 
-if ! run "command -v gns3server"; then
-  echo "${BOLD}${GREEN}Installing gns3server...${RESET}"
-  run "pipx install gns3-server" &&
-    echo "${BOLD}${GREEN}gns3server installed successfully${RESET}"
-fi
+install_gns3
