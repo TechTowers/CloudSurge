@@ -181,12 +181,25 @@ if [[ $INSTALL -eq 1 ]]; then
   fi
 
   install_gns3
+
+  run "mkdir CloudSurge/"
+  run "touch CloudSurge/.installed"
 fi
 
 if [[ $UPDATE -eq 1 ]]; then
-  update
+  if run "[[ -e CloudSurge/.installed ]]"; then
+    update
+  else
+    echo "${BOLD}${RED}Please install with -i first.${RESET}"
+    exit 1
+  fi
 fi
 
 if [[ $CONFIGURE -eq 1 ]]; then
-  true
+  if run "[[ -e CloudSurge/.installed ]]"; then
+    true
+  else
+    echo "${BOLD}${RED}Please install with -i first.${RESET}"
+    exit 1
+  fi
 fi
