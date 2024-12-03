@@ -81,9 +81,6 @@ update() {
   echo "${BOLD}${GREEN}Upgrading system packages...${RESET}"
   sleep 1
   runs "apt upgrade -y"
-
-  echo "${BOLD}${GREEN}Upgrading pipx packages...${RESET}"
-  run "pipx upgrade-all"
 }
 
 if [[ -z "$@" ]]; then
@@ -188,6 +185,7 @@ if [[ $INSTALL -eq 1 ]]; then
 elif [[ $UPDATE -eq 1 ]]; then
   if run "[[ -e CloudSurge/.installed ]]"; then
     update
+    install_gns3
   else
     echo "${BOLD}${RED}Please install with -i first.${RESET}"
     exit 1
