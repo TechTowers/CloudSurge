@@ -3,6 +3,9 @@
 SERVER=""
 SERVER_PASSWORD=""
 GNS3_PATH="\$HOME/.local/bin/gns3server"
+INSTALL=0
+UPDATE=0
+CONFIGURE=0
 KEY_FILE=""
 
 # Formatting
@@ -20,8 +23,11 @@ usage() {
     Remotely install and setup everything needed for CloudSurge.
 
     Options:
-      -s, --server   server address (something like user@127.0.0.1)
-      -k, --keyfile  key file to use for ssh
+      -s, --server     server address (something like user@127.0.0.1)
+      -k, --keyfile    key file to use for ssh
+      -i, --install    install GNS3 Server on a server 
+      -u, --update     update everything on the server 
+      -c, --configure  configure the remote server
 
       -h, --help     display this help
 EOF
@@ -67,12 +73,25 @@ install_gns3() {
   fi
 }
 
+update() {
+  echo "${BOLD}${GREEN}Updating system packages...${RESET}"
+  sleep 1
+  runs "apt update -y"
+
+  echo "${BOLD}${GREEN}Upgrading system packages...${RESET}"
+  sleep 1
+  runs "apt upgrade -y"
+
+  echo "${BOLD}${GREEN}Upgrading pipx packages...${RESET}"
+  run "pipx upgrade-all"
+}
+
 if [[ -z "$@" ]]; then
   usage
   exit 1
 fi
 
-TEMP=$(getopt -o s:k:h --long server:,keyfile:,help -n "$0" -- "$@")
+TEMP=$(getopt -o s:k:iuch --long server:,keyfile:,install,update,configure,help -n "$0" -- "$@")
 
 if [ $? != 0 ]; then
   echo "Terminating..." >&2
@@ -94,6 +113,21 @@ while true; do
     shift 2
     continue
     ;;
+  -i | --install)
+    INSTALL=1
+    shift
+    continue
+    ;;
+  -u | --update)
+    UPDATE=1
+    shift
+    continue
+    ;;
+  -c | --configure)
+    CONFIGURE=1
+    shift
+    continue
+    ;;
   -h | --help)
     usage
     exit 0
@@ -113,6 +147,11 @@ if [[ -z $SERVER ]]; then
   exit 1
 fi
 
+if [[ $INSTALL -eq 0 && $UPDATE -eq 0 && $CONFIGURE -eq 0 ]]; then
+  echo "${BOLD}${RED}Please at least use one of these flags: -i, -u, -c" >&2
+  exit 1
+fi
+
 read -s -p "Enter password for Server: " SERVER_PASSWORD
 echo
 
@@ -128,22 +167,26 @@ if ! run "command -v apt &> /dev/null"; then
   exit 1
 fi
 
-echo "${BOLD}${GREEN}Updating system...${RESET}"
-sleep 1
-runs "apt update -y"
+if [[ $INSTALL -eq 1 ]]; then
+  update
 
-echo "${BOLD}${GREEN}Upgrading system...${RESET}"
-sleep 1
-runs "apt upgrade -y"
+  if ! run "command -v pipx &> /dev/null"; then
+    echo "${BOLD}${YELLOW}pipx was not found${RESET}"
+    echo "${BOLD}${YELLOW}Installing pipx...${RESET}"
+    sleep 1
+    runs "apt install pipx -y" &&
+      echo "${BOLD}${GREEN}pipx installed successfully${RESET}"
+    run "pipx ensurepath" &&
+      echo "${BOLD}${GREEN}Added paths...${RESET}"
+  fi
 
-if ! run "command -v pipx &> /dev/null"; then
-  echo "${BOLD}${YELLOW}pipx was not found${RESET}"
-  echo "${BOLD}${YELLOW}Installing pipx...${RESET}"
-  sleep 1
-  runs "apt install pipx -y" &&
-    echo "${BOLD}${GREEN}pipx installed successfully${RESET}"
-  run "pipx ensurepath" &&
-    echo "${BOLD}${GREEN}Added paths...${RESET}"
+  install_gns3
 fi
 
-install_gns3
+if [[ $UPDATE -eq 1 ]]; then
+  update
+fi
+
+if [[ $CONFIGURE -eq 1 ]]; then
+  true
+fi
