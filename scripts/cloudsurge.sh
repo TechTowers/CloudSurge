@@ -147,8 +147,8 @@ if [[ -z $SERVER ]]; then
   exit 1
 fi
 
-if [[ $INSTALL -eq 0 && $UPDATE -eq 0 && $CONFIGURE -eq 0 ]]; then
-  echo "${BOLD}${RED}Please at least use one of these flags: -i, -u, -c" >&2
+if ((INSTALL + UPDATE + CONFIGURE != 1)); then
+  echo "${BOLD}${RED}Please use only one of these flags: -i, -u, -c" >&2
   exit 1
 fi
 
@@ -184,18 +184,16 @@ if [[ $INSTALL -eq 1 ]]; then
 
   run "mkdir CloudSurge/"
   run "touch CloudSurge/.installed"
-fi
 
-if [[ $UPDATE -eq 1 ]]; then
+elif [[ $UPDATE -eq 1 ]]; then
   if run "[[ -e CloudSurge/.installed ]]"; then
     update
   else
     echo "${BOLD}${RED}Please install with -i first.${RESET}"
     exit 1
   fi
-fi
 
-if [[ $CONFIGURE -eq 1 ]]; then
+elif [[ $CONFIGURE -eq 1 ]]; then
   if run "[[ -e CloudSurge/.installed ]]"; then
     true
   else
