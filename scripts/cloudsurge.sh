@@ -187,6 +187,7 @@ if [[ $INSTALL -eq 1 ]]; then
     apt "install nftables"
   fi
 
+  echo "${BOLD}${GREEN}Enabling nftables${RESET}"
   runs "systemctl enable --now nftables"
 
   install_gns3
