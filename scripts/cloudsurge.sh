@@ -43,6 +43,7 @@ run() {
 
 runs() {
   run "echo $SERVER_PASSWORD | sudo -S $1"
+  echo
 }
 
 apt() {
