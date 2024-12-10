@@ -88,6 +88,40 @@ update() {
   apt "upgrade"
 }
 
+get_nftable_config() {
+  cat <<EOF
+flush ruleset                                                                    
+                                                                             
+table inet firewall {
+                                                                             
+    chain inbound_ipv4 {
+        icmp type echo-request limit rate 5/second accept      
+    }
+
+    chain inbound_ipv6 {                                                         
+        icmpv6 type { nd-neighbor-solicit, nd-router-advert, nd-neighbor-advert } accept
+        icmpv6 type echo-request limit rate 5/second accept
+    }
+
+    chain inbound {                                                              
+        type filter hook input priority 0; policy drop;
+
+        ct state vmap { established : accept, related : accept, invalid : drop } 
+
+        iifname lo accept
+
+        meta protocol vmap { ip : jump inbound_ipv4, ip6 : jump inbound_ipv6 }
+
+        tcp dport { 22, 3080 } accept
+    }                                                                            
+                                                                             
+    chain forward {                                                              
+        type filter hook forward priority 0; policy drop;                        
+    }                                                                            
+}
+EOF
+}
+
 if [[ -z "$@" ]]; then
   usage
   exit 1
@@ -207,7 +241,12 @@ elif [[ $UPDATE -eq 1 ]]; then
 
 elif [[ $CONFIGURE -eq 1 ]]; then
   if run "[[ -e CloudSurge/.installed ]]"; then
-    true
+    echo "${BOLD}${GREEN}Writing firewall rules${RESET}"
+    runs "chmod 777 /etc/nftables.conf"
+    get_nftable_config | run "cat > /etc/nftables.conf"
+    runs "chmod 755 /etc/nftables.conf"
+    echo "${BOLD}${GREEN}Restarting nftables${RESET}"
+    runs "systemctl restart nftables"
   else
     echo "${BOLD}${RED}Please install with -i first.${RESET}"
     exit 1
