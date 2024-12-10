@@ -192,7 +192,7 @@ if [[ $INSTALL -eq 1 ]]; then
 
   install_gns3
 
-  run "mkdir CloudSurge/"
+  run "mkdir CloudSurge/ 2> /dev/null"
   run "touch CloudSurge/.installed"
 
 elif [[ $UPDATE -eq 1 ]]; then
