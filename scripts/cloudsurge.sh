@@ -45,6 +45,10 @@ runs() {
   run "echo $SERVER_PASSWORD | sudo -S $1"
 }
 
+apt() {
+  runs "DEBIAN_FRONTEND=noninteractive apt $1 -y"
+}
+
 install_gns3() {
   if command -v gns3 &>/dev/null; then
     GNS3_VERSION=$(gns3 --version)
@@ -76,11 +80,11 @@ install_gns3() {
 update() {
   echo "${BOLD}${GREEN}Updating system packages...${RESET}"
   sleep 1
-  runs "apt update -y"
+  apt "update"
 
   echo "${BOLD}${GREEN}Upgrading system packages...${RESET}"
   sleep 1
-  runs "apt upgrade -y"
+  apt "upgrade"
 }
 
 if [[ -z "$@" ]]; then
@@ -171,7 +175,7 @@ if [[ $INSTALL -eq 1 ]]; then
     echo "${BOLD}${YELLOW}pipx was not found${RESET}"
     echo "${BOLD}${YELLOW}Installing pipx...${RESET}"
     sleep 1
-    runs "apt install pipx -y" &&
+    apt "install pipx" &&
       echo "${BOLD}${GREEN}pipx installed successfully${RESET}"
     run "pipx ensurepath" &&
       echo "${BOLD}${GREEN}Added paths...${RESET}"
@@ -180,7 +184,7 @@ if [[ $INSTALL -eq 1 ]]; then
   if ! run "[[ -e /usr/sbin/nft ]]"; then
     echo "${BOLD}${YELLOW}nftables was not found${RESET}"
     echo "${BOLD}${YELLOW}Installing nftables...${RESET}"
-    runs "apt install nftables"
+    apt "install nftables"
   fi
 
   runs "systemctl enable --now nftables"
