@@ -177,6 +177,14 @@ if [[ $INSTALL -eq 1 ]]; then
       echo "${BOLD}${GREEN}Added paths...${RESET}"
   fi
 
+  if ! run "[[ -e /usr/sbin/nft ]]"; then
+    echo "${BOLD}${YELLOW}nftables was not found${RESET}"
+    echo "${BOLD}${YELLOW}Installing nftables...${RESET}"
+    runs "apt install nftables"
+  fi
+
+  runs "systemctl enable --now nftables"
+
   install_gns3
 
   run "mkdir CloudSurge/"
