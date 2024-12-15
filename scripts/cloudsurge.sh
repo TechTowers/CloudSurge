@@ -18,11 +18,11 @@ RESET=$(tput sgr0)
 usage() {
   cat <<EOF
     Usage:
-      $0 [options]
+      $0 [flags]
 
     Remotely install and setup everything needed for CloudSurge.
 
-    Options:
+    Flags:
       -s, --server     server address (something like user@127.0.0.1)
       -k, --keyfile    key file to use for ssh
       -i, --install    install GNS3 Server on a server 
@@ -204,6 +204,11 @@ if ! run "command -v apt &> /dev/null"; then
 fi
 
 if [[ $INSTALL -eq 1 ]]; then
+  if ! run "LC_ALL=C.UTF-8 lscpu | grep Virtualization"; then
+    echo "${BOLD}${RED}This machine does not support KVM! Please use a machine that supports KVM or enable it.${RESET}"
+    exit 1
+  fi
+
   update
 
   if ! run "command -v pipx &> /dev/null"; then
