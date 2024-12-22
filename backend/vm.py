@@ -59,11 +59,6 @@ class Provider(ABC):
         """Configures the virtual machine."""
         pass
 
-
-    def get_account_name(self) -> str:
-        """Get the account name."""
-        return self._account_name
-
     def get_connection_date(self) -> date:
         """Get the connection date."""
         return self._connection_date
@@ -76,7 +71,7 @@ class VirtualMachine:
     """Class representing a virtual machine."""
 
     def __init__(self, vm_name: str, provider: Provider, is_active: bool, is_configured: bool,
-                 cost_limit: int, public_ip: str, first_connection_date: date, total_cost: int, total_uptime: int):
+                 cost_limit: int, public_ip: str, first_connection_date: date):
         self._vm_name = vm_name
         self._provider = provider
         self._is_active = is_active
@@ -84,20 +79,9 @@ class VirtualMachine:
         self._cost_limit = cost_limit
         self._public_ip = IPv4Address(public_ip)
         self._first_connection_date = first_connection_date
-        self._total_cost = total_cost
-        self._total_uptime = total_uptime
 
     def get_vm_name(self) -> str:
-        """Get the virtual machine name.
-
-        Returns:
-            str: Virtual machine name.
-
-        Examples:
-            >>> vm = VirtualMachine("test-vm", Provider("AWS"), True, True, 100, "192.168.1.1", date.today(), 50, 120)
-            >>> vm.get_vm_name()
-            'test-vm'
-        """
+        """Get the virtual machine name."""
         return self._vm_name
 
     def set_vm_name(self, vm_name: str):
@@ -204,40 +188,10 @@ class VirtualMachine:
         """
         self._first_connection_date = first_connection_date
 
-    def get_total_cost(self) -> int:
-        """Get the total cost of the virtual machine.
 
-        Returns:
-            int: Total cost.
-        """
-        return self._total_cost
-
-    def set_total_cost(self, total_cost: int):
-        """Set the total cost of the virtual machine.
-
-        Args:
-            total_cost (int): New total cost.
-        """
-        self._total_cost = total_cost
-
-    def get_total_uptime(self) -> int:
-        """Get the total uptime of the virtual machine in minutes.
-
-        Returns:
-            int: Total uptime in minutes.
-        """
-        return self._total_uptime
-
-    def set_total_uptime(self, total_uptime: int):
-        """Set the total uptime of the virtual machine.
-
-        Args:
-            total_uptime (int): New total uptime in minutes.
-        """
-        self._total_uptime = total_uptime
 
     def __str__(self):
-        return f"\n VirtualMachine:\n VM Name: {self._vm_name}\n Provider: {self._provider.get_provider_name()}\n Active: {self._is_active}\n Configured: {self._is_configured}\n Cost Limit: ${self._cost_limit}\n Public IP: {self._public_ip}\n First Connection Date: {self._first_connection_date}\n Total Cost: ${self._total_cost}\n Total Uptime: {self._total_uptime} minutes\n"
+        return f"\n VirtualMachine:\n VM Name: {self._vm_name}\n Provider: {self._provider.get_provider_name()}\n Active: {self._is_active}\n Configured: {self._is_configured}\n Cost Limit: ${self._cost_limit}\n Public IP: {self._public_ip}\n First Connection Date: {self._first_connection_date}"
 
     def print_info(self):
         """Print information about the virtual machine."""
