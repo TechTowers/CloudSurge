@@ -43,7 +43,9 @@ run() {
 
 runs() {
   run "echo $SERVER_PASSWORD | sudo -S $1"
+  ECODE=$?
   echo
+  return $ECODE
 }
 
 apt() {
