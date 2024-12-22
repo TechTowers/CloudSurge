@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import date
 from typing import List
 import os
 
@@ -40,12 +41,11 @@ class Database:
             print(f"Unexpected error: {e}")
 
     def create_table_vm(self):
-        """Creates the virtual machine table if not exists."""
+        """Creates the virtual machine table if not exists, with vm_name as PRIMARY KEY."""
         try:
             self.cursor.execute("""
                 CREATE TABLE IF NOT EXISTS virtual_machine (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    vm_name TEXT NOT NULL,
+                    vm_name TEXT PRIMARY KEY,
                     provider_account_name TEXT,
                     is_active BOOLEAN,
                     is_configured BOOLEAN,
@@ -92,16 +92,15 @@ class Database:
             vms = []
             for row in rows:
                 vm = {
-                    'id': row[0],
-                    'vm_name': row[1],
-                    'provider_account_name': row[2],
-                    'is_active': row[3],
-                    'is_configured': row[4],
-                    'cost_limit': row[5],
-                    'public_ip': row[6],
-                    'first_connection_date': row[7],
-                    'total_cost': row[8],
-                    'total_uptime': row[9]
+                    'vm_name': row[0],
+                    'provider_account_name': row[1],
+                    'is_active': row[2],
+                    'is_configured': row[3],
+                    'cost_limit': row[4],
+                    'public_ip': row[5],
+                    'first_connection_date': row[6],
+                    'total_cost': row[7],
+                    'total_uptime': row[8]
                 }
                 vms.append(vm)
             return vms
@@ -151,6 +150,17 @@ class Database:
         """Inserts multiple virtual machines into the database."""
         for vm in vms:
             self.insert_vm(vm)
+
+    def delete_database(self):
+        """Deletes the entire database file."""
+        try:
+            if os.path.exists(self.db_file):
+                os.remove(self.db_file)
+                print("Database successfully deleted.")
+            else:
+                print(f"Database file {self.db_file} does not exist.")
+        except Exception as e:
+            print(f"Error deleting database: {e}")
 
     def close(self):
         """Closes the database connection and saves all changes."""
