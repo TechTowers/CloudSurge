@@ -1,7 +1,10 @@
 import sqlite3
 from datetime import date
-from typing import List
+from typing import List, Protocol
+import re
 import os
+
+
 
 class Database:
     """Simulates a SQLite database and provides methods to interact with it."""
@@ -63,8 +66,10 @@ class Database:
         except Exception as e:
             print(f"Unexpected error: {e}")
 
-    def read_provider(self) -> List[dict]:
+    def read_provider(self):
         """Reads and returns all provider information from the database."""
+        # Regex pattern to split by ':' and ',,,'
+        from backend import Azure
         try:
             self.cursor.execute("SELECT * FROM provider")
             rows = self.cursor.fetchall()
@@ -75,7 +80,12 @@ class Database:
                     'connection_date': row[1],
                     'provider_info': row[2]
                 }
-                providers.append(provider)
+
+                parts = re.split(r':', provider['provider_info'])
+                provider_name = parts[0]
+                if provider_name == 'Azure':
+                    providers.append(Azure.from_provider_info(provider['account_name'], provider['connection_date'], provider['provider_info']))
+
             return providers
         except sqlite3.Error as e:
             print(f"Error reading provider data: {e}")
@@ -84,7 +94,7 @@ class Database:
             print(f"Unexpected error while reading providers: {e}")
             raise
 
-    def read_vm(self) -> List[dict]:
+    def read_vm(self, available_provider_accounts):
         """Reads and returns all virtual machine information from the database."""
         try:
             self.cursor.execute("SELECT * FROM virtual_machine")
@@ -102,7 +112,13 @@ class Database:
                     'total_cost': row[7],
                     'total_uptime': row[8]
                 }
-                vms.append(vm)
+                from backend import VirtualMachine
+                for provider_account in available_provider_accounts:
+                    if provider_account.get_account_name() == vm['provider_account_name']:
+                        # Provider Found
+                        vms.append(VirtualMachine(vm['vm_name'], provider_account, vm['is_active'], vm['is_configured'], vm['cost_limit'], vm['public_ip'], vm['first_connection_date'], vm['total_cost'], vm['total_uptime']))
+                        break
+
             return vms
         except sqlite3.Error as e:
             print(f"Error reading VM data: {e}")
@@ -117,7 +133,7 @@ class Database:
             self.cursor.execute("""
                 INSERT INTO provider (account_name, connection_date, provider_info)
                 VALUES (?, ?, ?);
-            """, (provider.get_account_name(), provider.get_connection_date(), ', '.join(provider.get_provider_info())))
+            """, (provider.get_account_name(), provider.get_connection_date(), provider.get_provider_info()))
             self.connection.commit()
         except sqlite3.Error as e:
             print(f"Error inserting provider into database: {e}")

@@ -10,6 +10,21 @@ class Provider(ABC):
         self._account_name = account_name
         self._connection_date = connection_date
 
+    @staticmethod
+    @abstractmethod
+    def from_provider_info(account_name: str, connection_date: date, provider_info: str):
+        """Creates a Provider object from the provider information.
+
+        Args:
+            account_name (str): Account name.
+            connection_date (date): Connection date.
+            provider_info (str): Provider information.
+
+        Returns:
+            Provider: Provider object.
+        """
+        pass
+
     @abstractmethod
     def get_provider_name(self) -> str:
         """Returns the name of the provider."""
@@ -52,6 +67,10 @@ class Provider(ABC):
     def get_connection_date(self) -> date:
         """Get the connection date."""
         return self._connection_date
+
+    def __str__(self):
+        return f"Account Name: {self._account_name}, Connection Date: {self._connection_date}"
+
 
 class VirtualMachine:
     """Class representing a virtual machine."""
@@ -217,15 +236,9 @@ class VirtualMachine:
         """
         self._total_uptime = total_uptime
 
+    def __str__(self):
+        return f"\n VirtualMachine:\n VM Name: {self._vm_name}\n Provider: {self._provider.get_provider_name()}\n Active: {self._is_active}\n Configured: {self._is_configured}\n Cost Limit: ${self._cost_limit}\n Public IP: {self._public_ip}\n First Connection Date: {self._first_connection_date}\n Total Cost: ${self._total_cost}\n Total Uptime: {self._total_uptime} minutes\n"
+
     def print_info(self):
         """Print information about the virtual machine."""
-        print(f"VM Name: {self._vm_name}")
-        print(f"Provider-Account: {self._provider.get_account_name()}")
-        print(f"Provider: {self._provider.get_provider_name()}")
-        print(f"Active: {self._is_active}")
-        print(f"Configured: {self._is_configured}")
-        print(f"Cost Limit: ${self._cost_limit}")
-        print(f"Public IP: {self._public_ip}")
-        print(f"First Connection Date: {self._first_connection_date}")
-        print(f"Total Cost: ${self._total_cost}")
-        print(f"Total Uptime: {self._total_uptime} minutes")
+        print(self.__str__())
