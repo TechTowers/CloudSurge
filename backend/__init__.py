@@ -55,4 +55,5 @@ if __name__ == "__main__":
     vm_cs = VirtualMachine("CloudSurge VM", None, True, True, 100, "50.85.216.201", date.today(), "azureuser", "", "e3918db483871f02", "~/.ssh/test_key.pem")
     vm_cs.install_vm()
 
+    print(vm2.is_reachable())
     db.close()

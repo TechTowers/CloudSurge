@@ -128,6 +128,21 @@ class VirtualMachine:
             "-i"
         ])
 
+    def configure_vm(self):
+        from backend import get_cloudsurge_script
+        get_cloudsurge_script()
+        process = subprocess.Popen([
+            "~/.local/bin/cloudsurge.sh",
+            "-s", f"{self.get_root_username()}@{self.get_public_ip()}",
+            "-k", self.get_ssh_key(),
+            "-c",
+            "-z", self.get_zerotier_network()],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        pass
+
     def get_zerotier_network(self) -> str:
         """Get the zerotier network."""
         return self._zerotier_network
