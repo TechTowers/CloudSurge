@@ -3,6 +3,7 @@
 SERVER=""
 SERVER_PASSWORD=""
 GNS3_PATH="\$HOME/.local/bin/gns3server"
+ZEROTIER_NETWORK=""
 INSTALL=0
 UPDATE=0
 CONFIGURE=0
@@ -28,6 +29,7 @@ usage() {
       -i, --install    install GNS3 Server on a server 
       -u, --update     update everything on the server 
       -c, --configure  configure the remote server
+      -z, --zerotier   the zerotier network to join
 
       -h, --help     display this help
 EOF
@@ -90,46 +92,12 @@ update() {
   apt "upgrade"
 }
 
-get_nftable_config() {
-  cat <<EOF
-flush ruleset                                                                    
-                                                                             
-table inet firewall {
-                                                                             
-    chain inbound_ipv4 {
-        icmp type echo-request limit rate 5/second accept      
-    }
-
-    chain inbound_ipv6 {                                                         
-        icmpv6 type { nd-neighbor-solicit, nd-router-advert, nd-neighbor-advert } accept
-        icmpv6 type echo-request limit rate 5/second accept
-    }
-
-    chain inbound {                                                              
-        type filter hook input priority 0; policy drop;
-
-        ct state vmap { established : accept, related : accept, invalid : drop } 
-
-        iifname lo accept
-
-        meta protocol vmap { ip : jump inbound_ipv4, ip6 : jump inbound_ipv6 }
-
-        tcp dport { 22, 3080 } accept
-    }                                                                            
-                                                                             
-    chain forward {                                                              
-        type filter hook forward priority 0; policy drop;                        
-    }                                                                            
-}
-EOF
-}
-
 if [[ -z "$@" ]]; then
   usage
   exit 1
 fi
 
-TEMP=$(getopt -o s:k:iuch --long server:,keyfile:,install,update,configure,help -n "$0" -- "$@")
+TEMP=$(getopt -o s:k:iuczh: --long server:,keyfile:,install,update,configure,zerotier:,help -n "$0" -- "$@")
 
 if [ $? != 0 ]; then
   echo "Terminating..." >&2
@@ -164,6 +132,11 @@ while true; do
   -c | --configure)
     CONFIGURE=1
     shift
+    continue
+    ;;
+  -z | --zerotier)
+    ZEROTIER_NETWORK=$2
+    shift 2
     continue
     ;;
   -h | --help)
@@ -223,16 +196,24 @@ if [[ $INSTALL -eq 1 ]]; then
       echo "${BOLD}${GREEN}Added paths...${RESET}"
   fi
 
-  if ! run "[[ -e /usr/sbin/nft ]]"; then
-    echo "${BOLD}${YELLOW}nftables was not found${RESET}"
-    echo "${BOLD}${YELLOW}Installing nftables...${RESET}"
-    apt "install nftables"
-  fi
-
-  echo "${BOLD}${GREEN}Enabling nftables${RESET}"
-  runs "systemctl enable --now nftables"
-
   install_gns3
+
+  if ! runs "command -v zerotier-cli &> /dev/null"; then
+    if ! run "command -v curl &> /dev/null"; then
+      echo "${BOLD}${YELLOW}curl was not found${RESET}"
+      echo "${BOLD}${YELLOW}Installing curl...${RESET}"
+      sleep 1
+      apt "install curl" &&
+        echo "${BOLD}${GREEN}curl installed successfully${RESET}"
+    fi
+
+    run "curl -s https://install.zerotier.com > /tmp/zerotier.sh"
+    echo "${BOLD}${YELLOW}ZeroTier was not found${RESET}"
+    echo "${BOLD}${YELLOW}Installing ZeroTier...${RESET}"
+    sleep 1
+    runs "bash /tmp/zerotier.sh" &&
+      echo "${BOLD}${GREEN}ZeroTier installed successfully${RESET}"
+  fi
 
   run "mkdir CloudSurge/ 2> /dev/null"
   run "touch CloudSurge/.installed"
@@ -248,12 +229,11 @@ elif [[ $UPDATE -eq 1 ]]; then
 
 elif [[ $CONFIGURE -eq 1 ]]; then
   if run "[[ -e CloudSurge/.installed ]]"; then
-    echo "${BOLD}${GREEN}Writing firewall rules${RESET}"
-    runs "chmod 777 /etc/nftables.conf"
-    get_nftable_config | run "cat > /etc/nftables.conf"
-    runs "chmod 755 /etc/nftables.conf"
-    echo "${BOLD}${GREEN}Restarting nftables${RESET}"
-    runs "systemctl restart nftables"
+    echo "${BOLD}${GREEN}Configuring ZeroTier Network...${RESET}"
+    for NETWORK in $(runs "zerotier-cli listnetworks | tail +2 | cut -d ' ' -f3"); do
+      runs "zerotier-cli leave $NETWORK"
+    done
+    runs "zerotier-cli join $ZEROTIER_NETWORK"
   else
     echo "${BOLD}${RED}Please install with -i first.${RESET}"
     exit 1
