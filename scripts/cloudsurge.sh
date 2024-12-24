@@ -97,7 +97,7 @@ if [[ -z "$@" ]]; then
   exit 1
 fi
 
-TEMP=$(getopt -o s:k:iuczh: --long server:,keyfile:,install,update,configure,zerotier:,help -n "$0" -- "$@")
+TEMP=$(getopt -o s:k:iucz:h: --long server:,keyfile:,install,update,configure,zerotier:,help -n "$0" -- "$@")
 
 if [ $? != 0 ]; then
   echo "Terminating..." >&2
@@ -179,7 +179,7 @@ if ! run "command -v apt &> /dev/null"; then
 fi
 
 if [[ $INSTALL -eq 1 ]]; then
-  if ! run "LC_ALL=C.UTF-8 lscpu | grep Virtualization"; then
+  if ! run "LC_ALL=C.UTF-8 lscpu | grep Virtualization &> /dev/null"; then
     echo "${BOLD}${RED}This machine does not support KVM! Please use a machine that supports KVM or enable it.${RESET}"
     exit 1
   fi
@@ -213,6 +213,7 @@ if [[ $INSTALL -eq 1 ]]; then
     sleep 1
     runs "bash /tmp/zerotier.sh" &&
       echo "${BOLD}${GREEN}ZeroTier installed successfully${RESET}"
+    runs "systemctl enable --now zerotier-one.service"
   fi
 
   run "mkdir CloudSurge/ 2> /dev/null"
@@ -229,11 +230,18 @@ elif [[ $UPDATE -eq 1 ]]; then
 
 elif [[ $CONFIGURE -eq 1 ]]; then
   if run "[[ -e CloudSurge/.installed ]]"; then
+    if [[ -z $ZEROTIER_NETWORK ]]; then
+      echo "${RED}${BOLD}Please set a ZeroTier Network with -z/--zerotier${RESET}" >&2
+      exit 1
+    fi
     echo "${BOLD}${GREEN}Configuring ZeroTier Network...${RESET}"
     for NETWORK in $(runs "zerotier-cli listnetworks | tail +2 | cut -d ' ' -f3"); do
-      runs "zerotier-cli leave $NETWORK"
+      echo
+      echo "${BOLD}${GREEN}Leaving old ZeroTier Network $NETWORK...${RESET}"
+      runs "zerotier-cli leave $NETWORK > /dev/null"
     done
-    runs "zerotier-cli join $ZEROTIER_NETWORK"
+    echo "${BOLD}${GREEN}Joining ZeroTier Network $ZEROTIER_NETWORK...${RESET}"
+    runs "zerotier-cli join $ZEROTIER_NETWORK > /dev/null"
   else
     echo "${BOLD}${RED}Please install with -i first.${RESET}"
     exit 1
