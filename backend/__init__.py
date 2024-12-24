@@ -37,7 +37,7 @@ if __name__ == "__main__":
 
     ###
     #vm = VirtualMachine("test-vm-2", provider, True, True, 100, "192.168.0.101", date.today(), "root", "sus123!", "123456","")
-    #vm2 = VirtualMachine("test vm no provider", None, True, True, 100, "", date.today(), "username", "dogdogdogdog123!", "12132","")
+    vm2 = VirtualMachine("test vm no provider", None, True, True, 100, "192.169.10.1", date.today(), "username", "dogdogdogdog123!", "12132","")
 
 
     db = Database()

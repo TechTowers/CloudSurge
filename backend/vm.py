@@ -6,7 +6,7 @@ import subprocess
 
 import paramiko
 
-from backend import get_cloudsurge_script
+
 
 
 class Provider(ABC):
@@ -120,6 +120,7 @@ class VirtualMachine:
             return False
 
     def install_vm(self):
+        from backend import get_cloudsurge_script
         get_cloudsurge_script()
         subprocess.run([
             "~/.local/bin/cloudsurge.sh",
