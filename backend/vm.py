@@ -2,6 +2,12 @@ from abc import abstractmethod, ABC
 from datetime import date
 from ipaddress import IPv4Address
 
+import subprocess
+
+import paramiko
+
+from backend import get_cloudsurge_script
+
 
 class Provider(ABC):
     """Abstract class for a cloud provider."""
@@ -30,10 +36,6 @@ class Provider(ABC):
         """Returns the name of the provider."""
         pass
 
-    def get_account_name(self) -> str:
-        """Returns the name of this account"""
-        return self._account_name
-
     @abstractmethod
     def get_provider_info(self) -> str:
         """Returns a list of provider-related information."""
@@ -55,13 +57,18 @@ class Provider(ABC):
         pass
 
     @abstractmethod
-    def configure_vm(self, virtual_m) -> None:
-        """Configures the virtual machine."""
+    def connection_is_alive(self) -> str:
+        """Returns if the connection to the provider is still alive"""
+
         pass
 
     def get_connection_date(self) -> date:
         """Get the connection date."""
         return self._connection_date
+
+    def get_account_name(self) -> str:
+        """Returns the name of this account"""
+        return self._account_name
 
     def __str__(self):
         return f"Account Name: {self._account_name}, Connection Date: {self._connection_date}"
@@ -71,26 +78,79 @@ class VirtualMachine:
     """Class representing a virtual machine."""
 
     def __init__(self, vm_name: str, provider: Provider, is_active: bool, is_configured: bool,
-                 cost_limit: int, public_ip: str, first_connection_date: date):
+                 cost_limit: int, public_ip: str, first_connection_date: date, root_username: str, password: str, zerotier_network: str, ssh_key:str):
         self._vm_name = vm_name
-        self._provider = provider
+        from backend import Database
+        if (provider == None):
+            self._provider = Database.no_provider
+        else:
+            self._provider = provider
         self._is_active = is_active
         self._is_configured = is_configured
         self._cost_limit = cost_limit
         self._public_ip = IPv4Address(public_ip)
         self._first_connection_date = first_connection_date
+        self._root_username = root_username
+        self._password = password
+        self._zerotier_network = zerotier_network
+        self._ssh_key = ssh_key
+
+    def is_reachable(self):
+        """Checks if the virtual machine is reachable via SSH."""
+        try:
+            # Initialize SSH client
+            ssh = paramiko.SSHClient()
+            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())  # Automatically add unknown host keys
+
+
+            # Attempt to establish an SSH connection
+            ssh.connect(str(self._public_ip), username=self._root_username, password=self._password, timeout=15)
+
+            # If we reach here, the VM is reachable
+            ssh.close()  # Close the SSH connection after test
+            return True
+        except paramiko.AuthenticationException:
+            print(f"SSH Authentication failed for VM: {self._vm_name}")
+            return False
+        except paramiko.SSHException as e:
+            print(f"SSH connection failed for VM {self._vm_name}: {str(e)}")
+            return False
+        except Exception as e:
+            print(f"An error occurred while testing SSH connection for VM {self._vm_name}: {str(e)}")
+            return False
+
+    def install_vm(self):
+        get_cloudsurge_script()
+        subprocess.run([
+            "~/.local/bin/cloudsurge.sh",
+            "-s", f"{self.get_root_username()}@{self.get_public_ip()}",
+            "-k", self.get_ssh_key(),
+            "-i"
+        ])
+
+    def get_zerotier_network(self) -> str:
+        """Get the zerotier network."""
+        return self._zerotier_network
+
+    def set_zerotier_network(self, zerotier_network: str):
+        """Set the zerotier network.
+
+        Args:
+            zerotier_network (str): New zerotier network.
+        """
+        self._zerotier_network = zerotier_network
+
+    def get_root_username(self) -> str:
+        """Get the root username."""
+        return self._root_username
+
+    def get_password(self) -> str:
+        """Get the root password."""
+        return self._password
 
     def get_vm_name(self) -> str:
         """Get the virtual machine name."""
         return self._vm_name
-
-    def set_vm_name(self, vm_name: str):
-        """Set the virtual machine name.
-
-        Args:
-            vm_name (str): New virtual machine name.
-        """
-        self._vm_name = vm_name
 
     def get_provider(self) -> Provider:
         """Get the provider object.
@@ -99,14 +159,6 @@ class VirtualMachine:
             Provider: Provider object.
         """
         return self._provider
-
-    def set_provider(self, provider: Provider):
-        """Set the provider object.
-
-        Args:
-            provider (Provider): New provider object.
-        """
-        self._provider = provider
 
     def get_is_active(self) -> bool:
         """Check if the virtual machine is active.
@@ -163,15 +215,6 @@ class VirtualMachine:
             IPv4Address: Public IP address.
         """
         return self._public_ip
-
-    def set_public_ip(self, public_ip: str):
-        """Set the public IP address of the virtual machine.
-
-        Args:
-            public_ip (str): New public IP address.
-        """
-        self._public_ip = IPv4Address(public_ip)
-
     def get_first_connection_date(self) -> date:
         """Get the first connection date of the virtual machine.
 
@@ -179,19 +222,21 @@ class VirtualMachine:
             date: First connection date.
         """
         return self._first_connection_date
-
-    def set_first_connection_date(self, first_connection_date: date):
-        """Set the first connection date of the virtual machine.
-
-        Args:
-            first_connection_date (date): New first connection date.
-        """
-        self._first_connection_date = first_connection_date
-
-
+    def get_ssh_key(self) -> str:
+        """Get the ssh key."""
+        return self._ssh_key
 
     def __str__(self):
-        return f"\n VirtualMachine:\n VM Name: {self._vm_name}\n Provider: {self._provider.get_provider_name()}\n Active: {self._is_active}\n Configured: {self._is_configured}\n Cost Limit: ${self._cost_limit}\n Public IP: {self._public_ip}\n First Connection Date: {self._first_connection_date}"
+        return f"\n VirtualMachine:\n" \
+               f" VM Name: {self._vm_name}\n" \
+               f" Provider: {self._provider.get_provider_name()}\n" \
+               f" Active: {self._is_active}\n" \
+               f" Configured: {self._is_configured}\n" \
+               f" Cost Limit: ${self._cost_limit}\n" \
+               f" Public IP: {self._public_ip}\n" \
+               f" First Connection Date: {self._first_connection_date}\n" \
+               f" Root Username: {self._root_username}\n" \
+               f" ZeroTier Network: {self._zerotier_network}"
 
     def print_info(self):
         """Print information about the virtual machine."""

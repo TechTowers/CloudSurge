@@ -4,11 +4,12 @@ from typing import List, Protocol
 import re
 import os
 
+from backend.no_provider import NoProvider
 
 
 class Database:
     """Simulates a SQLite database and provides methods to interact with it."""
-
+    _no_provider = NoProvider("No-Provider", date.today())
     def __init__(self, db_file: str = os.path.expanduser("~") + '/cloud_provider_db.sqlite'):
         self.db_file = db_file
         self.connection = None
@@ -77,6 +78,8 @@ class Database:
                 provider_name = parts[0]
                 if provider_name == 'Azure':
                     providers.append(Azure.from_provider_info(provider['account_name'], provider['connection_date'], provider['provider_info']))
+                elif provider_name == 'No-Provider':
+                    providers.append(NoProvider.from_provider_info(provider['account_name'], provider['connection_date'], provider['provider_info']))
 
             return providers
         except sqlite3.Error as e:
@@ -94,6 +97,10 @@ class Database:
             self.cursor.execute("""
                 CREATE TABLE IF NOT EXISTS virtual_machine (
                     vm_name TEXT PRIMARY KEY,
+                    root_username TEXT,
+                    root_password TEXT,
+                    ssh_key TEXT,
+                    zerotier_network TEXT,
                     provider_account_name TEXT,
                     is_active BOOLEAN,
                     is_configured BOOLEAN,
@@ -113,10 +120,10 @@ class Database:
         """Inserts a virtual machine object into the virtual machine table."""
         try:
             self.cursor.execute("""
-                INSERT INTO virtual_machine (vm_name, provider_account_name, is_active, is_configured,
+                INSERT INTO virtual_machine (vm_name,root_username,root_password,ssh_key,zerotier_network, provider_account_name, is_active, is_configured,
                                               cost_limit, public_ip, first_connection_date)
-                VALUES (?, ?, ?, ?, ?, ?, ?);
-            """, (vm.get_vm_name(), vm.get_provider().get_account_name(), vm.get_is_active(),
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+            """, (vm.get_vm_name(), vm.get_root_username(), vm.get_password(),vm.get_ssh_key(), vm.get_zerotier_network(), vm.get_provider().get_account_name(), vm.get_is_active(),
                   vm.get_is_configured(), vm.get_cost_limit(), str(vm.get_public_ip()),
                   str(vm.get_first_connection_date())))
             self.connection.commit()
@@ -134,18 +141,36 @@ class Database:
             for row in rows:
                 vm = {
                     'vm_name': row[0],
-                    'provider_account_name': row[1],
-                    'is_active': row[2],
-                    'is_configured': row[3],
-                    'cost_limit': row[4],
-                    'public_ip': row[5],
-                    'first_connection_date': row[6],
+                    'root_username': row[1],
+                    'root_password': row[2],
+                    'ssh_key': row[3],
+                    'zerotier_network': row[4],
+                    'provider_account_name': row[5],
+                    'is_active': row[6],
+                    'is_configured': row[7],
+                    'cost_limit': row[8],
+                    'public_ip': row[9],
+                    'first_connection_date': row[10],
                 }
+
+                # Find the corresponding provider for the VM
                 from backend import VirtualMachine
                 for provider_account in available_provider_accounts:
                     if provider_account.get_account_name() == vm['provider_account_name']:
-                        # Provider Found
-                        vms.append(VirtualMachine(vm['vm_name'], provider_account, vm['is_active'], vm['is_configured'], vm['cost_limit'], vm['public_ip'], vm['first_connection_date']))
+                        # Create VirtualMachine object with the full updated attributes
+                        vms.append(VirtualMachine(
+                            vm['vm_name'],
+                            provider_account,
+                            vm['is_active'],
+                            vm['is_configured'],
+                            vm['cost_limit'],
+                            vm['public_ip'],
+                            vm['first_connection_date'],
+                            vm['root_username'],  # Pass root_username
+                            vm['root_password'],  # Pass root_password
+                            vm['zerotier_network'],  # Pass zerotier_network
+                            vm['ssh_key']  # SSH Key
+                        ))
                         break
 
             return vms
@@ -155,6 +180,7 @@ class Database:
         except Exception as e:
             print(f"Unexpected error while reading VMs: {e}")
             raise
+
 
     # Database Ending-Methods
     def delete_database(self):
@@ -173,3 +199,7 @@ class Database:
         """Closes the database connection and saves all changes."""
         if self.connection:
             self.connection.close()
+
+    @property
+    def no_provider(self):
+        return self._no_provider
