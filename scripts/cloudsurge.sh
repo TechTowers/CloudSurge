@@ -97,7 +97,7 @@ if [[ -z "$@" ]]; then
   exit 1
 fi
 
-TEMP=$(getopt -o s:k:iucz:h: --long server:,keyfile:,install,update,configure,zerotier:,help -n "$0" -- "$@")
+TEMP=$(getopt -o s:k:iucz:h --long server:,keyfile:,install,update,configure,zerotier:,help -n "$0" -- "$@")
 
 if [ $? != 0 ]; then
   echo "Terminating..." >&2
