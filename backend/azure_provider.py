@@ -1,5 +1,9 @@
 from vm import Provider
 from datetime import date
+from azure.identity import ClientSecretCredential
+from azure.mgmt.resource import ResourceManagementClient
+from azure.mgmt.compute import ComputeManagementClient
+from azure.mgmt.network import NetworkManagementClient
 
 import subprocess
 import json
@@ -13,6 +17,14 @@ class Azure(Provider):
         self._client_id = client_id
         self._client_secret = client_secret
         self._tenant_id = tenant_id
+        # Retrieve Ids using:
+        self.credential = ClientSecretCredential(
+            tenant_id=tenant_id,
+            client_id=client_id,
+            client_secret=client_secret,
+        )
+        self.compute_client = ComputeManagementClient(self.credential, subscription_id)
+        # az ad sp create-for-rbac --name <your-service-principal-name> --role Contributor --scopes /subscriptions/<your-subscription-id> --output json
 
     @staticmethod
     def from_provider_info(account_name: str, connection_date: date, provider_info: str):
@@ -37,105 +49,148 @@ class Azure(Provider):
         """Returns information about the provider (e.g., Subscription ID)."""
         return self.get_provider_name() + ":" + f"{self._subscription_id},,,{self._client_id},,,{self._client_secret},,,{self._tenant_id}"
 
-    def connection_is_alive(self) -> str:
-        """Returns if the connection to the provider is still alive"""
+    def connection_is_alive(self) -> bool:
+        """
+        Verifies if the Azure login/authentication works.
 
-        pass
-    def create_vm(self):
-        """Creates a virtual machine on Azure using `curl`."""
+        :return: True if login/authentication is successful, False otherwise.
+        """
+        try:
+            # Attempt to list subscriptions to confirm authentication
+            subscriptions = list(ComputeManagementClient(self.credential, self.subscription_id).subscriptions.list())
+            print(f"Authenticated successfully. Found {len(subscriptions)} subscriptions.")
+            return True
+        except Exception as e:
+            print(f"Authentication failed: {e}")
+            return False
 
-        # Step 1: Obtain an OAuth 2.0 token using client credentials
-        token_url = f"https://login.microsoftonline.com/{self._tenant_id}/oauth2/v2.0/token"
-        token_data = {
-            "grant_type": "client_credentials",
-            "client_id": self._client_id,
-            "client_secret": self._client_secret,
-            "scope": "https://management.azure.com/.default"
-        }
+    def create_vm(
+            self,
+            subscription_id: str,
+            resource_group_name: str,
+            location: str,
+            vm_name: str,
+            vm_size: str,
+            admin_username: str,
+            admin_password: str,
+            image_reference: dict,
+            network_vnet_name: str,
+            network_subnet_name: str,
+            public_ip_name: str,
+            nic_name: str
+    ):
 
-        # Execute curl to get the token
-        token_command = [
-            "curl", "-X", "POST", token_url,
-            "-H", "Content-Type: application/x-www-form-urlencoded",
-            "-d", f"grant_type={token_data['grant_type']}&client_id={token_data['client_id']}&client_secret={token_data['client_secret']}&scope={token_data['scope']}"
-        ]
-        response = subprocess.run(token_command, capture_output=True, text=True)
-        token_response = json.loads(response.stdout)
+        # Authenticate using ClientSecretCredential
+        credential = self.credential
 
-        if "access_token" not in token_response:
-            print("Failed to obtain access token.")
-            return
+        # Create clients for managing Azure resources
+        resource_client = ResourceManagementClient(credential, subscription_id)
+        compute_client = ComputeManagementClient(credential, subscription_id)
+        network_client = NetworkManagementClient(credential, subscription_id)
 
-        access_token = token_response["access_token"]
+        # Step 1: Create Resource Group
+        resource_client.resource_groups.create_or_update(
+            resource_group_name,
+            {"location": location}
+        )
 
-        # Step 2: Create a Virtual Machine (VM) using Azure REST API
-        # Variables for VM creation
-        resource_group = "myResourceGroup"
-        vm_name = "myVMName"  # VM name variable
-        location = "eastus"
-        vm_size = "Standard_DS1_v2"
-        publisher = "Canonical"
-        offer = "UbuntuServer"
-        sku = "20_04-lts"
-        version = "latest"
-        os_disk_create_option = "FromImage"
-        admin_username = "azureuser"
-        admin_password = "Password123!"
-        nic_id = f"/subscriptions/{self._subscription_id}/resourceGroups/{resource_group}/providers/Microsoft.Network/networkInterfaces/myNic"
+        # Step 2: Create Virtual Network and Subnet
+        vnet = network_client.virtual_networks.begin_create_or_update(
+            resource_group_name,
+            network_vnet_name,
+            {
+                "location": location,
+                "address_space": {"address_prefixes": ["10.0.0.0/16"]},
+            },
+        ).result()
 
-        vm_creation_url = f"https://management.azure.com/subscriptions/{self._subscription_id}/resourceGroups/{resource_group}/providers/Microsoft.Compute/virtualMachines/{vm_name}?api-version=2023-05-01"
+        subnet = network_client.subnets.begin_create_or_update(
+            resource_group_name,
+            network_vnet_name,
+            network_subnet_name,
+            {"address_prefix": "10.0.0.0/24"},
+        ).result()
 
-        vm_creation_payload = {
-            "location": location,
-            "properties": {
-                "hardwareProfile": {
-                    "vmSize": vm_size
-                },
-                "storageProfile": {
-                    "imageReference": {
-                        "publisher": publisher,
-                        "offer": offer,
-                        "sku": sku,
-                        "version": version
-                    },
-                    "osDisk": {
-                        "createOption": os_disk_create_option
+        # Step 3: Create Public IP Address
+        public_ip = network_client.public_ip_addresses.begin_create_or_update(
+            resource_group_name,
+            public_ip_name,
+            {
+                "location": location,
+                "sku": {"name": "Basic"},
+                "public_ip_allocation_method": "Dynamic",
+            },
+        ).result()
+
+        # Step 4: Create Network Interface
+        nic = network_client.network_interfaces.begin_create_or_update(
+            resource_group_name,
+            nic_name,
+            {
+                "location": location,
+                "ip_configurations": [
+                    {
+                        "name": "default",
+                        "subnet": {"id": subnet.id},
+                        "public_ip_address": {"id": public_ip.id},
                     }
-                },
-                "osProfile": {
-                    "computerName": vm_name,
-                    "adminUsername": admin_username,
-                    "adminPassword": admin_password
-                },
-                "networkProfile": {
-                    "networkInterfaces": [{
-                        "id": nic_id
-                    }]
-                }
-            }
+                ],
+            },
+        ).result()
+
+        # Step 5: Create Virtual Machine
+        vm_parameters = {
+            "location": location,
+            "hardware_profile": {"vm_size": vm_size},
+            "storage_profile": {"image_reference": image_reference},
+            "os_profile": {
+                "computer_name": vm_name,
+                "admin_username": admin_username,
+                "admin_password": admin_password,
+            },
+            "network_profile": {
+                "network_interfaces": [{"id": nic.id, "primary": True}],
+            },
         }
 
-        # Execute the curl to create the VM
-        vm_creation_command = [
-            "curl", "-X", "PUT", vm_creation_url,
-            "-H", f"Authorization: Bearer {access_token}",
-            "-H", "Content-Type: application/json",
-            "-d", json.dumps(vm_creation_payload)
-        ]
-        create_vm_response = subprocess.run(vm_creation_command, capture_output=True, text=True)
+        vm = compute_client.virtual_machines.begin_create_or_update(
+            resource_group_name,
+            vm_name,
+            vm_parameters,
+        ).result()
 
-        if create_vm_response.returncode == 0:
-            print(f"VM creation response: {create_vm_response.stdout}")
-        else:
-            print(f"Failed to create VM: {create_vm_response.stderr}")
+        print(f"Virtual Machine '{vm_name}' created successfully.")
 
-    def stop_vm(self, virtual_machine) -> None:
-        """Stops the virtual machine on Azure."""
-        print(f"Stopping VM for Azure account {self._account_name}...")
+    def stop_vm(self, resource_group_name, vm_name):
+        """
+        Stops a VM in Azure.
 
-    def delete_vm(self, virtual_machine) -> None:
-        """Deletes the virtual machine on Azure."""
-        print(f"Deleting VM for Azure account {self._account_name}...")
+        :param resource_group_name: Name of the resource group containing the VM.
+        :param vm_name: Name of the VM to stop.
+        """
+        try:
+            print(f"Stopping VM '{vm_name}' in resource group '{resource_group_name}'...")
+            operation = self.compute_client.virtual_machines.begin_power_off(resource_group_name, vm_name)
+            operation.result()  # Wait for completion
+            print(f"VM '{vm_name}' has been stopped successfully.")
+        except Exception as e:
+            print(f"Failed to stop VM '{vm_name}': {e}")
+
+
+    def delete_vm(self, resource_group_name, vm_name) -> None:
+        """
+        Deletes a VM from Azure.
+
+        :param resource_group_name: Name of the resource group containing the VM.
+        :param vm_name: Name of the VM to delete.
+        """
+        try:
+            print(f"Deleting VM '{vm_name}' in resource group '{resource_group_name}'...")
+            operation = self.compute_client.virtual_machines.begin_delete(resource_group_name, vm_name)
+            operation.result()  # Wait for completion
+            print(f"VM '{vm_name}' has been deleted successfully.")
+        except Exception as e:
+            print(f"Failed to delete VM '{vm_name}': {e}")
 
     def configure_vm(self, virtual_machine) -> None:
         """Configures the virtual machine as per the Azure specifics."""

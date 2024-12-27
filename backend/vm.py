@@ -41,27 +41,6 @@ class Provider(ABC):
         """Returns a list of provider-related information."""
         pass
 
-    @abstractmethod
-    def create_vm(self) -> None:
-        """Creates or starts a virtual machine."""
-        pass
-
-    @abstractmethod
-    def stop_vm(self, virtual_machine) -> None:
-        """Stops the virtual machine if it exists."""
-        pass
-
-    @abstractmethod
-    def delete_vm(self, virtual_machine) -> None:
-        """Deletes the virtual machine if it exists."""
-        pass
-
-    @abstractmethod
-    def connection_is_alive(self) -> str:
-        """Returns if the connection to the provider is still alive"""
-
-        pass
-
     def get_connection_date(self) -> date:
         """Get the connection date."""
         return self._connection_date
@@ -81,7 +60,7 @@ class VirtualMachine:
                  cost_limit: int, public_ip: str, first_connection_date: date, root_username: str, password: str, zerotier_network: str, ssh_key:str):
         self._vm_name = vm_name
         from backend import Database
-        if (provider == None):
+        if provider == None:
             self._provider = Database.no_provider
         else:
             self._provider = provider

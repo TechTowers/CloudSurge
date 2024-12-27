@@ -32,16 +32,34 @@ def get_cloudsurge_script():
 
 if __name__ == "__main__":
     provider = Azure("Sussybaka12321",date.today(),"39b171f0-e5a8-4caa-b47a-30b8436b2fcc","sus","baa","kaa")
-    provider.create_vm()
+    provider.create_vm(
+         subscription_id="39b171f0-e5a8-4caa-b47a-30b8436b2fcc",
+         resource_group_name="test-rg",
+         location="eastus",
+         vm_name="test-vm",
+         vm_size="Standard_B1s",
+         admin_username="azureuser",
+         admin_password="Password1234!",
+         image_reference={
+             "publisher": "Canonical",
+             "offer": "UbuntuServer",
+             "sku": "18.04-LTS",
+             "version": "latest",
+         },
+         network_vnet_name="test-vnet",
+         network_subnet_name="test-subnet",
+         public_ip_name="test-public-ip",
+         nic_name="test-nic",
+     )
     #print(provider.check_subscription())
 
     ###
     #vm = VirtualMachine("test-vm-2", provider, True, True, 100, "192.168.0.101", date.today(), "root", "sus123!", "123456","")
-    vm2 = VirtualMachine("test vm no provider", None, True, True, 100, "192.169.10.1", date.today(), "username", "dogdogdogdog123!", "12132","")
+    #vm2 = VirtualMachine("test vm no provider", None, True, True, 100, "192.169.10.1", date.today(), "username", "dogdogdogdog123!", "12132","")
 
 
-    db = Database()
-    db.init()
+    #db = Database()
+    #db.init()
 
     #db.insert_provider(provider)
     #db.insert_vm(vm)
@@ -52,8 +70,8 @@ if __name__ == "__main__":
     #for d in db.read_vm(providers):
     #    print (str(d))
 
-    vm_cs = VirtualMachine("CloudSurge VM", None, True, True, 100, "50.85.216.201", date.today(), "azureuser", "", "e3918db483871f02", "~/.ssh/test_key.pem")
-    vm_cs.install_vm()
+    #vm_cs = VirtualMachine("CloudSurge VM", None, True, True, 100, "50.85.216.201", date.today(), "azureuser", "", "e3918db483871f02", "~/.ssh/test_key.pem")
+    #vm_cs.install_vm()
 
-    print(vm2.is_reachable())
-    db.close()
+    #print(vm2.is_reachable())
+    #db.close()
