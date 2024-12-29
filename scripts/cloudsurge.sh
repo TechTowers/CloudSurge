@@ -223,6 +223,13 @@ if [[ $INSTALL -eq 1 ]]; then
     runs "systemctl enable --now zerotier-one.service"
   fi
 
+  echo "${BOLD}${GREEN}Downloading CloudSurge SystemdD service...${RESET}"
+  run "curl -s https://raw.githubusercontent.com/TechTowers/CloudSurge/refs/heads/feat/systemd-services/services/cloudsurge.service > cloudsurge.service"
+  runs "mv cloudsurge.service /etc/systemd/system/cloudsurge.service"
+  echo "${BOLD}${GREEN}Starting CloudSurge SystemdD service...${RESET}"
+  runs "systemctl enable --now cloudsurge.service" &&
+    echo "${BOLD}${GREEN}Started CloudSurge SystemdD service${RESET}"
+
   run "mkdir CloudSurge/ 2> /dev/null"
   run "touch CloudSurge/.installed"
 
