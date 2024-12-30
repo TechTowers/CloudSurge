@@ -50,6 +50,10 @@ runs() {
   return $ECODE
 }
 
+run_cs() {
+  runs "su cloudsurge -c '$1'"
+}
+
 apt() {
   runs "DEBIAN_FRONTEND=noninteractive apt $1 -y"
 }
@@ -68,16 +72,16 @@ install_gns3() {
       return 0
     else
       echo "${BOLD}${RED}Version mismatch between Client and Server! Installing the right version...${RESET}"
-      run "pipx install gns3-server==$GNS3_VERSION --force" &&
+      run_cs "pipx install gns3-server==$GNS3_VERSION --force" &&
         echo "${BOLD}${GREEN}Installed gns3server${RESET}"
     fi
   elif [[ -n $GNS3_VERSION && -z $GNS3_SERVER_VERSION ]]; then
     echo "${BOLD}${GREEN}Installing gns3server matching your local gns3 installation...${RESET}"
-    run "pipx install gns3-server==$GNS3_VERSION --force" &&
+    run_cs "pipx install gns3-server==$GNS3_VERSION --force" &&
       echo "${BOLD}${GREEN}Installed gns3server $GNS3_SERVER_VERSION${RESET}"
   else
     echo "${BOLD}${GREEN}Installing gns3server...${RESET}"
-    run "pipx install gns3-server --force" &&
+    run_cs "pipx install gns3-server --force" &&
       echo "${BOLD}${GREEN}Installed gns3server${RESET}"
   fi
 }
@@ -186,13 +190,16 @@ if [[ $INSTALL -eq 1 ]]; then
 
   update
 
+  runs "groupadd cloudsurge"
+  runs "useradd -c 'CloudSurge' -d /home/cloudsurge -m -s /bin/bash -g cloudsurge cloudsurge"
+
   if ! run "command -v pipx &> /dev/null"; then
     echo "${BOLD}${YELLOW}pipx was not found${RESET}"
     echo "${BOLD}${YELLOW}Installing pipx...${RESET}"
     sleep 1
     apt "install pipx" &&
       echo "${BOLD}${GREEN}pipx installed successfully${RESET}"
-    run "pipx ensurepath" &&
+    run_cs "pipx ensurepath" &&
       echo "${BOLD}${GREEN}Added paths...${RESET}"
   fi
 
@@ -215,6 +222,13 @@ if [[ $INSTALL -eq 1 ]]; then
       echo "${BOLD}${GREEN}ZeroTier installed successfully${RESET}"
     runs "systemctl enable --now zerotier-one.service"
   fi
+
+  echo "${BOLD}${GREEN}Downloading CloudSurge SystemdD service...${RESET}"
+  run "curl -s https://raw.githubusercontent.com/TechTowers/CloudSurge/refs/heads/feat/systemd-services/services/cloudsurge.service > cloudsurge.service"
+  runs "mv cloudsurge.service /etc/systemd/system/cloudsurge.service"
+  echo "${BOLD}${GREEN}Starting CloudSurge SystemdD service...${RESET}"
+  runs "systemctl enable --now cloudsurge.service" &&
+    echo "${BOLD}${GREEN}Started CloudSurge SystemdD service${RESET}"
 
   run "mkdir CloudSurge/ 2> /dev/null"
   run "touch CloudSurge/.installed"

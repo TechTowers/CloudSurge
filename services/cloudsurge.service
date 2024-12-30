@@ -1,0 +1,20 @@
+[Unit]
+Description=GNS3 Server
+Wants=network.target
+After=network.target
+
+[Service]
+Restart=always
+RestartSec=5s
+
+SuccessExitStatus=0
+NoNewPrivileges=true
+PrivateTmp=true
+
+User=cloudsurge
+Group=cloudsurge
+WorkingDirectory=/home/cloudsurge
+ExecStart=/home/cloudsurge/.local/bin/gns3server
+
+[Install]
+WantedBy=multi-user.target
