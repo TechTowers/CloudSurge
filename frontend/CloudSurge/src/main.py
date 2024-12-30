@@ -29,6 +29,9 @@ from .window import CloudsurgeWindow
 
 class CloudsurgeApplication(Adw.Application):
     """The main application singleton class."""
+    main_window: CloudsurgeWindow
+    main_listbox: Gtk.ListBox
+    providers: list[Adw.ActionRow] = []
 
     def __init__(self):
         super().__init__(application_id='org.gnome.Example',
@@ -36,6 +39,7 @@ class CloudsurgeApplication(Adw.Application):
         self.create_action('quit', lambda *_: self.quit(), ['<primary>q'])
         self.create_action('about', self.on_about_action)
         self.create_action('preferences', self.on_preferences_action)
+        self.create_action('add_provider', self.add_provider)
 
     def do_activate(self):
         """Called when the application is activated.
@@ -46,6 +50,8 @@ class CloudsurgeApplication(Adw.Application):
         win = self.props.active_window
         if not win:
             win = CloudsurgeWindow(application=self)
+            self.main_listbox = win.get_content().get_content().get_first_child()
+            print(self.main_listbox.get_row_at_index(0))
         win.present()
 
     def on_about_action(self, *args):
@@ -78,6 +84,19 @@ class CloudsurgeApplication(Adw.Application):
         self.add_action(action)
         if shortcuts:
             self.set_accels_for_action(f"app.{name}", shortcuts)
+
+    def test(self, button, huh):
+        print(button.get_name())
+
+    def show_providers(self):
+        print(providers)
+
+    def add_provider(self, name: str, _):
+        row = Adw.ActionRow()
+        row.set_title("Azure")
+        self.providers.append(row)
+        self.main_listbox.append(row)
+        print(self.main_listbox)
 
 
 def main(version):

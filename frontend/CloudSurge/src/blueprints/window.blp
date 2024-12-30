@@ -14,8 +14,10 @@ template CloudsurgeWindow : Adw.ApplicationWindow {
         ToggleButton providers {
           tooltip-text: _("go to Providers");
           label: "Providers";
+          action-name: "app.test";
         }
         ToggleButton machines {
+          active: true;
           tooltip-text: _("go to Machines");
           label: "Machines";
         }
@@ -24,13 +26,12 @@ template CloudsurgeWindow : Adw.ApplicationWindow {
       Button btn_add {
         tooltip-text: _("Add VM");
         icon-name: "list-add-symbolic";
+        action-name: "app.add_provider";
       }
     }
     content: Box {
       orientation: vertical;
       ListBox mainbox {
-        //orientation: vertical;
-        //spacing: 12;
         selection-mode: none;
         css-classes: ["boxed-list"];
       
