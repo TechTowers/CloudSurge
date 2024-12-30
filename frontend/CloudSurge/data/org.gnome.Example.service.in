@@ -1,0 +1,3 @@
+[D-BUS Service]
+Name=org.gnome.Example
+Exec=@bindir@/cloudsurge --gapplication-service

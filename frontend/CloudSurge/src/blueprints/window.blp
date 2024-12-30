@@ -1,0 +1,52 @@
+using Gtk 4.0;
+using Adw 1;
+
+template CloudsurgeWindow : Adw.ApplicationWindow {
+  default-width: 600;
+  default-height: 400;
+  title: _("CloudSurge");
+
+  Adw.ToolbarView {
+    [top]
+    Adw.HeaderBar {
+      title-widget: Box {
+        spacing: 6;
+        ToggleButton providers {
+          tooltip-text: _("go to Providers");
+          label: "Providers";
+        }
+        ToggleButton machines {
+          tooltip-text: _("go to Machines");
+          label: "Machines";
+        }
+      };
+      [start]
+      Button btn_add {
+        tooltip-text: _("Add VM");
+        icon-name: "list-add-symbolic";
+      }
+    }
+    content: Box {
+      orientation: vertical;
+      ListBox mainbox {
+        //orientation: vertical;
+        //spacing: 12;
+        selection-mode: none;
+        css-classes: ["boxed-list"];
+      
+        Adw.ActionRow vm1 {
+          title: "VM1";
+          subtitle: "10.0.0.1";
+        }
+        Adw.ActionRow vm2 {
+          title: "VM2";
+          subtitle: "10.0.0.2";
+        }
+        Adw.ActionRow vm3 {
+          title: "VM3";
+          subtitle: "10.0.0.3";
+        }
+      }
+    };
+  }
+}
