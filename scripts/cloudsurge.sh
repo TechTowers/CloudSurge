@@ -82,7 +82,6 @@ install_gns3() {
   install_tool "git"
   install_tool "make"
   install_tool "gcc"
-
   run "rm -rf ./CloudSurge/vpcs"
   run "git clone https://github.com/GNS3/vpcs ./CloudSurge/vpcs"
   run "cd ./CloudSurge/vpcs/src && bash mk.sh"
@@ -90,11 +89,17 @@ install_gns3() {
 
   apt "install libcap-dev"
   apt "install libpcap0.8-dev"
-
   run "rm -rf ./CloudSurge/ubridge"
   run "git clone https://github.com/GNS3/ubridge ./CloudSurge/ubridge"
   run "cd ./CloudSurge/ubridge && make"
   run "cd ./CloudSurge/ubridge && echo $SERVER_PASSWORD | sudo -S make install"
+
+  install_tool "cmake"
+  apt "install libelf-dev"
+  run "git clone https://github.com/GNS3/dynamips ./CloudSurge/dynamips"
+  run "mkdir ./CloudSurge/dynamips/build"
+  run "cd ./CloudSurge/dynamips/build && cmake .."
+  run "cd ./CloudSurge/dynamips/build && echo $SERVER_PASSWORD | sudo -S make install"
 
   if [[ -n $GNS3_VERSION && -n $GNS3_SERVER_VERSION ]]; then
     if [[ "$GNS3_VERSION" == "$GNS3_SERVER_VERSION" ]]; then
