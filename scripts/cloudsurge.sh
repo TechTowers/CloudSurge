@@ -58,6 +58,16 @@ apt() {
   runs "DEBIAN_FRONTEND=noninteractive apt $1 -y"
 }
 
+install_tool() {
+  if ! run "command -v $1 &> /dev/null"; then
+    echo "${BOLD}${YELLOW}$1 was not found${RESET}"
+    echo "${BOLD}${YELLOW}Installing $1...${RESET}"
+    sleep 1
+    apt "install $1" &&
+      echo "${BOLD}${GREEN}$1 installed successfully${RESET}"
+  fi
+}
+
 install_gns3() {
   if command -v gns3 &>/dev/null; then
     GNS3_VERSION=$(gns3 --version)
@@ -193,26 +203,14 @@ if [[ $INSTALL -eq 1 ]]; then
   runs "groupadd cloudsurge"
   runs "useradd -c 'CloudSurge' -d /home/cloudsurge -m -s /bin/bash -g cloudsurge cloudsurge"
 
-  if ! run "command -v pipx &> /dev/null"; then
-    echo "${BOLD}${YELLOW}pipx was not found${RESET}"
-    echo "${BOLD}${YELLOW}Installing pipx...${RESET}"
-    sleep 1
-    apt "install pipx" &&
-      echo "${BOLD}${GREEN}pipx installed successfully${RESET}"
-    run_cs "pipx ensurepath" &&
-      echo "${BOLD}${GREEN}Added paths...${RESET}"
-  fi
+  install_tool "pipx"
+  run_cs "pipx ensurepath" &&
+    echo "${BOLD}${GREEN}Added paths...${RESET}"
 
   install_gns3
 
   if ! runs "command -v zerotier-cli &> /dev/null"; then
-    if ! run "command -v curl &> /dev/null"; then
-      echo "${BOLD}${YELLOW}curl was not found${RESET}"
-      echo "${BOLD}${YELLOW}Installing curl...${RESET}"
-      sleep 1
-      apt "install curl" &&
-        echo "${BOLD}${GREEN}curl installed successfully${RESET}"
-    fi
+    install_tool "curl"
 
     run "curl -s https://install.zerotier.com > /tmp/zerotier.sh"
     echo "${BOLD}${YELLOW}ZeroTier was not found${RESET}"
