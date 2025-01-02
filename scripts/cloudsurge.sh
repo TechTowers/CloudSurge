@@ -101,6 +101,8 @@ install_gns3() {
   run "cd ./CloudSurge/dynamips/build && cmake .."
   run "cd ./CloudSurge/dynamips/build && echo $SERVER_PASSWORD | sudo -S make install"
 
+  runs "usermod -aG kvm cloudsurge"
+
   if [[ -n $GNS3_VERSION && -n $GNS3_SERVER_VERSION ]]; then
     if [[ "$GNS3_VERSION" == "$GNS3_SERVER_VERSION" ]]; then
       return 0
