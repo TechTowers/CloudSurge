@@ -5,6 +5,7 @@ import requests
 
 from backend.azure_provider import Azure
 from backend.db import Database
+from backend.digitalocean_provider import DigitalOcean
 from backend.no_provider import NoProvider
 from backend.vm import Provider
 from backend.vm import VirtualMachine
@@ -32,4 +33,43 @@ def get_cloudsurge_script():
 
 
 if __name__ == "__main__":
-    pass
+    print("Starting Test")
+    db = Database()
+    db.init()
+
+    providers = db.read_provider()
+    print("SUS: " + str(providers))
+    if len(providers) != 0:
+
+        print("Detected Providers:")
+        vm = db.read_vm(providers)[0]
+        print(str(vm))
+        vm.get_provider().delete_vm(vm)
+    else:
+        pass
+        provider_connection = DigitalOcean("t31@gmail.com", date.today(), "Sussybaka123")
+
+
+        print(provider_connection.connection_is_alive())
+
+        ssh_key_ids = ["irgendwasmit: dazwischen"]  # Assuming you have SSH keys registered
+
+        # Parameters for creating the VM
+        location = 'nyc3'
+        vm_name = 'test-vm'
+        vm_size = 's-1vcpu-1gb'
+        admin_username = 'admin'
+        admin_password = 'password'
+        image_reference = 'ubuntu-20-04-x64'  # You can replace this with an actual image name/slug
+        zerotier_network = '12345'  # Optional field, if required
+        ssh_key_path = '/path/to/your/ssh/key'
+
+        # Create the VM
+        vm = provider_connection.create_vm(
+            location, vm_name, vm_size, admin_username, admin_password,
+            image_reference, ssh_key_ids, zerotier_network, ssh_key_path
+        )
+
+        db.insert_provider(provider_connection)
+        db.insert_vm(vm)
+        pass

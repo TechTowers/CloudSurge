@@ -60,7 +60,7 @@ class Database:
 
     def read_provider(self):
         """Reads and returns all provider information from the database."""
-        from backend import Azure
+        from backend import Azure, DigitalOcean
         try:
             self.cursor.execute("SELECT * FROM provider")
             rows = self.cursor.fetchall()
@@ -78,6 +78,8 @@ class Database:
                     providers.append(Azure.from_provider_info(provider['account_name'], provider['connection_date'], provider['provider_info']))
                 elif provider_name == 'No-Provider':
                     providers.append(NoProvider.from_provider_info(provider['account_name'], provider['connection_date'], provider['provider_info']))
+                elif provider_name == 'DigitalOcean':
+                    providers.append(DigitalOcean.from_provider_info(provider['account_name'], provider['connection_date'], provider['provider_info']))
 
             return providers
         except sqlite3.Error as e:

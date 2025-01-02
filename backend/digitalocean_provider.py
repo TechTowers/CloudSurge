@@ -1,20 +1,23 @@
-import pydo
+import time
+import digitalocean
 from datetime import date
 from vm import VirtualMachine, Provider
 
-#author: Luka Pacar
+# author: Luka Pacar
 class DigitalOcean(Provider):
     """DigitalOcean cloud provider implementation."""
 
     def __init__(self, account_name: str, connection_date: date, token: str):
         super().__init__(account_name, connection_date)
+        self.provider_info_string = self.get_provider_name() + self.starting_character + f"{token}"
         self.token = token
-        self.client = pydo.Client(self.token)  # Initialize the PyDo Client with the token
+        self.client = digitalocean.Manager(token=self.token)  # Initialize the PyDo Client with the token
         self.provider_info_string = self.get_provider_name() + self.starting_character + f"{self.token}"
 
     @staticmethod
     def from_provider_info(account_name: str, connection_date: date, provider_info: str):
         """Creates a Provider object from the provider information."""
+        provider_info = provider_info.split(Provider.starting_character)[1]
         return DigitalOcean(account_name, connection_date, provider_info)
 
     def get_provider_name(self) -> str:
@@ -28,8 +31,7 @@ class DigitalOcean(Provider):
     def connection_is_alive(self) -> bool:
         """Verifies if the DigitalOcean authentication works."""
         try:
-            # Instead of using account_info(), check droplets directly to verify access
-            droplets = self.client.droplets.list()  # List all droplets to check authentication
+            droplets = self.client.get_all_droplets()  # Correct way to list all droplets
             if droplets:
                 print("Authenticated successfully. Found droplets.")
                 return True
@@ -50,7 +52,9 @@ class DigitalOcean(Provider):
             image_reference: str,
             ssh_key_ids: list,
             zerotier_network: str = "",
-            ssh_key_path: str = ""
+            ssh_key_path: str = "",
+            max_retries: int = 10,  # Maximum retries for load
+            retry_interval: int = 10  # Time in seconds between each retry
     ):
         """Creates a Droplet (VM) on DigitalOcean.
 
@@ -64,44 +68,68 @@ class DigitalOcean(Provider):
             ssh_key_ids (list): List of SSH key IDs.
             zerotier_network (str): ZeroTier network ID.
             ssh_key_path (str): Path to the SSH key file.
+            max_retries (int): Maximum retries for load (until the VM gets an IP).
+            retry_interval (int): Time in seconds between each Public-IP-Test-Retry.
         """
         try:
-            # Creating droplet on DigitalOcean using the PyDo client
-            droplet = self.client.droplets.create(
-                name=vm_name,
-                region=location,
-                size=vm_size,
-                image=image_reference,
-                ssh_keys=ssh_key_ids
-            )
-            print(f"VM '{vm_name}' is being created.")
+            req = {
+                "token": self.token,
+                "name": vm_name,
+                "region": location,
+                "size": vm_size,
+                "image": image_reference,
+                "ssh_keys": ssh_key_ids,
+                "backups": False,
+                "ipv6": False,
+                "monitoring": False,
+            }
 
-            # Retrieve droplet information to access its IP and other info
-            droplet = self.client.droplets.get(droplet['id'])
+            # Ensure the token is set
+            if not self.token:
+                print("API token is missing.")
+                return None
 
-            # Check public IP address from the droplet information (waiting for network info)
-            ip_address = None
-            if 'networks' in droplet:
-                for network in droplet['networks']['v4']:
-                    if network.get('type') == 'public':
-                        ip_address = network['ip_address']
+            # Create the droplet and return the response
+            droplet = digitalocean.Droplet(**req)
+            print(f"VM '{vm_name}' is being created...")
+
+            # Initiate VM creation
+            droplet.create()
+
+            # Retry mechanism to wait until the droplet is fully created and has an IP address
+            retries = 0
+            while retries < max_retries:
+                try:
+                    droplet.load()  # Try to load droplet details
+                    if droplet.ip_address:
+                        print(f'Droplet IP: {droplet.ip_address}')
                         break
+                    else:
+                        print("Droplet IP not available yet...")
+                except Exception as e:
+                    print(f"Error loading droplet: {e}")
 
-            # Return the VirtualMachine object
+                retries += 1
+                time.sleep(retry_interval)  # Wait before retrying
+
+            if retries == max_retries:
+                print(f"Failed to load droplet after {max_retries} retries.")
+
+            # Return the VirtualMachine object after creation
             return VirtualMachine(
                 vm_name,
                 self,
                 True,
                 False,
-                1000000,
-                ip_address or "Pending",
+                1000000,  # Approximate cost, you can adjust this based on your pricing
+                droplet.ip_address or "Pending",
                 date.today(),
                 admin_username,
                 admin_password,
                 zerotier_network,
                 ssh_key_path
             )
-        except Exception as e:
+        except Exception as e:  # General exception to catch all errors
             print(f"Failed to create VM '{vm_name}': {e}")
             return None
 
@@ -109,7 +137,7 @@ class DigitalOcean(Provider):
         """Stops (powers off) a VM on DigitalOcean."""
         try:
             droplet = self._get_droplet(vm)
-            self.client.droplets.power_off(droplet['id'])
+            droplet.power_off()
             vm.set_is_active(False)
             print(f"VM '{vm.get_vm_name()}' has been powered off.")
         except Exception as e:
@@ -119,7 +147,7 @@ class DigitalOcean(Provider):
         """Starts (powers on) a VM on DigitalOcean."""
         try:
             droplet = self._get_droplet(vm)
-            self.client.droplets.power_on(droplet['id'])
+            droplet.power_on()
             vm.set_is_active(True)
             print(f"VM '{vm.get_vm_name()}' has been powered on.")
         except Exception as e:
@@ -129,15 +157,15 @@ class DigitalOcean(Provider):
         """Deletes a VM on DigitalOcean."""
         try:
             droplet = self._get_droplet(vm)
-            self.client.droplets.delete(droplet['id'])
+            droplet.destroy()
             print(f"VM '{vm.get_vm_name()}' has been deleted.")
         except Exception as e:
             print(f"Failed to delete VM '{vm.get_vm_name()}': {e}")
 
     def _get_droplet(self, vm: VirtualMachine):
         """Finds and returns the droplet information."""
-        droplets = self.client.droplets.list()
+        droplets = self.client.get_all_droplets()
         for droplet in droplets:
-            if droplet['name'] == vm.get_vm_name():
+            if droplet.name == vm.get_vm_name():
                 return droplet
         raise ValueError(f"Droplet '{vm.get_vm_name()}' not found.")
