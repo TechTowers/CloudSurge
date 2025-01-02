@@ -69,6 +69,8 @@ install_tool() {
 }
 
 install_gns3() {
+  echo "${BOLD}${GREEN}Installing dependencies for GNS3${RESET}"
+  apt "install python3 python3-pip pipx qemu-kvm qemu-utils libvirt-clients libvirt-daemon-system virtinst software-properties-common ca-certificates curl gnupg2"
   if command -v gns3 &>/dev/null; then
     GNS3_VERSION=$(gns3 --version)
   fi
