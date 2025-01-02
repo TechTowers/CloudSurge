@@ -230,8 +230,8 @@ if [[ $INSTALL -eq 1 ]]; then
   runs "systemctl enable --now cloudsurge.service" &&
     echo "${BOLD}${GREEN}Started CloudSurge SystemdD service${RESET}"
 
-  run "mkdir CloudSurge/ 2> /dev/null"
-  run "touch CloudSurge/.installed"
+  run "mkdir ./CloudSurge/ 2> /dev/null"
+  run "touch ./CloudSurge/.installed"
 
 elif [[ $UPDATE -eq 1 ]]; then
   if run "[[ -e CloudSurge/.installed ]]"; then
