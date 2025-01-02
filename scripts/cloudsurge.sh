@@ -77,6 +77,15 @@ install_gns3() {
     GNS3_SERVER_VERSION=$(run "$GNS3_PATH --version")
   fi
 
+  install_tool "git"
+  install_tool "make"
+  install_tool "gcc"
+
+  run "rm -rf ./CloudSurge/vpcs"
+  run "git clone https://github.com/GNS3/vpcs ./CloudSurge/vpcs"
+  run "cd ./CloudSurge/vpcs/src && bash mk.sh"
+  runs "mv ./CloudSurge/vpcs/src/vpcs /usr/local/bin/vpcs"
+
   if [[ -n $GNS3_VERSION && -n $GNS3_SERVER_VERSION ]]; then
     if [[ "$GNS3_VERSION" == "$GNS3_SERVER_VERSION" ]]; then
       return 0
