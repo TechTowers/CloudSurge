@@ -11,6 +11,7 @@ from backend.vm import VirtualMachine
 
 
 def get_cloudsurge_script():
+    """ Retrieves the CloudSurge script from the GitHub repository and saves it to the local filesystem. """
     file_path = "~/.local/bin/cloudsurge.sh"
     url = "https://raw.githubusercontent.com/TechTowers/CloudSurge/refs/heads/development/scripts/cloudsurge.sh"
 
@@ -31,10 +32,8 @@ def get_cloudsurge_script():
 
 
 if __name__ == "__main__":
-    provider = Azure("Sussybaka12321",date.today(),"39b171f0-e5a8-4caa-b47a-30b8436b2fcc","sus","baa","kaa")
+    provider = Azure("Sussybaka12321",date.today(),"39b171f0-e5a8-4caa-b47a-30b8436b2fcc","sus","baa","kaa", "sussyresourcegroup")
     provider.create_vm(
-         subscription_id="39b171f0-e5a8-4caa-b47a-30b8436b2fcc",
-         resource_group_name="test-rg",
          location="eastus",
          vm_name="test-vm",
          vm_size="Standard_B1s",
@@ -50,6 +49,8 @@ if __name__ == "__main__":
          network_subnet_name="test-subnet",
          public_ip_name="test-public-ip",
          nic_name="test-nic",
+         zerotier_network="sussyzerotiernetwork",
+         ssh_key_path= "~/.ssh/test_key.pem"
      )
     #print(provider.check_subscription())
 

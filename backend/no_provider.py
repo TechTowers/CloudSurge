@@ -1,7 +1,7 @@
 from vm import Provider
 from datetime import date
 
-
+#author: Luka Pacar
 class NoProvider(Provider):
     """Azure cloud provider implementation."""
 
@@ -28,7 +28,7 @@ class NoProvider(Provider):
 
     def get_provider_info(self) -> str:
         """Returns information about the provider (e.g., Subscription ID)."""
-        return self.get_provider_name() + ": "
+        return self.get_provider_name() + self.starting_character + " "
 
 
     def connection_is_alive(self) -> str:

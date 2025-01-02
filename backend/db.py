@@ -1,12 +1,11 @@
 import sqlite3
 from datetime import date
-from typing import List, Protocol
 import re
 import os
 
 from backend.no_provider import NoProvider
 
-
+#author: Luka Pacar
 class Database:
     """Simulates a SQLite database and provides methods to interact with it."""
     _no_provider = NoProvider("No-Provider", date.today())
@@ -46,7 +45,7 @@ class Database:
         except Exception as e:
             print(f"Unexpected error: {e}")
 
-    def insert_provider(self, provider: 'Provider') -> None:
+    def insert_provider(self, provider) -> None:
         """Inserts a provider object into the provider table."""
         try:
             self.cursor.execute("""
@@ -61,7 +60,6 @@ class Database:
 
     def read_provider(self):
         """Reads and returns all provider information from the database."""
-        # Regex pattern to split by ':' and ',,,'
         from backend import Azure
         try:
             self.cursor.execute("SELECT * FROM provider")
@@ -116,7 +114,7 @@ class Database:
         except Exception as e:
             print(f"Unexpected error: {e}")
 
-    def insert_vm(self, vm: 'VirtualMachine') -> None:
+    def insert_vm(self, vm) -> None:
         """Inserts a virtual machine object into the virtual machine table."""
         try:
             self.cursor.execute("""
