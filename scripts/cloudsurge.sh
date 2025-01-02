@@ -224,7 +224,7 @@ if [[ $INSTALL -eq 1 ]]; then
   fi
 
   echo "${BOLD}${GREEN}Downloading CloudSurge SystemdD service...${RESET}"
-  run "curl -s https://raw.githubusercontent.com/TechTowers/CloudSurge/refs/heads/feat/systemd-services/services/cloudsurge.service > cloudsurge.service"
+  run "curl -s https://raw.githubusercontent.com/TechTowers/CloudSurge/refs/heads/development/services/cloudsurge.service > cloudsurge.service"
   runs "mv cloudsurge.service /etc/systemd/system/cloudsurge.service"
   echo "${BOLD}${GREEN}Starting CloudSurge SystemdD service...${RESET}"
   runs "systemctl enable --now cloudsurge.service" &&
