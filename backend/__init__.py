@@ -32,47 +32,4 @@ def get_cloudsurge_script():
 
 
 if __name__ == "__main__":
-    provider = Azure("Sussybaka12321",date.today(),"39b171f0-e5a8-4caa-b47a-30b8436b2fcc","sus","baa","kaa", "sussyresourcegroup")
-    provider.create_vm(
-         location="eastus",
-         vm_name="test-vm",
-         vm_size="Standard_B1s",
-         admin_username="azureuser",
-         admin_password="Password1234!",
-         image_reference={
-             "publisher": "Canonical",
-             "offer": "UbuntuServer",
-             "sku": "18.04-LTS",
-             "version": "latest",
-         },
-         network_vnet_name="test-vnet",
-         network_subnet_name="test-subnet",
-         public_ip_name="test-public-ip",
-         nic_name="test-nic",
-         zerotier_network="sussyzerotiernetwork",
-         ssh_key_path= "~/.ssh/test_key.pem"
-     )
-    #print(provider.check_subscription())
-
-    ###
-    #vm = VirtualMachine("test-vm-2", provider, True, True, 100, "192.168.0.101", date.today(), "root", "sus123!", "123456","")
-    #vm2 = VirtualMachine("test vm no provider", None, True, True, 100, "192.169.10.1", date.today(), "username", "dogdogdogdog123!", "12132","")
-
-
-    #db = Database()
-    #db.init()
-
-    #db.insert_provider(provider)
-    #db.insert_vm(vm)
-    #db.insert_vm(vm2)
-    #providers = db.read_provider()
-    #for d in providers:
-    #    print (str(d))
-    #for d in db.read_vm(providers):
-    #    print (str(d))
-
-    #vm_cs = VirtualMachine("CloudSurge VM", None, True, True, 100, "50.85.216.201", date.today(), "azureuser", "", "e3918db483871f02", "~/.ssh/test_key.pem")
-    #vm_cs.install_vm()
-
-    #print(vm2.is_reachable())
-    #db.close()
+    pass

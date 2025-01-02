@@ -48,8 +48,6 @@ class Azure(Provider):
         """Returns information about the provider (Provider, SubscriptionID, ClientID, ClientSecret, TenantID)."""
         return self.provider_info_string
 
-
-
     def connection_is_alive(self) -> bool:
         """
         Verifies if the Azure authentication works by attempting to list subscriptions.
@@ -64,7 +62,6 @@ class Azure(Provider):
         except Exception as e:
             print(f"Authentication failed: {e}")
             return False
-
 
     def create_vm(
             self,
@@ -81,6 +78,21 @@ class Azure(Provider):
             zerotier_network: str,
             ssh_key_path: str
     ):
+        """Creates a VM in Azure.
+
+          Args:
+            location (str): Location of the VM.
+            vm_name (str): Name of the VM.
+            vm_size (str): Size of the VM.
+            admin_username (str): Admin username.
+            admin_password (str): Admin password.
+            image_reference (dict): Image reference.
+            network_vnet_name (str): Virtual Network name.
+            public_ip_name (str): Public IP name.
+            nic_name (str): Network Interface name.
+            zerotier_network (str): ZeroTier network ID.
+            ssh_key_path (str): Path to the SSH key file.
+        """
 
         # Step 1: Create Resource Group
         self.resource_client.resource_groups.create_or_update(
@@ -206,4 +218,4 @@ class Azure(Provider):
             print(f"Failed to delete VM '{name}': {e}")
 
     def __str__(self):
-        return f"\n  Provider-Azure:\n  Account Name: {self._account_name}\n  Connection Date: {self._connection_date}\n  Subscription ID: {self._subscription_id}\n  Client ID: {self._client_id}\n  Client Secret: {self._client_secret}\n  Tenant ID: {self._tenant_id}"
+        return f"\n  Provider-Azure:\n  Account Name: {self._account_name}\n  Connection Date: {self._connection_date}\n Info: {self.provider_info_string}\n"
