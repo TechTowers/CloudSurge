@@ -69,6 +69,8 @@ install_tool() {
 }
 
 install_gns3() {
+  echo "${BOLD}${GREEN}Installing dependencies for GNS3${RESET}"
+  apt "install python3 python3-pip pipx qemu-kvm qemu-utils libvirt-clients libvirt-daemon-system virtinst software-properties-common ca-certificates curl gnupg2"
   if command -v gns3 &>/dev/null; then
     GNS3_VERSION=$(gns3 --version)
   fi
@@ -80,11 +82,26 @@ install_gns3() {
   install_tool "git"
   install_tool "make"
   install_tool "gcc"
-
   run "rm -rf ./CloudSurge/vpcs"
   run "git clone https://github.com/GNS3/vpcs ./CloudSurge/vpcs"
   run "cd ./CloudSurge/vpcs/src && bash mk.sh"
   runs "mv ./CloudSurge/vpcs/src/vpcs /usr/local/bin/vpcs"
+
+  apt "install libcap-dev"
+  apt "install libpcap0.8-dev"
+  run "rm -rf ./CloudSurge/ubridge"
+  run "git clone https://github.com/GNS3/ubridge ./CloudSurge/ubridge"
+  run "cd ./CloudSurge/ubridge && make"
+  run "cd ./CloudSurge/ubridge && echo $SERVER_PASSWORD | sudo -S make install"
+
+  install_tool "cmake"
+  apt "install libelf-dev"
+  run "git clone https://github.com/GNS3/dynamips ./CloudSurge/dynamips"
+  run "mkdir ./CloudSurge/dynamips/build"
+  run "cd ./CloudSurge/dynamips/build && cmake .."
+  run "cd ./CloudSurge/dynamips/build && echo $SERVER_PASSWORD | sudo -S make install"
+
+  runs "usermod -aG kvm cloudsurge"
 
   if [[ -n $GNS3_VERSION && -n $GNS3_SERVER_VERSION ]]; then
     if [[ "$GNS3_VERSION" == "$GNS3_SERVER_VERSION" ]]; then
