@@ -134,6 +134,7 @@ install_gns3() {
   install_tool "cmake"
   apt "install libelf-dev"
   success "Successfully installed dependencies for dynamips"
+  run "rm -rf ./CloudSurge/dynamips"
   success "Cloning dynamips repository..."
   sleep 1
   run "git clone https://github.com/GNS3/dynamips ./CloudSurge/dynamips" ||
