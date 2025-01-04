@@ -83,6 +83,7 @@ install_tool() {
 
 install_gns3() {
   success "Installing dependencies for GNS3..."
+  sleep 1
   apt "install python3 python3-pip pipx qemu-kvm qemu-utils libvirt-clients libvirt-daemon-system virtinst software-properties-common ca-certificates curl gnupg2" ||
     fail "Installing dependencies for GNS3 failed!"
   if command -v gns3 &>/dev/null; then
@@ -99,12 +100,15 @@ install_gns3() {
   install_tool "gcc"
   run "rm -rf ./CloudSurge/vpcs"
   success "Cloning vpcs repository..."
+  sleep 1
   run "git clone https://github.com/GNS3/vpcs ./CloudSurge/vpcs" ||
     fail "Cloning vpcs failed!"
   success "Building vpcs..."
+  sleep 1
   run "cd ./CloudSurge/vpcs/src && bash mk.sh" ||
     fail "Building vpcs failed!"
   success "Installing vpcs..."
+  sleep 1
   runs "mv ./CloudSurge/vpcs/src/vpcs /usr/local/bin/vpcs" ||
     fail "Installing vpcs failed!"
 
@@ -114,12 +118,15 @@ install_gns3() {
   success "Successfully installed dependencies for ubridge"
   run "rm -rf ./CloudSurge/ubridge"
   success "Cloning ubridge repository..."
+  sleep 1
   run "git clone https://github.com/GNS3/ubridge ./CloudSurge/ubridge" ||
     fail "Cloning ubridge failed!"
   success "Building ubridge..."
+  sleep 1
   run "cd ./CloudSurge/ubridge && make" ||
     fail "Building ubridge failed!"
   success "Installing ubridge..."
+  sleep 1
   run "cd ./CloudSurge/ubridge && echo $SERVER_PASSWORD | sudo -S make install" ||
     fail "Installing ubridge failed!"
 
@@ -128,16 +135,21 @@ install_gns3() {
   apt "install libelf-dev"
   success "Successfully installed dependencies for dynamips"
   success "Cloning dynamips repository..."
+  sleep 1
   run "git clone https://github.com/GNS3/dynamips ./CloudSurge/dynamips" ||
     fail "Cloning dynamips failed!"
   run "mkdir ./CloudSurge/dynamips/build"
   success "Building dynamips..."
+  sleep 1
   run "cd ./CloudSurge/dynamips/build && cmake .." ||
     fail "Building dynamips failed!"
+  success "Installing dynamips..."
+  sleep 1
   run "cd ./CloudSurge/dynamips/build && echo $SERVER_PASSWORD | sudo -S make install" ||
     fail "Installing dynamips failed!"
 
   success "Adding kvm group to cloudsurge user"
+  sleep 1
   runs "usermod -aG kvm cloudsurge" ||
     fail "Successfully added kvm group to cloudsurge failed!"
 
@@ -146,15 +158,18 @@ install_gns3() {
       return 0
     else
       warning "Version mismatch between Client and Server! Installing the right version..."
+      sleep 1
       run_cs "pipx install gns3-server==$GNS3_VERSION --force" ||
         fail "Installing gns3server failed!"
     fi
   elif [[ -n $GNS3_VERSION && -z $GNS3_SERVER_VERSION ]]; then
     success "Installing gns3server matching your local gns3 installation..."
+    sleep 1
     run_cs "pipx install gns3-server==$GNS3_VERSION --force" ||
       fail "Installing gns3server failed!"
   else
     success "Installing gns3server..."
+    sleep 1
     run_cs "pipx install gns3-server --force" ||
       fail "Installing gns3server failed!"
   fi
@@ -261,6 +276,7 @@ if [[ $INSTALL -eq 1 ]]; then
   update
 
   success "Adding user and group cloudsurge..."
+  sleep 1
   runs "groupadd cloudsurge"
   runs "useradd -c 'CloudSurge' -d /home/cloudsurge -m -s /bin/bash -g cloudsurge cloudsurge"
 
@@ -281,17 +297,21 @@ if [[ $INSTALL -eq 1 ]]; then
       fail "Installing ZeroTier failed!"
 
     success "Enabling ZeroTier..."
+    sleep 1
     runs "systemctl enable --now zerotier-one.service" ||
       fail "Enabling ZeroTier failed!"
   fi
 
   success "Downloading CloudSurge SystemdD service..."
+  sleep 1
   run "curl -s https://raw.githubusercontent.com/TechTowers/CloudSurge/refs/heads/development/services/cloudsurge.service > cloudsurge.service" ||
     fail "Downloading CloudSurge service failed!"
   success "Moving cloudsurge service to correct place..."
+  sleep 1
   runs "mv cloudsurge.service /etc/systemd/system/cloudsurge.service" ||
     fail "Moving cloudsurge service failed!"
   success "Starting CloudSurge SystemdD service..."
+  sleep 1
   runs "systemctl enable --now cloudsurge.service" ||
     fail "Starting CloudSurge service failed!"
 
