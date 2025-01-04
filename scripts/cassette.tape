@@ -14,7 +14,7 @@ Set Margin 20
 Set MarginFill "#83A598"
 Set BorderRadius 15
 
-Type "./re"
+Type "./cl"
 Tab
 Enter
 Sleep 1s
@@ -28,10 +28,10 @@ Enter
 Up
 Sleep 1
 Up
-Type " -s karun@192.168.182.137 -k ~/.ssh/cs"
+Type " -s karun@192.168.182.153 -k ~/.ssh/cs -i"
 Enter
 Sleep 1
-Type junioradmin
+Type password
 Enter
 Wait
 
