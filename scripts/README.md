@@ -3,16 +3,16 @@
 Here you'll find all the essential scripts powering the magic of CloudSurge.  
 Currently, we have just one script:
 
-- 🛠️ `remote-install.sh`
+- 🛠️ `cloudsurge.sh`
 
-## 🛠️ `remote-install.sh`
+## 🛠️ `cloudsurge.sh`
 
 ### 📖 Usage
 
 📸 _Screenshot of usage:_  
-![📸 A screenshot of the usage of `remote-install.sh` script](assets/usage.png "📸 A screenshot of the usage of `remote-install.sh` script")
+![📸 A screenshot of the usage of `cloudsurge.sh`](assets/usage.png "📸 A screenshot of the usage of `cloudsurge.sh`")
 
 ### 🎥 Demo
 
 ✨ _See it in action:_  
-![🎥 A demo of `remote-install.sh` script](assets/demo.gif "🎥 A demo of `remote-install.sh` script")
+![🎥 A demo of `cloudsurge.sh`](assets/demo.gif "🎥 A demo of `cloudsurge.sh`")
