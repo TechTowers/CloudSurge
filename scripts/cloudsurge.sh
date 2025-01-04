@@ -31,7 +31,7 @@ usage() {
       -c, --configure  configure the remote server
       -z, --zerotier   the zerotier network to join
 
-      -h, --help     display this help
+      -h, --help       display this help
 EOF
 }
 
