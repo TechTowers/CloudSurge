@@ -7,6 +7,7 @@ ZEROTIER_NETWORK=""
 INSTALL=0
 UPDATE=0
 CONFIGURE=0
+PASSWORDLESS=1
 KEY_FILE=""
 
 # Formatting
@@ -30,7 +31,7 @@ usage() {
       -u, --update     update everything on the server 
       -c, --configure  configure the remote server
       -z, --zerotier   the zerotier network to join
-
+      -p, --password   ask for a password
       -h, --help       display this help
 EOF
 }
@@ -193,7 +194,7 @@ if [[ -z "$@" ]]; then
   exit 1
 fi
 
-TEMP=$(getopt -o s:k:iucz:h --long server:,keyfile:,install,update,configure,zerotier:,help -n "$0" -- "$@")
+TEMP=$(getopt -o s:k:iucz:ph --long server:,keyfile:,install,update,configure,zerotier:,passwordless,help -n "$0" -- "$@")
 
 if [ $? != 0 ]; then
   echo "Terminating..." >&2
@@ -235,6 +236,11 @@ while true; do
     shift 2
     continue
     ;;
+  -p | --passwordless)
+    PASSWORDLESS=0
+    shift
+    continue
+    ;;
   -h | --help)
     usage
     exit 0
@@ -257,12 +263,14 @@ if ((INSTALL + UPDATE + CONFIGURE != 1)); then
   fail "Please use only one of these flags: -i, -u, -c"
 fi
 
-read -s -p "Enter password for Server: " SERVER_PASSWORD
-echo
+if [[ $PASSWORDLESS == 0 ]]; then
+  read -s -p "Enter password for Server: " SERVER_PASSWORD
+  echo
 
-echo "Checking password..."
-if ! runs "echo" &>/dev/null; then
-  fail "Connection failed! Is the password correct?"
+  echo "Checking password..."
+  if ! runs "echo" &>/dev/null; then
+    fail "Connection failed! Is the password correct?"
+  fi
 fi
 
 if ! run "command -v apt &> /dev/null"; then
