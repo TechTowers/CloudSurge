@@ -333,8 +333,7 @@ elif [[ $UPDATE -eq 1 ]]; then
     update
     install_gns3
   else
-    echo "${BOLD}${RED}Please install with -i first.${RESET}"
-    exit 1
+    fail "Please install with -i first."
   fi
 
 elif [[ $CONFIGURE -eq 1 ]]; then
@@ -342,7 +341,7 @@ elif [[ $CONFIGURE -eq 1 ]]; then
     if [[ -z $ZEROTIER_NETWORK ]]; then
       fail "Please set a ZeroTier Network with -z/--zerotier"
     fi
-    echo "${BOLD}${GREEN}Configuring ZeroTier Network...${RESET}"
+    success "Configuring ZeroTier Network..."
     for NETWORK in $(runs "zerotier-cli listnetworks | tail +2 | cut -d ' ' -f3"); do
       echo
       warning "Leaving old ZeroTier Network $NETWORK..."
@@ -353,7 +352,6 @@ elif [[ $CONFIGURE -eq 1 ]]; then
     runs "zerotier-cli join $ZEROTIER_NETWORK > /dev/null" ||
       fail "Joining ZeroTier Network $ZEROTIER_NETWORK failed!"
   else
-    echo "${BOLD}${RED}Please install with -i first.${RESET}"
-    exit 1
+    fail "Please install with -i first."
   fi
 fi
