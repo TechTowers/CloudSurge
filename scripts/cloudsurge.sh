@@ -76,7 +76,7 @@ install_tool() {
     warning "$1 was not found"
     success "Installing $1..."
     sleep 1
-    apt "install $1" &&
+    apt "install $1" ||
       fail "Installing $1 failed!"
   fi
 }
