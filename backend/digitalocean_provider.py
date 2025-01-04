@@ -1,6 +1,8 @@
 import time
 import digitalocean
 from datetime import date
+
+from backend import Database
 from vm import VirtualMachine, Provider
 
 # author: Luka Pacar
@@ -47,7 +49,6 @@ class DigitalOcean(Provider):
             location: str,
             vm_name: str,
             vm_size: str,
-            admin_username: str,
             admin_password: str,
             image_reference: str,
             ssh_key_ids: list,
@@ -84,12 +85,11 @@ class DigitalOcean(Provider):
                 "monitoring": False,
             }
 
-            # Ensure the token is set
             if not self.token:
                 print("API token is missing.")
                 return None
 
-            # Create the droplet and return the response
+            # Create the vm
             droplet = digitalocean.Droplet(**req)
             print(f"VM '{vm_name}' is being created...")
 
@@ -100,7 +100,7 @@ class DigitalOcean(Provider):
             retries = 0
             while retries < max_retries:
                 try:
-                    droplet.load()  # Try to load droplet details
+                    droplet.load()
                     if droplet.ip_address:
                         print(f'Droplet IP: {droplet.ip_address}')
                         break
@@ -115,6 +115,7 @@ class DigitalOcean(Provider):
             if retries == max_retries:
                 print(f"Failed to load droplet after {max_retries} retries.")
 
+
             # Return the VirtualMachine object after creation
             return VirtualMachine(
                 vm_name,
@@ -124,7 +125,7 @@ class DigitalOcean(Provider):
                 1000000,  # Approximate cost, you can adjust this based on your pricing
                 droplet.ip_address or "Pending",
                 date.today(),
-                admin_username,
+                "root",
                 admin_password,
                 zerotier_network,
                 ssh_key_path
@@ -153,12 +154,14 @@ class DigitalOcean(Provider):
         except Exception as e:
             print(f"Failed to start VM '{vm.get_vm_name()}': {e}")
 
-    def delete_vm(self, vm: VirtualMachine):
+    def delete_vm(self, vm: VirtualMachine, db: Database):
         """Deletes a VM on DigitalOcean."""
         try:
             droplet = self._get_droplet(vm)
             droplet.destroy()
             print(f"VM '{vm.get_vm_name()}' has been deleted.")
+            if db:
+                db.delete_vm(vm)
         except Exception as e:
             print(f"Failed to delete VM '{vm.get_vm_name()}': {e}")
 

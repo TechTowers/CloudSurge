@@ -3,6 +3,7 @@ from azure.identity import ClientSecretCredential
 from azure.mgmt.resource import ResourceManagementClient, SubscriptionClient
 from azure.mgmt.compute import ComputeManagementClient
 from azure.mgmt.network import NetworkManagementClient
+
 from vm import VirtualMachine
 from vm import Provider
 
@@ -202,7 +203,7 @@ class Azure(Provider):
             print(f"Failed to start VM '{name}': {e}")
 
 
-    def delete_vm(self, vm: VirtualMachine) -> None:
+    def delete_vm(self, vm: VirtualMachine, db) -> None:
         """
         Deletes a VM from Azure.
 
@@ -214,6 +215,8 @@ class Azure(Provider):
             operation = self.compute_client.virtual_machines.begin_delete(self._resource_group_name, name)
             operation.result()  # Wait for completion
             print(f"VM '{name}' has been deleted successfully.")
+            if db:
+                db.delete_vm(vm)
         except Exception as e:
             print(f"Failed to delete VM '{name}': {e}")
 

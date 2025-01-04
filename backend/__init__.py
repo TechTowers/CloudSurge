@@ -1,8 +1,10 @@
 import os
+import time
 from datetime import date
 
 import requests
 
+from backend.aws_provider import AWS
 from backend.azure_provider import Azure
 from backend.db import Database
 from backend.digitalocean_provider import DigitalOcean
@@ -38,38 +40,57 @@ if __name__ == "__main__":
     db.init()
 
     providers = db.read_provider()
-    print("SUS: " + str(providers))
-    if len(providers) != 0:
 
-        print("Detected Providers:")
-        vm = db.read_vm(providers)[0]
-        print(str(vm))
-        vm.get_provider().delete_vm(vm)
+    v = db.read_vm(providers)
+
+    if len(providers) != 0:
+        print(str(providers))
+        print("DISCTINCT")
+        print(str(providers[0]))
+        vm = providers[0].create_vm(
+            location="us-east-1",
+            vm_name="test-instance",
+            vm_size="t3.micro",
+            admin_password="YourSecurePassword!",
+            image_reference="ami-079cb33ef719a7b78",
+            ssh_key_name="CloudSurge"
+        )
+        db.insert_vm(vm)
+        db.reload_provider(providers[0])
     else:
-        pass
-        provider_connection = DigitalOcean("t31@gmail.com", date.today(), "Sussybaka123")
+
+        provider_connection = AWS("@gmail.com", date.today(), "AKIJB2IT", "oINYvZ", "us-east-1")
+        #db.insert_provider(provider_connection)
 
 
         print(provider_connection.connection_is_alive())
 
-        ssh_key_ids = ["irgendwasmit: dazwischen"]  # Assuming you have SSH keys registered
+        from datetime import datetime
 
-        # Parameters for creating the VM
-        location = 'nyc3'
-        vm_name = 'test-vm'
-        vm_size = 's-1vcpu-1gb'
-        admin_username = 'admin'
-        admin_password = 'password'
-        image_reference = 'ubuntu-20-04-x64'  # You can replace this with an actual image name/slug
-        zerotier_network = '12345'  # Optional field, if required
-        ssh_key_path = '/path/to/your/ssh/key'
+        # Test parameters for VM creation
+        location = "us-east-1"  # AWS region (us-east-1, Virginia region)
+        vm_name = "test-instance"  # VM Name
+        vm_size = "t3.micro"  # Instance type (free-tier eligible)
+        admin_password = "YourSecurePassword!"  # Admin password for tagging
+        image_reference = "ami-079cb33ef719a7b78"  # Ubuntu 20.04 LTS AMI ID
+        ssh_key_name = "CloudSurge"  # Ensure this key pair already exists
 
-        # Create the VM
-        vm = provider_connection.create_vm(
-            location, vm_name, vm_size, admin_username, admin_password,
-            image_reference, ssh_key_ids, zerotier_network, ssh_key_path
+        # Call the create_vm method to create the VM
+        vm_instance = provider_connection.create_vm(
+            location=location,
+            vm_name=vm_name,
+            vm_size=vm_size,
+            admin_password=admin_password,
+            image_reference=image_reference,
+            ssh_key_name=ssh_key_name
         )
 
-        db.insert_provider(provider_connection)
-        db.insert_vm(vm)
-        pass
+        # Check and print the VM details after creation
+        if vm_instance:
+            print(f"VM '{vm_instance.get_vm_name()}' created successfully!")
+            print(f"Public IP: {vm_instance.get_public_ip()}")
+            db.insert_vm(vm_instance)
+            print("Finished")
+        else:
+            print("VM creation failed.")
+        db.reload_provider(provider_connection)

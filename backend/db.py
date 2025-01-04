@@ -3,6 +3,7 @@ from datetime import date
 import re
 import os
 
+from backend import AWS
 from backend.no_provider import NoProvider
 
 #author: Luka Pacar
@@ -58,6 +59,27 @@ class Database:
         except Exception as e:
             print(f"Unexpected error while inserting provider: {e}")
 
+    def reload_provider(self, provider) -> None:
+        """Deletes and re-inserts a provider object into the provider table."""
+        self.delete_provider(provider)
+        self.insert_provider(provider)
+
+    def delete_provider(self, provider) -> None:
+        """Deletes a provider from the provider table based on the account name."""
+        try:
+            # Execute the deletion query
+            self.cursor.execute("""
+                DELETE FROM provider
+                WHERE account_name = ?;
+            """, (provider.get_account_name(),))
+            self.connection.commit()  # Commit the transaction to the database
+            print(f"Provider with account_name '{provider.get_account_name()}' deleted successfully.")
+        except sqlite3.Error as e:
+            print(f"Error deleting provider from database: {e}")
+        except Exception as e:
+            print(f"Unexpected error while deleting provider: {e}")
+
+
     def read_provider(self):
         """Reads and returns all provider information from the database."""
         from backend import Azure, DigitalOcean
@@ -80,6 +102,8 @@ class Database:
                     providers.append(NoProvider.from_provider_info(provider['account_name'], provider['connection_date'], provider['provider_info']))
                 elif provider_name == 'DigitalOcean':
                     providers.append(DigitalOcean.from_provider_info(provider['account_name'], provider['connection_date'], provider['provider_info']))
+                elif provider_name == 'AWS':
+                    providers.append(AWS.from_provider_info(provider['account_name'], provider['connection_date'], provider['provider_info']))
 
             return providers
         except sqlite3.Error as e:
@@ -116,6 +140,11 @@ class Database:
         except Exception as e:
             print(f"Unexpected error: {e}")
 
+    def reload_vm(self, vm) -> None:
+        """Deletes and re-inserts a virtual machine object into the virtual machine table."""
+        self.delete_vm(vm)
+        self.insert_vm(vm)
+
     def insert_vm(self, vm) -> None:
         """Inserts a virtual machine object into the virtual machine table."""
         try:
@@ -131,6 +160,21 @@ class Database:
             print(f"Error inserting VM into database: {e}")
         except Exception as e:
             print(f"Unexpected error while inserting VM: {e}")
+
+    def delete_vm(self, vm) -> None:
+        """Deletes a virtual machine from the virtual machine table based on the VM name."""
+        try:
+            # Execute the deletion query
+            self.cursor.execute("""
+                DELETE FROM virtual_machine
+                WHERE vm_name = ?;
+            """, (vm.get_vm_name(),))
+            self.connection.commit()  # Commit the transaction to the database
+            print(f"Virtual machine '{vm.get_vm_name()}' deleted successfully.")
+        except sqlite3.Error as e:
+            print(f"Error deleting virtual machine from database: {e}")
+        except Exception as e:
+            print(f"Unexpected error while deleting virtual machine: {e}")
 
     def read_vm(self, available_provider_accounts):
         """Reads and returns all virtual machine information from the database."""
