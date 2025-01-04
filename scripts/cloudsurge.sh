@@ -280,6 +280,7 @@ if [[ $INSTALL -eq 1 ]]; then
   runs "groupadd cloudsurge"
   runs "useradd -c 'CloudSurge' -d /home/cloudsurge -m -s /bin/bash -g cloudsurge cloudsurge"
 
+  apt "install python3-venv"
   install_tool "pipx"
   run_cs "pipx ensurepath" ||
     fail "Adding paths failed!"
