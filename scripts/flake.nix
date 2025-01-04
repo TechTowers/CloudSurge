@@ -36,6 +36,7 @@
       pkgs.mkShell {
         packages = with pkgs; [
           vhs
+          bashInteractive
         ];
       };
   };
