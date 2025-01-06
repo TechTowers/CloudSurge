@@ -26,6 +26,7 @@ template $NewView: Adw.Window {
       Button btn_cancel {
         label: _("_Cancel");
         use-underline: true;
+        action-name: "window.close";
       }
 
       [end]
@@ -72,31 +73,31 @@ template $NewView: Adw.Window {
           Adw.PreferencesGroup {
             title: _("Type");
 
-            Adw.ActionRow application {
-              activatable-widget: check_application;
+            Adw.ActionRow provider_select {
+              activatable-widget: check_provider;
               title: _("_Provider Account");
-              subtitle: _("Optimized for productivity software. Can run apps that might need DirectX, but not guaranteed. Includes basic fonts and essential Wine components.");
+              //subtitle: _("Optimized for productivity software. Can run apps that might need DirectX, but not guaranteed. Includes basic fonts and essential Wine components.");
               //icon-name: "applications-engineering-symbolic";
               use-underline: true;
 
               [prefix]
-              CheckButton check_application {
+              CheckButton check_provider {
                 valign: center;
                 active: true;
               }
             }
 
-            Adw.ActionRow gaming {
-              activatable-widget: check_gaming;
+            Adw.ActionRow vm_select {
+              activatable-widget: check_vm;
               title: _("_VM");
-              subtitle: _("Optimized for games, game engines, and 3D apps. Includes DirectX, Vulkan, and enhanced performance settings.");
+              //subtitle: _("Optimized for games, game engines, and 3D apps. Includes DirectX, Vulkan, and enhanced performance settings.");
               //icon-name: "input-gaming-symbolic";
               use-underline: true;
 
               [prefix]
-              CheckButton check_gaming {
+              CheckButton check_vm {
                 valign: center;
-                group: check_application;
+                group: check_provider;
               }
             }
           }

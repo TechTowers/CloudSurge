@@ -24,9 +24,16 @@ from gi.repository import Gtk
 class NewView(Adw.Window):
     __gtype_name__ = 'NewView'
 
+    check_provider = Gtk.Template.Child()
+
     def __init__(self, window, **kwargs):
         super().__init__(**kwargs)
         self.app = window.app
         self.window = window
         #self.manager = window.manager
         self.is_closable = True
+
+        self.check_provider.connect("activate", self.show_provider_settings)
+
+    def show_provider_settings(self, _):
+        pass

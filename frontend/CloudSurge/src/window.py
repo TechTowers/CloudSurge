@@ -24,5 +24,8 @@ from gi.repository import Gtk
 class CloudsurgeWindow(Adw.ApplicationWindow):
     __gtype_name__ = 'CloudsurgeWindow'
 
+    providers = Gtk.Template.Child()
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.providers.set_active(True)

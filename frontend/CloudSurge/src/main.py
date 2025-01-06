@@ -41,6 +41,7 @@ class CloudsurgeApplication(Adw.Application):
         self.create_action('about', self.on_about_action)
         self.create_action('preferences', self.on_preferences_action)
         self.create_action('new', self.show_add_view)
+        self.create_action('test', self.test)
 
     def do_activate(self):
         """Called when the application is activated.
@@ -52,7 +53,6 @@ class CloudsurgeApplication(Adw.Application):
         if not win:
             win = CloudsurgeWindow(application=self)
             self.main_listbox = win.get_content().get_content().get_first_child()
-            print(self.main_listbox.get_row_at_index(0))
         win.present()
         self.main_window = win
         self.main_window.app = self
@@ -103,6 +103,7 @@ class CloudsurgeApplication(Adw.Application):
 
     def show_add_view(self, _, widget=False):
         new_window = NewView(self.main_window)
+        new_window.app = self
         new_window.present()
 
 
