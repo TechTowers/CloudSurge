@@ -25,6 +25,7 @@ gi.require_version('Adw', '1')
 
 from gi.repository import Gtk, Gio, Adw
 from .window import CloudsurgeWindow
+from .new import NewView
 
 
 class CloudsurgeApplication(Adw.Application):
@@ -39,7 +40,7 @@ class CloudsurgeApplication(Adw.Application):
         self.create_action('quit', lambda *_: self.quit(), ['<primary>q'])
         self.create_action('about', self.on_about_action)
         self.create_action('preferences', self.on_preferences_action)
-        self.create_action('add_provider', self.add_provider)
+        self.create_action('new', self.show_add_view)
 
     def do_activate(self):
         """Called when the application is activated.
@@ -53,6 +54,8 @@ class CloudsurgeApplication(Adw.Application):
             self.main_listbox = win.get_content().get_content().get_first_child()
             print(self.main_listbox.get_row_at_index(0))
         win.present()
+        self.main_window = win
+        self.main_window.app = self
 
     def on_about_action(self, *args):
         """Callback for the app.about action."""
@@ -97,6 +100,10 @@ class CloudsurgeApplication(Adw.Application):
         self.providers.append(row)
         self.main_listbox.append(row)
         print(self.main_listbox)
+
+    def show_add_view(self, _, widget=False):
+        new_window = NewView(self.main_window)
+        new_window.present()
 
 
 def main(version):
