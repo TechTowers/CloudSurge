@@ -1,10 +1,10 @@
+# author: Luka Pacar
 from abc import abstractmethod, ABC
 from datetime import date
 from ipaddress import IPv4Address
 
 import subprocess
 
-#author: Luka Pacar
 class Provider(ABC):
     """Represents a Connection with no Provider. Typically skipping the vm-creation step and using ssh"""
 

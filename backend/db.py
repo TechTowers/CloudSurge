@@ -1,3 +1,4 @@
+# author: Luka Pacar 4CN
 import sqlite3
 from datetime import date
 import re
@@ -46,7 +47,7 @@ class Database:
         except Exception as e:
             print(f"Unexpected error: {e}")
 
-    def insert_provider(self, provider) -> None:
+    def insert_provider(self, provider, print_output=True) -> None:
         """Inserts a provider object into the provider table."""
         try:
             self.cursor.execute("""
@@ -54,17 +55,19 @@ class Database:
                 VALUES (?, ?, ?);
             """, (provider.get_account_name(), provider.get_connection_date(), provider.get_provider_info()))
             self.connection.commit()
+            print(f"Provider with account_name '{provider.get_account_name()}' inserted successfully.") if print_output else None
         except sqlite3.Error as e:
             print(f"Error inserting provider into database: {e}")
         except Exception as e:
             print(f"Unexpected error while inserting provider: {e}")
 
-    def reload_provider(self, provider) -> None:
+    def reload_provider(self, provider, print_output=True) -> None:
         """Deletes and re-inserts a provider object into the provider table."""
-        self.delete_provider(provider)
-        self.insert_provider(provider)
+        self.delete_provider(provider, False)
+        self.insert_provider(provider, False)
+        print(f"Provider '{provider.get_account_name()}' reloaded successfully.") if print_output else None
 
-    def delete_provider(self, provider) -> None:
+    def delete_provider(self, provider, print_output=True) -> None:
         """Deletes a provider from the provider table based on the account name."""
         try:
             # Execute the deletion query
@@ -73,7 +76,7 @@ class Database:
                 WHERE account_name = ?;
             """, (provider.get_account_name(),))
             self.connection.commit()  # Commit the transaction to the database
-            print(f"Provider with account_name '{provider.get_account_name()}' deleted successfully.")
+            print(f"Provider with account_name '{provider.get_account_name()}' deleted successfully.") if print_output else None
         except sqlite3.Error as e:
             print(f"Error deleting provider from database: {e}")
         except Exception as e:
@@ -140,12 +143,13 @@ class Database:
         except Exception as e:
             print(f"Unexpected error: {e}")
 
-    def reload_vm(self, vm) -> None:
+    def reload_vm(self, vm, print_output=True) -> None:
         """Deletes and re-inserts a virtual machine object into the virtual machine table."""
         self.delete_vm(vm)
         self.insert_vm(vm)
+        print(f"Virtual machine '{vm.get_vm_name()}' reloaded successfully.") if print_output else None
 
-    def insert_vm(self, vm) -> None:
+    def insert_vm(self, vm, print_output=True) -> None:
         """Inserts a virtual machine object into the virtual machine table."""
         try:
             self.cursor.execute("""
@@ -156,12 +160,13 @@ class Database:
                   vm.get_is_configured(), vm.get_cost_limit(), str(vm.get_public_ip()),
                   str(vm.get_first_connection_date())))
             self.connection.commit()
+            print(f"Virtual machine '{vm.get_vm_name()}' inserted successfully.") if print_output else None
         except sqlite3.Error as e:
             print(f"Error inserting VM into database: {e}")
         except Exception as e:
             print(f"Unexpected error while inserting VM: {e}")
 
-    def delete_vm(self, vm) -> None:
+    def delete_vm(self, vm, print_output=True) -> None:
         """Deletes a virtual machine from the virtual machine table based on the VM name."""
         try:
             # Execute the deletion query
@@ -170,7 +175,7 @@ class Database:
                 WHERE vm_name = ?;
             """, (vm.get_vm_name(),))
             self.connection.commit()  # Commit the transaction to the database
-            print(f"Virtual machine '{vm.get_vm_name()}' deleted successfully.")
+            print(f"Virtual machine '{vm.get_vm_name()}' deleted successfully.") if print_output else None
         except sqlite3.Error as e:
             print(f"Error deleting virtual machine from database: {e}")
         except Exception as e:
@@ -227,13 +232,13 @@ class Database:
 
 
     # Database Ending-Methods
-    def delete_database(self):
+    def delete_database(self, print_output=True):
         """Deletes the entire database file."""
         try:
             self.close()
             if os.path.exists(self.db_file):
                 os.remove(self.db_file)
-                print("Database successfully deleted.")
+                print("Database successfully deleted.") if print_output else None
             else:
                 print(f"Database file {self.db_file} does not exist.")
         except Exception as e:

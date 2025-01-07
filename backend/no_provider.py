@@ -1,7 +1,7 @@
+# author: Luka Pacar
 from vm import Provider
 from datetime import date
 
-#author: Luka Pacar
 class NoProvider(Provider):
     """Azure cloud provider implementation."""
 

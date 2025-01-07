@@ -1,3 +1,4 @@
+# author: Luka Pacar 4CN
 from datetime import date
 from azure.identity import ClientSecretCredential
 from azure.mgmt.resource import ResourceManagementClient, SubscriptionClient
@@ -93,6 +94,7 @@ class Azure(Provider):
             nic_name (str): Network Interface name.
             zerotier_network (str): ZeroTier network ID.
             ssh_key_path (str): Path to the SSH key file.
+            network_subnet_name (str): Subnet name.
         """
 
         # Step 1: Create Resource Group
@@ -208,6 +210,7 @@ class Azure(Provider):
         Deletes a VM from Azure.
 
         :param vm: Name of the VM to delete.
+        :param db: Database object to delete the VM from.
         """
         name = vm.get_vm_name()
         try:
