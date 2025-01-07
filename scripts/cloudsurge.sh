@@ -194,12 +194,8 @@ if [[ -z $* ]]; then
   exit 1
 fi
 
-TEMP=$(getopt -o s:k:iucz:ph --long server:,keyfile:,install,update,configure,zerotier:,passwordless,help -n "$0" -- "$@")
-
-if [ $? != 0 ]; then
-  echo "Terminating..." >&2
+TEMP=$(getopt -o s:k:iucz:ph --long server:,keyfile:,install,update,configure,zerotier:,passwordless,help -n "$0" -- "$@") ||
   exit 1
-fi
 
 eval set -- "$TEMP"
 unset TEMP
