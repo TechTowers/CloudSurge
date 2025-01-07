@@ -264,7 +264,7 @@ if ((INSTALL + UPDATE + CONFIGURE != 1)); then
 fi
 
 if [[ $PASSWORDLESS == 0 ]]; then
-  read -s -p "Enter password for Server: " SERVER_PASSWORD
+  read -r -s -p "Enter password for Server: " SERVER_PASSWORD
   echo
 
   echo "Checking password..."
