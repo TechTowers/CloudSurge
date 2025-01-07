@@ -189,17 +189,13 @@ update() {
     fail "upgrading system packages failed!"
 }
 
-if [[ -z "$@" ]]; then
+if [[ -z $* ]]; then
   usage
   exit 1
 fi
 
-TEMP=$(getopt -o s:k:iucz:ph --long server:,keyfile:,install,update,configure,zerotier:,passwordless,help -n "$0" -- "$@")
-
-if [ $? != 0 ]; then
-  echo "Terminating..." >&2
+TEMP=$(getopt -o s:k:iucz:ph --long server:,keyfile:,install,update,configure,zerotier:,passwordless,help -n "$0" -- "$@") ||
   exit 1
-fi
 
 eval set -- "$TEMP"
 unset TEMP
@@ -264,7 +260,7 @@ if ((INSTALL + UPDATE + CONFIGURE != 1)); then
 fi
 
 if [[ $PASSWORDLESS == 0 ]]; then
-  read -s -p "Enter password for Server: " SERVER_PASSWORD
+  read -r -s -p "Enter password for Server: " SERVER_PASSWORD
   echo
 
   echo "Checking password..."
@@ -346,7 +342,7 @@ elif [[ $CONFIGURE -eq 1 ]]; then
       echo
       warning "Leaving old ZeroTier Network $NETWORK..."
       runs "zerotier-cli leave $NETWORK > /dev/null" ||
-        echo "${BOLD}${RED}Leaving ZeroTier Network $ZEROTIER_NETWORK failed!${RESET}"
+        warning "Leaving ZeroTier Network $ZEROTIER_NETWORK failed!"
     done
     success "Joining ZeroTier Network $ZEROTIER_NETWORK..."
     runs "zerotier-cli join $ZEROTIER_NETWORK > /dev/null" ||

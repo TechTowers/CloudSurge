@@ -49,4 +49,4 @@ chmod +x cloudsurge.sh
 ./cloudsurge.sh -h
 ```
 
-### GUI (WIP)
+### 🖱️ GUI (WIP)
