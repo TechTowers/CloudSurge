@@ -189,7 +189,7 @@ update() {
     fail "upgrading system packages failed!"
 }
 
-if [[ -z "$@" ]]; then
+if [[ -z $* ]]; then
   usage
   exit 1
 fi
