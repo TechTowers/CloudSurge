@@ -346,7 +346,7 @@ elif [[ $CONFIGURE -eq 1 ]]; then
       echo
       warning "Leaving old ZeroTier Network $NETWORK..."
       runs "zerotier-cli leave $NETWORK > /dev/null" ||
-        echo "${BOLD}${RED}Leaving ZeroTier Network $ZEROTIER_NETWORK failed!${RESET}"
+        warning "Leaving ZeroTier Network $ZEROTIER_NETWORK failed!"
     done
     success "Joining ZeroTier Network $ZEROTIER_NETWORK..."
     runs "zerotier-cli join $ZEROTIER_NETWORK > /dev/null" ||
