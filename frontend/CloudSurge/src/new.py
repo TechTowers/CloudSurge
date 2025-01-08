@@ -22,9 +22,16 @@ from gi.repository import Gtk
 
 @Gtk.Template(resource_path='/org/gnome/Example/blueprints/new.ui')
 class NewView(Adw.Window):
+    def test(self, jojo, _):
+        print(self.provider_dropdown.get_selected_item().get_string())
+
     __gtype_name__ = 'NewView'
 
     check_provider = Gtk.Template.Child()
+    check_machine = Gtk.Template.Child()
+    provider_settings = Gtk.Template.Child()
+    machine_settings = Gtk.Template.Child()
+    provider_dropdown = Gtk.Template.Child()
 
     def __init__(self, window, **kwargs):
         super().__init__(**kwargs)
@@ -34,6 +41,14 @@ class NewView(Adw.Window):
         self.is_closable = True
 
         self.check_provider.connect("activate", self.show_provider_settings)
+        self.check_machine.connect("activate", self.show_machine_settings)
+        self.provider_dropdown.connect("notify::selected-item", self.test)
 
     def show_provider_settings(self, _):
-        pass
+        self.machine_settings.hide()
+        self.provider_settings.show()
+
+    def show_machine_settings(self, _):
+        self.provider_settings.hide()
+        self.machine_settings.show()
+
