@@ -33,7 +33,7 @@ template $NewView: Adw.Window {
       Button btn_create {
         label: _("A_dd");
         use-underline: true;
-        sensitive: false;
+        //sensitive: false;
 
         styles [
           "suggested-action",
@@ -146,6 +146,12 @@ template $NewView: Adw.Window {
             Adw.EntryRow security_group_id {
               use-markup: false;
               title: _("Security Group ID");
+            }
+            Adw.EntryRow token {
+              use-markup: false;
+              title: _("Token");
+
+              visible: false;
             }
           }
 

@@ -32,6 +32,32 @@ class NewView(Adw.Window):
     provider_settings = Gtk.Template.Child()
     machine_settings = Gtk.Template.Child()
     provider_dropdown = Gtk.Template.Child()
+    btn_create = Gtk.Template.Child()
+
+    account_name = Gtk.Template.Child()
+    provider_name = Gtk.Template.Child()
+
+    account_name_string: str
+    provider_name_string: str
+
+    # Aws
+    access_key = Gtk.Template.Child()
+    secret_key = Gtk.Template.Child()
+    region = Gtk.Template.Child()
+    vpc_id = Gtk.Template.Child()
+    subnet_id = Gtk.Template.Child()
+    security_group_id = Gtk.Template.Child()
+
+    access_key_string: str
+    secret_key_string: str
+    region_string: str
+    vpc_id_string: str
+    subnet_id_string: str
+    security_group_id_string: str
+    #aws_fields = [access_key, secret_key, region, vpc_id , subnet_id, security_group_id]
+
+    # DigitalOcean
+    token = Gtk.Template.Child()
 
     def __init__(self, window, **kwargs):
         super().__init__(**kwargs)
@@ -40,9 +66,12 @@ class NewView(Adw.Window):
         #self.manager = window.manager
         self.is_closable = True
 
+        self.aws_fields = [self.provider_name, self.account_name, self.access_key, self.secret_key, self.region, self.vpc_id , self.subnet_id, self.security_group_id]
         self.check_provider.connect("activate", self.show_provider_settings)
         self.check_machine.connect("activate", self.show_machine_settings)
-        self.provider_dropdown.connect("notify::selected-item", self.test)
+        self.provider_dropdown.connect("notify::selected-item", self.change_provider)
+        self.btn_create.connect("clicked", self.submit)
+
 
     def show_provider_settings(self, _):
         self.machine_settings.hide()
@@ -52,3 +81,33 @@ class NewView(Adw.Window):
         self.provider_settings.hide()
         self.machine_settings.show()
 
+    def change_provider(self, obj, _):
+        if self.provider_dropdown.get_selected_item().get_string() == "Aws":
+            self.token.hide()
+
+            self.access_key.show()
+            self.secret_key.show()
+            self.region.show()
+            self.vpc_id.show()
+            self.subnet_id.show()
+            self.security_group_id.show()
+
+        elif self.provider_dropdown.get_selected_item().get_string() == "DigitalOcean":
+            self.access_key.hide()
+            self.secret_key.hide()
+            self.region.hide()
+            self.vpc_id.hide()
+            self.subnet_id.hide()
+            self.security_group_id.hide()
+
+            self.token.show()
+
+    def submit(self, _):
+        if self.provider_dropdown.get_selected_item().get_string() == "Aws":
+            for field in self.aws_fields:
+                if field.get_text() == "":
+                    print("empty")
+                    return
+
+        elif self.provider_dropdown.get_selected_item().get_string() == "DigitalOcean":
+            pass
