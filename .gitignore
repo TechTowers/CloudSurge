@@ -1,5 +1,6 @@
 test_env
 
-frontend/CloudSurge/subprojects/blueprint-compiler
-
 .idea
+
+frontend/CloudSurge/subprojects/blueprint-compiler
+frontend/CloudSurge/.flatpak-builder/
