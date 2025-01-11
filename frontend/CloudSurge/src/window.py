@@ -24,8 +24,29 @@ from gi.repository import Gtk
 class CloudsurgeWindow(Adw.ApplicationWindow):
     __gtype_name__ = 'CloudsurgeWindow'
 
-    providers = Gtk.Template.Child()
+    providers_button = Gtk.Template.Child()
+    machines_button = Gtk.Template.Child()
+
+    providers_list = Gtk.Template.Child()
+    machines_list = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.providers.set_active(True)
+        #self.providers_button.set_active(True)
+        
+        self.providers_button.connect("clicked", self.show_providers)
+        self.machines_button.connect("clicked", self.show_machines)
+
+    def show_providers(self, _):
+        self.machines_list.hide()
+        self.providers_list.show()
+
+        self.machines_button.set_active(False)
+        self.providers_button.set_active(True)
+
+    def show_machines(self, _):
+        self.providers_list.hide()
+        self.machines_list.show()
+
+        self.providers_button.set_active(False)
+        self.machines_button.set_active(True)

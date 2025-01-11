@@ -51,26 +51,6 @@ template $NewView: Adw.Window {
           title: _("Add Provider/Machine");
 
           Adw.PreferencesGroup {
-            Adw.EntryRow entry_name {
-              use-markup: false;
-              title: _("Name");
-
-              [suffix]
-              MenuButton menu_duplicate {
-                valign: center;
-                tooltip-text: _("Show Information");
-                icon-name: "warning-symbolic";
-                popover: popover_duplicate;
-                visible: false;
-
-                styles [
-                  "flat",
-                ]
-              }
-            }
-          }
-
-          Adw.PreferencesGroup {
             title: _("Type");
 
             Adw.ActionRow provider_select {
@@ -135,18 +115,6 @@ template $NewView: Adw.Window {
               use-markup: false;
               title: _("Region");
             }
-            Adw.EntryRow vpc_id {
-              use-markup: false;
-              title: _("Vpc ID");
-            }
-            Adw.EntryRow subnet_id {
-              use-markup: false;
-              title: _("Subnet ID");
-            }
-            Adw.EntryRow security_group_id {
-              use-markup: false;
-              title: _("Security Group ID");
-            }
             Adw.EntryRow token {
               use-markup: false;
               title: _("Token");
@@ -160,46 +128,44 @@ template $NewView: Adw.Window {
             sensitive: true;
             visible: false;
 
-            Adw.EntryRow machine_name {
+            Adw.EntryRow vm_name {
               use-markup: false;
               title: _("Name");
             }
+            Adw.ComboRow vm_provider_dropdown {
+              title: _("Provider");
+              subtitle: _("Choose provider for VM");
 
-            Adw.ComboRow {
-              title: _("Architecture");
-              subtitle: _("32-bit should only be used if strictly necessary.");
-
-              model: StringList {};
-            }
-
-            Adw.ActionRow {
-              title: _("Configuration");
-              subtitle: _("Import a custom configuration.");
-
-              Button {
-                tooltip-text: _("Reset to Default");
-                valign: center;
-                visible: false;
-                icon-name: "edit-undo-symbolic";
-
-                styles [
-                  "flat",
+              model: StringList vm_provider_choice {
+                strings [
+                  _("SSH (No provider)"),
+                  _("DigitalOcean1"),
                 ]
-              }
-
-              Button {
-                valign: center;
-
-                Box {
-                  spacing: 6;
-
-                  Image {
-                    icon-name: "document-open-symbolic";
-                  }
-
-                  Label {}
-                }
-              }
+              };
+            }
+            Adw.EntryRow provider {
+              use-markup: false;
+              title: _("Provider");
+            }
+            Adw.EntryRow cost_limit {
+              use-markup: false;
+              title: _("Cost limit $");
+            }
+            Adw.EntryRow public_ip {
+              use-markup: false;
+              title: _("Public IP");
+            }
+            Adw.EntryRow username {
+              use-markup: false;
+              title: _("Username");
+            }
+            Adw.EntryRow password {
+              use-markup: false;
+              title: _("Password");
+            }
+            Adw.EntryRow ssh_key {
+              use-markup: false;
+              title: _("SSH Key");
             }
           }
         };

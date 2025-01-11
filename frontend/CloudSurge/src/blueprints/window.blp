@@ -11,11 +11,15 @@ template $CloudsurgeWindow : Adw.ApplicationWindow {
     Adw.HeaderBar {
       title-widget: Box {
         spacing: 6;
-        ToggleButton providers {
+        ToggleButton home_button {
+          tooltip-text: _("go to Home");
+          label: "Home";
+        }
+        ToggleButton providers_button {
           tooltip-text: _("go to Providers");
           label: "Providers";
         }
-        ToggleButton machines {
+        ToggleButton machines_button {
           tooltip-text: _("go to Machines");
           label: "Machines";
         }
@@ -27,27 +31,107 @@ template $CloudsurgeWindow : Adw.ApplicationWindow {
         action-name: "app.new";
       }
     }
-    content: Box {
-      orientation: vertical;
-      ListBox mainbox {
-        //orientation: vertical;
-        //spacing: 12;
-        selection-mode: none;
-        css-classes: ["boxed-list"];
-      
-        Adw.ActionRow vm1 {
-          title: "VM1";
-          subtitle: "10.0.0.1";
+
+    content: Adw.Clamp {
+      Box main_box {
+        orientation: vertical;
+        //visible: false;
+
+        Box home_box {
+          orientation: vertical;
+          valign: center;
+          halign: center;
+
+
+          Label thank_you_label {
+            label: "Thank you for using CloudSurge";
+            margin-top: 30;
+            styles [
+              "title-1"
+            ]
+          }
+          Label zerotier_label {
+            halign: start;
+            label: "Configure your Zerotier ID:";
+            margin-top: 30;
+            styles [
+              "title-4"
+            ]
+          }
+          Box {
+            margin-top: 10;
+            Adw.EntryRow zerotier_id {
+              use-markup: false;
+              title: _("Zerotier ID");
+            }
+            Button save_zerotier_id {
+              label: "Save";
+              styles [
+                "suggested-action",
+              ]
+            }
+          }
+          Label help_label {
+            halign: start;
+            label: "Help/Documentation:";
+            margin-top: 30;
+            styles [
+              "title-4"
+            ]
+          }
+          LinkButton help_links {
+            halign: start;
+            label: "https://www.helpazure.com";
+            uri: "https://www.helpazure.com";
+            margin-top: 5;
+          }
+
         }
-        Adw.ActionRow vm2 {
-          title: "VM2";
-          subtitle: "10.0.0.2";
+
+        ListBox providers_list {
+          //orientation: vertical;
+          //spacing: 12;
+          visible: false;
+          selection-mode: none;
+          css-classes: ["boxed-list"];
+
+          Adw.ActionRow Azure1 {
+            title: "Azure1";
+            subtitle: "10.0.0.1";
+          }
+          Adw.ActionRow Azure2 {
+            title: "Azure2";
+            subtitle: "10.0.0.2";
+          }
+          Adw.ActionRow DigitalOcean1 {
+            title: "DigitalOcean1";
+            subtitle: "10.0.0.3";
+          }
         }
-        Adw.ActionRow vm3 {
-          title: "VM3";
-          subtitle: "10.0.0.3";
+
+        ListBox machines_list {
+          //orientation: vertical;
+          //spacing: 12;
+          visible: false;
+
+          selection-mode: none;
+          css-classes: ["boxed-list"];
+
+          Adw.ActionRow vm1 {
+            title: "VM1";
+            subtitle: "10.0.0.1";
+          }
+          Adw.ActionRow vm2 {
+            title: "VM2";
+            subtitle: "10.0.0.2";
+          }
+          Adw.ActionRow vm3 {
+            title: "VM3";
+            subtitle: "10.0.0.3";
+          }
         }
       }
     };
+
   }
 }
