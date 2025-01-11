@@ -4,7 +4,6 @@ from datetime import date
 import requests
 
 from backend.aws_provider import AWS
-from backend.DEPRECATED_azure_provider import Azure
 from backend.db import Database
 from backend.digitalocean_provider import DigitalOcean
 from backend.no_provider import NoProvider
@@ -36,10 +35,5 @@ if __name__ == "__main__":
     db = Database()
     db.init()
 
-    provider_connection = DigitalOcean("sussy", date.today(),  "nothing")
-    vm = provider_connection.create_vm(
-        vm_name="sussy1233333",
-        ssh_key_ids=["47:4c:06:a3:ec:7e:9f:a1:34:58:01:18:97:60:0a:ba"],
-        zerotier_network="12345",
-        ssh_key_path="C:\\Users\\you\\.ssh\\id_ed25519"
-    )
+    prov = db.read_provider()
+    vm = db.read_vm(prov)

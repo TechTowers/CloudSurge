@@ -1,7 +1,7 @@
 # author: Luka Pacar
 import time
 import digitalocean # From python-digitalocean
-from datetime import date
+from datetime import date, datetime, timedelta, timezone
 
 from backend import Database
 from vm import VirtualMachine, Provider
@@ -107,7 +107,7 @@ class DigitalOcean(Provider):
                         print(f"\033[32mSuccessfully created VM '{vm_name}'.\033[0m") if print_output else None
                         break
                     else:
-                        print(f'\033[33mDroplet IP not available yet...\033[0m') if print_output else None
+                        print(f'\033[33mVM IP not available yet...\033[0m') if print_output else None
                 except Exception as e:
                     print(f'\033[31mError loading droplet: {e}\033[0m')
 
@@ -167,6 +167,93 @@ class DigitalOcean(Provider):
                 db.delete_vm(vm)
         except Exception as e:
             print(f"Failed to delete VM '{vm.get_vm_name()}': {e}")
+
+    def get_vm_hourly_rate(self, vm: VirtualMachine, print_output=True) -> float:
+        """
+        Retrieves the hourly rate for the specified VM (Droplet).
+
+        Args:
+            vm (VirtualMachine): The virtual machine to query for hourly rate.
+            print_output (bool): Print the output.
+
+        Returns:
+            float: The hourly rate for the VM in USD.
+        """
+        try:
+            # Retrieve the droplet by name
+            droplet = self._get_droplet(vm)
+
+            # Match the droplet's size_slug with available sizes to get the hourly rate
+            size_slug = droplet.size_slug  # Example: 's-1vcpu-1gb'
+            sizes = self.client.get_all_sizes()  # Get all size options
+
+            for size in sizes:
+                if size.slug == size_slug:
+                    hourly_rate = size.price_hourly
+                    print(f"Hourly rate for VM '{vm.get_vm_name()}' ({size_slug}): ${hourly_rate:.4f} USD.") if print_output else None
+                    return hourly_rate
+
+            raise ValueError(f"Size slug '{size_slug}' not found in available sizes.")
+        except Exception as e:
+            print(f"Failed to retrieve hourly rate for VM '{vm.get_vm_name()}': {e}")
+            return 0.0
+
+    def get_vm_uptime(self, vm: VirtualMachine, print_output=True) -> timedelta:
+        """
+        Retrieves the total uptime of the specified VM (Droplet).
+
+        Args:
+            vm (VirtualMachine): The virtual machine to query for uptime.
+            print_output (bool): Print the output.
+
+        Returns:
+            str: The total uptime in a human-readable format (e.g., '2 days, 3 hours, 15 minutes').
+        """
+        try:
+            # Retrieve the droplet by name
+            droplet = self._get_droplet(vm)
+
+            # Parse the created_at timestamp
+            creation_date = datetime.strptime(droplet.created_at, '%Y-%m-%dT%H:%M:%SZ')
+            creation_date = creation_date.replace(tzinfo=timezone.utc)  # Ensure it's timezone-aware
+
+            # Calculate uptime using UTC time
+            current_time = datetime.now(timezone.utc)
+            uptime_timedelta = current_time - creation_date
+
+            print(f"Uptime for VM '{vm.get_vm_name()}': {uptime_timedelta}.") if print_output else None
+            return uptime_timedelta
+        except Exception as e:
+            print(f"Failed to retrieve uptime for VM '{vm.get_vm_name()}': {e}")
+            return timedelta(0)
+
+    def get_vm_cost(self, vm: VirtualMachine, print_output=True) -> float:
+        """
+        Retrieves the total cost incurred by the specified VM (Droplet).
+
+        Args:
+            vm (VirtualMachine): The virtual machine to query for cost.
+            print_output (bool): Print the output.
+
+        Returns:
+            float: The total cost for the VM in USD.
+        """
+        try:
+
+            # Get hourly rate
+            hourly_rate = self.get_vm_hourly_rate(vm, False)
+            if hourly_rate == 0.0:
+                raise ValueError(f"Hourly rate could not be retrieved for VM '{vm.get_vm_name()}'.")
+
+            running_hours = self.get_vm_uptime(vm, False).total_seconds() / 3600
+
+            # Calculate total cost
+            total_cost = running_hours * hourly_rate
+            print(f"VM '{vm.get_vm_name()}' has incurred a cost of ${total_cost:.2f} USD.") if print_output else None
+            return total_cost
+        except Exception as e:
+            print(f"Failed to retrieve cost for VM '{vm.get_vm_name()}': {e}")
+            return 0.0
 
     def _get_droplet(self, vm: VirtualMachine):
         """Finds and returns the droplet information."""

@@ -27,27 +27,23 @@ class NoProvider(Provider):
         return "No-Provider"
 
     def get_provider_info(self) -> str:
-        """Returns information about the provider (e.g., Subscription ID)."""
+        """Returns information about the provider (e.g., No-Provider Name)."""
         return self.get_provider_name() + self.starting_character + " "
 
 
     def connection_is_alive(self) -> str:
-        """Returns if the connection to the provider is still alive"""
+        """Does Nothing."""
         pass
 
     def create_vm(self):
         pass
 
     def stop_vm(self, virtual_machine) -> None:
-        """Stops the virtual machine on Azure."""
+        """Does Nothing."""
         pass
 
     def delete_vm(self, virtual_machine) -> None:
-        """Deletes the virtual machine on Azure."""
-        pass
-
-    def configure_vm(self, virtual_machine) -> None:
-        """Configures the virtual machine as per the Azure specifics."""
+        """Does Nothing."""
         pass
 
     def __str__(self):
