@@ -20,6 +20,7 @@
 import os
 from gi.repository import Adw
 from gi.repository import Gtk
+import backend.db
 
 @Gtk.Template(resource_path='/org/gnome/Example/blueprints/window.ui')
 class CloudsurgeWindow(Adw.ApplicationWindow):
