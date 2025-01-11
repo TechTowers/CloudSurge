@@ -4,10 +4,11 @@ from abc import abstractmethod, ABC
 from datetime import date
 from ipaddress import IPv4Address
 
-
 import subprocess
 
 import requests
+
+from backend import Database
 
 
 def get_cloudsurge_script():
@@ -29,6 +30,7 @@ def get_cloudsurge_script():
                     os.fsync(f.fileno())
     else:  # HTTP status code 4XX/5XX
         print("Download failed: status code {}\n{}".format(r.status_code, r.text))
+
 
 class Provider(ABC):
     """Represents a Connection with no Provider. Typically skipping the vm-creation step and using ssh"""
@@ -73,20 +75,44 @@ class Provider(ABC):
         """Returns the name of this account"""
         return self._account_name
 
+    @abstractmethod
     def is_active(self, vm):
         """Check if the connection is active."""
         pass
 
+    @abstractmethod
     def get_vm_cost(self, vm):
         """Get the cost of the virtual machine."""
         pass
 
+    @abstractmethod
     def get_vm_uptime(self, vm):
         """Get the uptime of the virtual machine."""
         pass
 
+    @abstractmethod
     def get_vm_hourly_rate(self, vm):
         """Get the hourly rate of the virtual machine."""
+        pass
+
+    @abstractmethod
+    def create_vm(self, *args, **kwargs):
+        """Create a virtual machine."""
+        pass
+
+    @abstractmethod
+    def stop_vm(self, virtual_machine) -> None:
+        """Stop the virtual machine."""
+        pass
+
+    @abstractmethod
+    def delete_vm(self, virtual_machine, db: Database) -> None:
+        """Delete the virtual machine."""
+        pass
+
+    @abstractmethod
+    def start_vm(self, virtual_machine) -> None:
+        """Start the virtual machine."""
         pass
 
     def __str__(self):
@@ -205,8 +231,6 @@ class VirtualMachine:
         return f"\n VirtualMachine:\n" \
                f" VM Name: {self._vm_name}\n" \
                f" Provider: {self._provider.get_provider_name()}\n" \
-               f" Active: {self._is_active}\n" \
-               f" Configured: {self._is_configured}\n" \
                f" Cost Limit: ${self._cost_limit}\n" \
                f" Public IP: {self._public_ip}\n" \
                f" First Connection Date: {self._first_connection_date}\n" \

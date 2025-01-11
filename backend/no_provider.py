@@ -30,12 +30,16 @@ class NoProvider(Provider):
         """Returns information about the provider (e.g., No-Provider Name)."""
         return self.get_provider_name() + self.starting_character + " "
 
-
     def connection_is_alive(self) -> str:
         """Does Nothing."""
         pass
 
     def create_vm(self):
+        """Does Nothing."""
+        pass
+
+    def start_vm(self, virtual_machine) -> None:
+        """Does Nothing."""
         pass
 
     def stop_vm(self, virtual_machine) -> None:
@@ -45,6 +49,22 @@ class NoProvider(Provider):
     def delete_vm(self, virtual_machine) -> None:
         """Does Nothing."""
         pass
+
+    def is_active(self, vm):
+        """Check if the connection is active."""
+        return False
+
+    def get_vm_cost(self, vm):
+        """Get the cost of the virtual machine."""
+        return 0
+
+    def get_vm_uptime(self, vm):
+        """Get the uptime of the virtual machine."""
+        return 0
+
+    def get_vm_hourly_rate(self, vm):
+        """Get the hourly rate of the virtual machine."""
+        return 0
 
     def __str__(self):
         return "\n  No-Provider"

@@ -189,9 +189,7 @@ class AWS(Provider):
             return VirtualMachine(
                 vm_name,
                 self,
-                True,
-                False,
-                -1,  # Adjust this based on AWS pricing
+                -1,
                 public_ip,
                 date.today(),
                 "ubuntu",
@@ -214,7 +212,6 @@ class AWS(Provider):
 
             # Stop the instance using the instance ID
             self.client.stop_instances(InstanceIds=[instance_id])
-            vm.set_is_active(False)
             print(f"Stopping VM '{instance_name}' (ID: {instance_id}).") if print_output else None
         except ClientError as e:
             print(f"Failed to stop VM '{instance_name}': {e}")
@@ -229,13 +226,12 @@ class AWS(Provider):
 
             # Stop the instance using the instance ID
             self.client.start_instances(InstanceIds=[instance_id])
-            vm.set_is_active(True)
             print(f"Starting VM '{instance_name}' (ID: {instance_id}).") if print_output else None
 
         except ClientError as e:
             print(f"Failed to start VM '{instance_name}': {e}")
 
-    def delete_vm(self, vm: VirtualMachine, print_output=True):
+    def delete_vm(self, vm: VirtualMachine, db, print_output=True):
         """Deletes an EC2 instance on AWS."""
         instance_name = vm.get_vm_name()
         try:
@@ -244,6 +240,8 @@ class AWS(Provider):
             # Terminate the instance
             self.client.terminate_instances(InstanceIds=[instance_id])
             print(f"VM '{instance_name}' is being terminated.") if print_output else None
+            if db:
+                db.delete_vm(vm)
         except ClientError as e:
             print(f"Failed to delete VM '{instance_name}': {e}")
 
@@ -375,7 +373,7 @@ class AWS(Provider):
                 print(f"Failed to calculate uptime for VM '{vm.get_vm_name()}': {e}")
             return None
 
-    def get_total_vm_cost(self, vm: VirtualMachine, print_output=True) -> float:
+    def get_vm_cost(self, vm: VirtualMachine, print_output=True) -> float:
         """
         Calculates the total cost of an AWS EC2 instance based on uptime and hourly rate.
 

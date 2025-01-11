@@ -15,6 +15,7 @@ def get_active_servers():
     for vm in vms:
         if is_reachable(vm):
             amount_reachable += 1
+
     print(amount_reachable)
 
 def is_reachable(vm: VirtualMachine):

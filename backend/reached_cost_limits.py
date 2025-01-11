@@ -2,7 +2,6 @@
 from backend import VirtualMachine
 from backend import Database
 
-
 def get_reached_cost_limits():
     """Prints a list of virtual machines that have reached their cost limits."""
     db = Database()

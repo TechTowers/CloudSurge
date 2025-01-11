@@ -123,8 +123,6 @@ class DigitalOcean(Provider):
             return VirtualMachine(
                 vm_name,
                 self,
-                True,
-                False,
                 -1,
                 droplet.ip_address,
                 date.today(),
@@ -142,7 +140,6 @@ class DigitalOcean(Provider):
         try:
             droplet = self._get_droplet(vm)
             droplet.power_off()
-            vm.set_is_active(False)
             print(f"VM '{vm.get_vm_name()}' has been powered off.") if print_output else None
         except Exception as e:
             print(f"Failed to stop VM '{vm.get_vm_name()}': {e}")
@@ -152,7 +149,6 @@ class DigitalOcean(Provider):
         try:
             droplet = self._get_droplet(vm)
             droplet.power_on()
-            vm.set_is_active(True)
             print(f"VM '{vm.get_vm_name()}' has been powered on.") if print_output else None
         except Exception as e:
             print(f"Failed to start VM '{vm.get_vm_name()}': {e}")
