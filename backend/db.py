@@ -127,8 +127,6 @@ class Database:
                     ssh_key TEXT,
                     zerotier_network TEXT,
                     provider_account_name TEXT,
-                    is_active BOOLEAN,
-                    is_configured BOOLEAN,
                     cost_limit INTEGER,
                     public_ip TEXT,
                     first_connection_date TEXT,
@@ -151,12 +149,9 @@ class Database:
         """Inserts a virtual machine object into the virtual machine table."""
         try:
             self.cursor.execute("""
-                INSERT INTO virtual_machine (vm_name,root_username,root_password,ssh_key,zerotier_network, provider_account_name, is_active, is_configured,
-                                              cost_limit, public_ip, first_connection_date)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-            """, (vm.get_vm_name(), vm.get_root_username(), vm.get_password(),vm.get_ssh_key(), vm.get_zerotier_network(), vm.get_provider().get_account_name(), vm.get_is_active(),
-                  vm.get_is_configured(), vm.get_cost_limit(), str(vm.get_public_ip()),
-                  str(vm.get_first_connection_date())))
+                INSERT INTO virtual_machine (vm_name,root_username,root_password,ssh_key,zerotier_network, provider_account_name, cost_limit, public_ip, first_connection_date)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+            """, (vm.get_vm_name(), vm.get_root_username(), vm.get_password(),vm.get_ssh_key(), vm.get_zerotier_network(), vm.get_provider().get_account_name(), vm.get_cost_limit(), str(vm.get_public_ip()), str(vm.get_first_connection_date())))
             self.connection.commit()
             print(f"Virtual machine '{vm.get_vm_name()}' inserted successfully.") if print_output else None
         except sqlite3.Error as e:
@@ -193,11 +188,9 @@ class Database:
                     'ssh_key': row[3],
                     'zerotier_network': row[4],
                     'provider_account_name': row[5],
-                    'is_active': row[6],
-                    'is_configured': row[7],
-                    'cost_limit': row[8],
-                    'public_ip': row[9],
-                    'first_connection_date': row[10],
+                    'cost_limit': row[6],
+                    'public_ip': row[7],
+                    'first_connection_date': row[8],
                 }
 
                 # Find the corresponding provider for the VM
@@ -208,8 +201,6 @@ class Database:
                         vms.append(VirtualMachine(
                             vm['vm_name'],
                             provider_account,
-                            vm['is_active'],
-                            vm['is_configured'],
                             vm['cost_limit'],
                             vm['public_ip'],
                             vm['first_connection_date'],

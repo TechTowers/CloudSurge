@@ -96,7 +96,7 @@ class Provider(ABC):
 class VirtualMachine:
     """Class representing a virtual machine."""
 
-    def __init__(self, vm_name: str, provider: Provider, is_active: bool, is_configured: bool,
+    def __init__(self, vm_name: str, provider: Provider,
                  cost_limit: int, public_ip: str, first_connection_date: date, root_username: str, password: str, zerotier_network: str, ssh_key:str):
         self._vm_name = vm_name
         from backend import Database
@@ -104,8 +104,6 @@ class VirtualMachine:
             self._provider = Database.no_provider
         else:
             self._provider = provider
-        self._is_active = is_active
-        self._is_configured = is_configured
         self._cost_limit = cost_limit
         self._public_ip = IPv4Address(public_ip)
         self._first_connection_date = first_connection_date
@@ -131,7 +129,8 @@ class VirtualMachine:
             "~/.local/bin/cloudsurge.sh",
             "-s", f"{self.get_root_username()}@{self.get_public_ip()}",
             "-k", self.get_ssh_key(),
-            "-i"],
+            "-i",
+            "-p"],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -146,7 +145,8 @@ class VirtualMachine:
             "-s", f"{self.get_root_username()}@{self.get_public_ip()}",
             "-k", self.get_ssh_key(),
             "-c",
-            "-z", self.get_zerotier_network()],
+            "-z", self.get_zerotier_network(),
+            "-p"],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -159,17 +159,9 @@ class VirtualMachine:
         """Set the zerotier network."""
         self._zerotier_network = zerotier_network
 
-    def set_is_active(self, is_active: bool):
-        """Set the active status of the virtual machine."""
-        self._is_active = is_active
-
     def set_cost_limit(self, cost_limit: int):
         """Set the cost limit for the virtual machine."""
         self._cost_limit = cost_limit
-
-    def set_is_configured(self, is_configured: bool):
-        """Set the configured status of the virtual machine."""
-        self._is_configured = is_configured
 
     # Getters
     def get_zerotier_network(self) -> str:
@@ -191,14 +183,6 @@ class VirtualMachine:
     def get_provider(self) -> Provider:
         """Get the provider object."""
         return self._provider
-
-    def get_is_active(self) -> bool:
-        """Check if the virtual machine is active."""
-        return self._is_active
-
-    def get_is_configured(self) -> bool:
-        """Check if the virtual machine is configured."""
-        return self._is_configured
 
     def get_cost_limit(self) -> int:
         """Get the cost limit for the virtual machine."""
