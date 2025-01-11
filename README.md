@@ -83,3 +83,90 @@ Open [this](https://cloud.digitalocean.com/account/api/tokens) page and generate
 After that you will need to add an SSH key on [this](https://cloud.digitalocean.com/account/security) page. Click on the `Add SSH Key` button and follow the steps outlined there.
 
 After that you can add a DigitalOcean provider in CloudSurge. You will be asked for the API Token, the SSH fingerprint and the path of your SSH key: just put in the three things, and you're good to go :)
+
+### 🌐 AWS Setup
+
+The first step is to create an AWS account. During the registration process, you’ll need to provide some personal information and set up a payment method. Don’t worry—while a small temporary charge may appear on your bank account, it won’t be deducted and is purely for verification purposes.
+
+Once logged into your account, search for **“Users”** in the search bar and open this [**IAM section**](https://us-east-1.console.aws.amazon.com/iam/home?region=eu-north-1#/users).
+
+---
+
+#### Create a User
+
+### GUI Method:
+- Click on **“Create User”** and enter a username of your choice.
+- Enable the option **“Provide user access to the AWS Management Console”**.
+- Choose either a manually set password or the system-generated default.
+
+#### CLI Alternative:
+
+```bash
+aws iam create-user --user-name <username>
+```
+
+---
+
+#### Attach Policies
+
+###### GUI Method:
+- In the next step, select **“Attach policies directly”**.
+- Assign the **AmazonEC2FullAccess** policy to the user.
+
+###### CLI Alternative:
+
+```bash
+aws iam attach-user-policy --user-name <username> --policy-arn arn:aws:iam::aws:policy/AmazonEC2FullAccess
+```
+
+---
+
+#### Create Access Keys
+
+##### GUI Method:
+- Go back to the user list and open the newly created user.
+- Navigate to the **“Security Credentials”** tab and select **“Create Access Key”**.
+- Specify the intended use of the key (e.g., "Third-party service") and proceed by accepting the terms.
+- Save both the **Access Key** and **Secret Access Key** securely.
+
+##### CLI Alternative:
+
+```bash
+aws iam create-access-key --user-name <username>
+```
+The output will include the **Access Key** and **Secret Access Key**. Save them securely.
+
+---
+
+#### Create a Key Pair
+
+##### GUI Method:
+- Search for [**“Key Pairs”**](https://eu-north-1.console.aws.amazon.com/ec2/home?region=eu-north-1#KeyPairs:).
+- Create a new key pair using the **RSA** type and the private key format **.pem**.
+- Download the key file and save it under `~/.ssh/key-name.pem`.
+- Note the name of the key pair for future use.
+
+##### CLI Alternative:
+
+1. Ensure the `.ssh` directory exists:
+   ```bash
+   mkdir -p ~/.ssh
+   chmod 700 ~/.ssh
+   ```
+2. Create a new key pair and save it in the `.ssh` directory:
+   ```bash
+   aws ec2 create-key-pair --key-name <key-name> --query "KeyMaterial" --output text > ~/.ssh/key-name.pem
+   chmod 400 ~/.ssh/key-name.pem
+   ```
+
+---
+
+#### Final Setup
+
+Enter the following details into CloudSurge:
+- **Access Key**
+- **Secret Access Key**
+- **Key Pair Name**
+
+And you’re done!
+
