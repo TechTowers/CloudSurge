@@ -10,8 +10,8 @@ import requests
 
 
 def get_cloudsurge_script():
-    """ Retrieves the CloudSurge script from the GitHub repository and saves it to the local filesystem. """
-    file_path = "~/.local/bin/cloudsurge.sh"
+    """Retrieves the CloudSurge script from the GitHub repository and saves it to the local filesystem."""
+    file_path = f"{os.path.expanduser("~")}/.local/bin/cloudsurge.sh"
     url = "https://raw.githubusercontent.com/TechTowers/CloudSurge/refs/heads/development/scripts/cloudsurge.sh"
 
     if not os.path.exists(".local/bin"):
@@ -20,14 +20,16 @@ def get_cloudsurge_script():
     r = requests.get(url, stream=True)
     if r.ok:
         print("saving to", os.path.abspath(file_path))
-        with open(file_path, 'wb') as f:
+        with open(file_path, "wb") as f:
             for chunk in r.iter_content(chunk_size=1024 * 8):
                 if chunk:
                     f.write(chunk)
                     f.flush()
                     os.fsync(f.fileno())
     else:  # HTTP status code 4XX/5XX
-        print("Download failed: status code {}\n{}".format(r.status_code, r.text))
+        print(
+            "Download failed: status code {}\n{}".format(r.status_code, r.text)
+        )
 
 
 class Provider(ABC):
@@ -42,7 +44,9 @@ class Provider(ABC):
 
     @staticmethod
     @abstractmethod
-    def from_provider_info(account_name: str, connection_date: date, provider_info: str):
+    def from_provider_info(
+        account_name: str, connection_date: date, provider_info: str
+    ):
         """Creates a Provider object from the provider information.
 
         Args:
@@ -120,10 +124,21 @@ class Provider(ABC):
 class VirtualMachine:
     """Class representing a virtual machine."""
 
-    def __init__(self, vm_name: str, provider: Provider,
-                 cost_limit: int, public_ip: str, first_connection_date: date, root_username: str, password: str, zerotier_network: str, ssh_key:str):
+    def __init__(
+        self,
+        vm_name: str,
+        provider: Provider,
+        cost_limit: int,
+        public_ip: str,
+        first_connection_date: date,
+        root_username: str,
+        password: str,
+        zerotier_network: str,
+        ssh_key: str,
+    ):
         self._vm_name = vm_name
         from backend import Database
+
         if provider is None:
             self._provider = Database.no_provider
         else:
@@ -139,34 +154,46 @@ class VirtualMachine:
             self.install_vm()
             self.configure_vm()
 
-
     import subprocess
 
     import subprocess
 
     def is_reachable(self):
         """Check if the virtual machine is reachable."""
-        process = subprocess.call([
-            "ssh",
-            f"{self.get_root_username()}@{self.get_public_ip()}",
-            "-i", f"{self.get_ssh_key()}",
-            "-o", "StrictHostKeyChecking=no",
-            "-o", "UserKnownHostsFile=/dev/null",
-            "-o", "LogLevel=ERROR",  # Suppress warning messages
-            "echo exit"
-        ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=30)
+        process = subprocess.call(
+            [
+                "ssh",
+                f"{self.get_root_username()}@{self.get_public_ip()}",
+                "-i",
+                f"{self.get_ssh_key()}",
+                "-o",
+                "StrictHostKeyChecking=no",
+                "-o",
+                "UserKnownHostsFile=/dev/null",
+                "-o",
+                "LogLevel=ERROR",  # Suppress warning messages
+                "echo exit",
+            ],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            timeout=30,
+        )
 
         return process == 0
 
     def install_vm(self):
         """Installs CloudSurge specific data on the virtual machine."""
         get_cloudsurge_script()
-        process = subprocess.Popen([
-            "~/.local/bin/cloudsurge.sh",
-            "-s", f"{self.get_root_username()}@{self.get_public_ip()}",
-            "-k", self.get_ssh_key(),
-            "-i",
-            "-p"],
+        process = subprocess.Popen(
+            [
+                "~/.local/bin/cloudsurge.sh",
+                "-s",
+                f"{self.get_root_username()}@{self.get_public_ip()}",
+                "-k",
+                self.get_ssh_key(),
+                "-i",
+                "-p",
+            ],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -176,13 +203,18 @@ class VirtualMachine:
     def configure_vm(self):
         """Configures the virtual machine using the cloudsurge-script."""
         get_cloudsurge_script()
-        process = subprocess.Popen([
-            "~/.local/bin/cloudsurge.sh",
-            "-s", f"{self.get_root_username()}@{self.get_public_ip()}",
-            "-k", self.get_ssh_key(),
-            "-c",
-            "-z", self.get_zerotier_network(),
-            "-p"],
+        process = subprocess.Popen(
+            [
+                "~/.local/bin/cloudsurge.sh",
+                "-s",
+                f"{self.get_root_username()}@{self.get_public_ip()}",
+                "-k",
+                self.get_ssh_key(),
+                "-c",
+                "-z",
+                self.get_zerotier_network(),
+                "-p",
+            ],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -238,11 +270,13 @@ class VirtualMachine:
 
     # toString
     def __str__(self):
-        return f"\n VirtualMachine:\n" \
-               f" VM Name: {self._vm_name}\n" \
-               f" Provider: {self._provider.get_provider_name()}\n" \
-               f" Cost Limit: ${self._cost_limit}\n" \
-               f" Public IP: {self._public_ip}\n" \
-               f" First Connection Date: {self._first_connection_date}\n" \
-               f" Root Username: {self._root_username}\n" \
-               f" ZeroTier Network: {self._zerotier_network}"
+        return (
+            f"\n VirtualMachine:\n"
+            f" VM Name: {self._vm_name}\n"
+            f" Provider: {self._provider.get_provider_name()}\n"
+            f" Cost Limit: ${self._cost_limit}\n"
+            f" Public IP: {self._public_ip}\n"
+            f" First Connection Date: {self._first_connection_date}\n"
+            f" Root Username: {self._root_username}\n"
+            f" ZeroTier Network: {self._zerotier_network}"
+        )
