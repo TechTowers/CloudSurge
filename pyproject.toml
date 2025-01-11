@@ -7,7 +7,7 @@ license = "GPLv3"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.13"
+python = "^3.12"
 python-digitalocean = "^1.17.0"
 requests = "^2.32.3"
 boto3 = "^1.35.97"
