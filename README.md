@@ -8,6 +8,20 @@
     - [🖱️ GUI (WIP)](#🖱️-gui-wip)
   - [💽 Providers](#💽-providers)
     - [DigitalOcean](#digitalocean)
+    - [🌐 AWS Setup](#🌐-aws-setup)
+      - [Create a User](#create-a-user)
+    - [GUI Method:](#gui-method)
+      - [CLI Alternative:](#cli-alternative)
+      - [Attach Policies](#attach-policies)
+        - [GUI Method:](#gui-method)
+        - [CLI Alternative:](#cli-alternative)
+      - [Create Access Keys](#create-access-keys)
+        - [GUI Method:](#gui-method)
+        - [CLI Alternative:](#cli-alternative)
+      - [Create a Key Pair](#create-a-key-pair)
+        - [GUI Method:](#gui-method)
+        - [CLI Alternative:](#cli-alternative)
+      - [Final Setup](#final-setup)
 
 <!--toc:end-->
 
@@ -90,11 +104,10 @@ The first step is to create an AWS account. During the registration process, you
 
 Once logged into your account, search for **“Users”** in the search bar and open this [**IAM section**](https://us-east-1.console.aws.amazon.com/iam/home?region=eu-north-1#/users).
 
----
-
 #### Create a User
 
 ### GUI Method:
+
 - Click on **“Create User”** and enter a username of your choice.
 - Enable the option **“Provide user access to the AWS Management Console”**.
 - Choose either a manually set password or the system-generated default.
@@ -105,11 +118,10 @@ Once logged into your account, search for **“Users”** in the search bar and 
 aws iam create-user --user-name <username>
 ```
 
----
-
 #### Attach Policies
 
 ###### GUI Method:
+
 - In the next step, select **“Attach policies directly”**.
 - Assign the **AmazonEC2FullAccess** policy to the user.
 
@@ -119,11 +131,10 @@ aws iam create-user --user-name <username>
 aws iam attach-user-policy --user-name <username> --policy-arn arn:aws:iam::aws:policy/AmazonEC2FullAccess
 ```
 
----
-
 #### Create Access Keys
 
 ##### GUI Method:
+
 - Go back to the user list and open the newly created user.
 - Navigate to the **“Security Credentials”** tab and select **“Create Access Key”**.
 - Specify the intended use of the key (e.g., "Third-party service") and proceed by accepting the terms.
@@ -134,13 +145,13 @@ aws iam attach-user-policy --user-name <username> --policy-arn arn:aws:iam::aws:
 ```bash
 aws iam create-access-key --user-name <username>
 ```
-The output will include the **Access Key** and **Secret Access Key**. Save them securely.
 
----
+The output will include the **Access Key** and **Secret Access Key**. Save them securely.
 
 #### Create a Key Pair
 
 ##### GUI Method:
+
 - Search for [**“Key Pairs”**](https://eu-north-1.console.aws.amazon.com/ec2/home?region=eu-north-1#KeyPairs:).
 - Create a new key pair using the **RSA** type and the private key format **.pem**.
 - Download the key file and save it under `~/.ssh/key-name.pem`.
@@ -159,14 +170,12 @@ The output will include the **Access Key** and **Secret Access Key**. Save them 
    chmod 400 ~/.ssh/key-name.pem
    ```
 
----
-
 #### Final Setup
 
 Enter the following details into CloudSurge:
+
 - **Access Key**
 - **Secret Access Key**
 - **Key Pair Name**
 
 And you’re done!
-
