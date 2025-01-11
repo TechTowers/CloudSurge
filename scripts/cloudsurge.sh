@@ -310,15 +310,15 @@ if [[ $INSTALL -eq 1 ]]; then
 
   success "Downloading CloudSurge SystemdD service..."
   sleep 1
-  run "curl -s https://raw.githubusercontent.com/TechTowers/CloudSurge/refs/heads/main/services/cloudsurge.service > cloudsurge.service" ||
+  run "curl -s https://raw.githubusercontent.com/TechTowers/CloudSurge/refs/heads/main/services/cloudsurge-server.service > cloudsurge-server.service" ||
     fail "Downloading CloudSurge service failed!"
   success "Moving cloudsurge service to correct place..."
   sleep 1
-  runs "mv cloudsurge.service /etc/systemd/system/cloudsurge.service" ||
+  runs "mv cloudsurge-server.service /etc/systemd/system/cloudsurge-server.service" ||
     fail "Moving cloudsurge service failed!"
   success "Starting CloudSurge SystemdD service..."
   sleep 1
-  runs "systemctl enable --now cloudsurge.service" ||
+  runs "systemctl enable --now cloudsurge-server.service" ||
     fail "Starting CloudSurge service failed!"
 
   run "mkdir ./CloudSurge/ 2> /dev/null"
