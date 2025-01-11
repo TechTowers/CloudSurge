@@ -6,30 +6,7 @@ from ipaddress import IPv4Address
 
 import subprocess
 
-import requests
-
-
-def get_cloudsurge_script():
-    """Retrieves the CloudSurge script from the GitHub repository and saves it to the local filesystem."""
-    file_path = f"{os.path.expanduser("~")}/.local/bin/cloudsurge.sh"
-    url = "https://raw.githubusercontent.com/TechTowers/CloudSurge/refs/heads/development/scripts/cloudsurge.sh"
-
-    if not os.path.exists(".local/bin"):
-        os.makedirs(".local/bin")
-
-    r = requests.get(url, stream=True)
-    if r.ok:
-        print("saving to", os.path.abspath(file_path))
-        with open(file_path, "wb") as f:
-            for chunk in r.iter_content(chunk_size=1024 * 8):
-                if chunk:
-                    f.write(chunk)
-                    f.flush()
-                    os.fsync(f.fileno())
-    else:  # HTTP status code 4XX/5XX
-        print(
-            "Download failed: status code {}\n{}".format(r.status_code, r.text)
-        )
+from time import sleep
 
 
 class Provider(ABC):
@@ -57,17 +34,14 @@ class Provider(ABC):
         Returns:
             Provider: Provider object.
         """
-        pass
 
     @abstractmethod
     def get_provider_name(self) -> str:
         """Returns the name of the provider."""
-        pass
 
     @abstractmethod
     def get_provider_info(self) -> str:
         """Returns a list of provider-related information."""
-        pass
 
     def get_connection_date(self) -> date:
         """Get the connection date."""
@@ -80,42 +54,34 @@ class Provider(ABC):
     @abstractmethod
     def is_active(self, vm):
         """Check if the connection is active."""
-        pass
 
     @abstractmethod
     def get_vm_cost(self, vm):
         """Get the cost of the virtual machine."""
-        pass
 
     @abstractmethod
     def get_vm_uptime(self, vm):
         """Get the uptime of the virtual machine."""
-        pass
 
     @abstractmethod
     def get_vm_hourly_rate(self, vm):
         """Get the hourly rate of the virtual machine."""
-        pass
 
     @abstractmethod
     def create_vm(self, *args, **kwargs):
         """Create a virtual machine."""
-        pass
 
     @abstractmethod
     def stop_vm(self, virtual_machine) -> None:
         """Stop the virtual machine."""
-        pass
 
     @abstractmethod
     def delete_vm(self, virtual_machine, db) -> None:
         """Delete the virtual machine."""
-        pass
 
     @abstractmethod
     def start_vm(self, virtual_machine) -> None:
         """Start the virtual machine."""
-        pass
 
     def __str__(self):
         return f"Account Name: {self._account_name}, Connection Date: {self._connection_date}"
@@ -135,6 +101,7 @@ class VirtualMachine:
         password: str,
         zerotier_network: str,
         ssh_key: str,
+        new_vm: bool = True,
     ):
         self._vm_name = vm_name
         from backend import Database
@@ -150,13 +117,14 @@ class VirtualMachine:
         self._password = password
         self._zerotier_network = zerotier_network
         self._ssh_key = ssh_key
-        if self.is_reachable():
-            self.install_vm()
-            self.configure_vm()
-
-    import subprocess
-
-    import subprocess
+        if new_vm:
+            for _ in range(10):
+                if self.is_reachable():
+                    self.install_vm()
+                    self.configure_vm()
+                    break
+                else:
+                    sleep(2)
 
     def is_reachable(self):
         """Check if the virtual machine is reachable."""
@@ -168,10 +136,6 @@ class VirtualMachine:
                 f"{self.get_ssh_key()}",
                 "-o",
                 "StrictHostKeyChecking=no",
-                "-o",
-                "UserKnownHostsFile=/dev/null",
-                "-o",
-                "LogLevel=ERROR",  # Suppress warning messages
                 "echo exit",
             ],
             stdout=subprocess.DEVNULL,
@@ -183,29 +147,28 @@ class VirtualMachine:
 
     def install_vm(self):
         """Installs CloudSurge specific data on the virtual machine."""
-        get_cloudsurge_script()
-        process = subprocess.Popen(
+        _ = subprocess.run(
             [
-                "~/.local/bin/cloudsurge.sh",
+                f"{os.path.expanduser("~")}/.local/bin/cloudsurge.sh",
                 "-s",
                 f"{self.get_root_username()}@{self.get_public_ip()}",
                 "-k",
                 self.get_ssh_key(),
                 "-i",
+                self.get_zerotier_network(),
                 "-p",
             ],
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            input=f"{self.get_password()}\n",
+            capture_output=True,
+            check=True,
+            text=True,
         )
-        process.stdin.write(f"{self.get_password()}\n".encode("utf-8"))
 
     def configure_vm(self):
         """Configures the virtual machine using the cloudsurge-script."""
-        get_cloudsurge_script()
-        process = subprocess.Popen(
+        _ = subprocess.run(
             [
-                "~/.local/bin/cloudsurge.sh",
+                f"{os.path.expanduser("~")}/.local/bin/cloudsurge.sh",
                 "-s",
                 f"{self.get_root_username()}@{self.get_public_ip()}",
                 "-k",
@@ -215,12 +178,11 @@ class VirtualMachine:
                 self.get_zerotier_network(),
                 "-p",
             ],
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            input=f"{self.get_password()}\n",
+            capture_output=True,
+            check=True,
+            text=True,
         )
-        process.stdin.write(f"{self.get_password()}\n".encode("utf-8"))
-        pass
 
     # Setters
     def set_zerotier_network(self, zerotier_network: str):
