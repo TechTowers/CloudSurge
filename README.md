@@ -51,3 +51,32 @@ chmod +x cloudsurge.sh
    the VM on the ZeroTier Network
 
 ### 🖱️ GUI (WIP)
+
+## 💽 Providers
+
+Currently, we support two Providers:
+
+1. [DigitalOcean](www.digitalocean.com/)
+2. [AWS](aws.amazon.com)
+
+If you already have an account you should still read the sections below to do some things you may not have done!
+
+### DigitalOcean
+
+First create a DigitalOcean account. It will ask you for a payment method and verify the payment method by charging you a little bit, but don't worry you'll get it refunded again!
+
+It will ask you some Question to create a Droplet yourself, but if you're here you probably want to let us do that for you, so just skip it.
+
+Open [this](https://cloud.digitalocean.com/account/api/tokens) page and generate a new API Token with **Full Access**.
+
+After that you'll need to add an SSH key. First create one by using this command in your terminal:
+
+```bash
+ssh-keygen -t ed25519 -C "name@mail.com"
+```
+
+After that open [this](https://cloud.digitalocean.com/account/security) page and add your new SSH key by copying your public key like so:
+
+```bash
+
+```
