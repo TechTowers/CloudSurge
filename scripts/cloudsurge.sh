@@ -155,7 +155,12 @@ install_gns3() {
   runs "usermod -aG kvm cloudsurge" ||
     fail "Successfully added kvm group to cloudsurge failed!"
 
-  if [[ -n $GNS3_VERSION && -n $GNS3_SERVER_VERSION ]]; then
+  if echo "$GNS3_VERSION" | grep -E '[0-9]+\.[0-9]+\.[0-9]+'; then
+    success "Installing gns3server..."
+    sleep 1
+    run_cs "pipx install gns3-server --force" ||
+      fail "Installing gns3server failed!"
+  elif [[ -n $GNS3_VERSION && -n $GNS3_SERVER_VERSION ]]; then
     if [[ "$GNS3_VERSION" == "$GNS3_SERVER_VERSION" ]]; then
       return 0
     else
