@@ -1,9 +1,33 @@
 # author: Luka Pacar
+import os
 from abc import abstractmethod, ABC
 from datetime import date
 from ipaddress import IPv4Address
 
 import subprocess
+
+import requests
+
+
+def get_cloudsurge_script():
+    """ Retrieves the CloudSurge script from the GitHub repository and saves it to the local filesystem. """
+    file_path = "~/.local/bin/cloudsurge.sh"
+    url = "https://raw.githubusercontent.com/TechTowers/CloudSurge/refs/heads/development/scripts/cloudsurge.sh"
+
+    if not os.path.exists(".local/bin"):
+        os.makedirs(".local/bin")
+
+    r = requests.get(url, stream=True)
+    if r.ok:
+        print("saving to", os.path.abspath(file_path))
+        with open(file_path, 'wb') as f:
+            for chunk in r.iter_content(chunk_size=1024 * 8):
+                if chunk:
+                    f.write(chunk)
+                    f.flush()
+                    os.fsync(f.fileno())
+    else:  # HTTP status code 4XX/5XX
+        print("Download failed: status code {}\n{}".format(r.status_code, r.text))
 
 class Provider(ABC):
     """Represents a Connection with no Provider. Typically skipping the vm-creation step and using ssh"""
@@ -75,7 +99,6 @@ class VirtualMachine:
 
     def install_vm(self):
         """Installs CloudSurge specific data on the virtual machine."""
-        from backend import get_cloudsurge_script
         get_cloudsurge_script()
         process = subprocess.Popen([
             "~/.local/bin/cloudsurge.sh",
@@ -90,7 +113,6 @@ class VirtualMachine:
 
     def configure_vm(self):
         """Configures the virtual machine using the cloudsurge-script."""
-        from backend import get_cloudsurge_script
         get_cloudsurge_script()
         process = subprocess.Popen([
             "~/.local/bin/cloudsurge.sh",
