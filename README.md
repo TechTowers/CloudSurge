@@ -18,10 +18,7 @@ decided on using ZeroTier to work around this restriction.
 
 There are two main ways you could use CloudSurge. Either you let us create a VM
 for you or you create one yourself and use our CLI to just set up GNS3 and
-ZeroTier.
-
-1. Create a [ZeroTier](https://www.zerotier.com/) account
-2. Create a ZeroTier network [here](https://my.zerotier.com/)
+[ZeroTier](https://www.zerotier.com/) (click for Documentation).
 
 ### 💲 CLI
 
@@ -48,5 +45,9 @@ chmod +x cloudsurge.sh
 ```bash
 ./cloudsurge.sh -h
 ```
+
+7. After you installed and configured the VM with our script you need to
+   [authorize](https://docs.zerotier.com/start#authorize-your-device-on-your-network)
+   the VM on the ZeroTier Network
 
 ### 🖱️ GUI (WIP)
