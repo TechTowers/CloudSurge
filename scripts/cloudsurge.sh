@@ -91,8 +91,8 @@ install_gns3() {
     GNS3_VERSION=$(gns3 --version)
   fi
 
-  if run "[[ -x $GNS3_PATH ]]"; then
-    GNS3_SERVER_VERSION=$(run "$GNS3_PATH --version")
+  if run_cs "[[ -x $GNS3_PATH ]]"; then
+    GNS3_SERVER_VERSION=$(run_cs "$GNS3_PATH --version")
   fi
 
   success "Installing dependencies for vpcs..."
