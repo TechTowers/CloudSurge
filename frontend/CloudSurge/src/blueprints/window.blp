@@ -75,16 +75,23 @@ template $CloudsurgeWindow : Adw.ApplicationWindow {
               "title-4"
             ]
           }
-          Box {
+
+          ListBox {
+            selection-mode: none;
             margin-top: 10;
+
+            styles [
+              "boxed-list"
+            ]
+
             Adw.EntryRow zerotier_id {
-              use-markup: false;
               title: _("Zerotier ID");
             }
-            Button save_zerotier_id_button {
-              label: "Save";
+
+            Adw.ButtonRow save_zerotier_id_button {
+              title: _("Save");
               styles [
-                "suggested-action",
+               // "suggested-action"
               ]
             }
           }
@@ -100,6 +107,17 @@ template $CloudsurgeWindow : Adw.ApplicationWindow {
           Adw.ActionRow Azure1 {
             title: "Azure1";
             subtitle: "10.0.0.1";
+
+            Button settings {
+              valign: center;
+
+              child: Box {
+                spacing: 6;
+                Image {
+                  icon-name: "applications-system-symbolic";
+                }
+              };
+            }
           }
           Adw.ActionRow Azure2 {
             title: "Azure2";
@@ -134,6 +152,5 @@ template $CloudsurgeWindow : Adw.ApplicationWindow {
         }
       }
     };
-
   }
 }

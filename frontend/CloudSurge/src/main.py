@@ -28,6 +28,8 @@ from gi.repository import Gtk, Gio, Adw
 from .window import CloudsurgeWindow
 from .new import NewView
 
+#from .db import Database
+
 
 class CloudsurgeApplication(Adw.Application):
     """The main application singleton class."""
@@ -35,9 +37,20 @@ class CloudsurgeApplication(Adw.Application):
     main_listbox: Gtk.ListBox
     providers: list[Adw.ActionRow] = []
 
+    #db: Database
+
     def __init__(self):
         super().__init__(application_id='org.gnome.Example',
                          flags=Gio.ApplicationFlags.DEFAULT_FLAGS)
+
+        #self.db = Database()
+        #self.db.init()
+
+        # prov = self.db.read_provider()
+        # vm = self.db.read_vm(prov)
+        # print(prov)
+        # print(vm)
+
         self.create_action('quit', lambda *_: self.quit(), ['<primary>q'])
         self.create_action('about', self.on_about_action)
         self.create_action('preferences', self.on_preferences_action)

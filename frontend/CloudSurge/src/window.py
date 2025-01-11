@@ -20,7 +20,9 @@
 import os
 from gi.repository import Adw
 from gi.repository import Gtk
-import backend.db
+#import backend.db
+from .vm_settings_dialog import VmSettingsDialog
+
 
 @Gtk.Template(resource_path='/org/gnome/Example/blueprints/window.ui')
 class CloudsurgeWindow(Adw.ApplicationWindow):
@@ -37,6 +39,8 @@ class CloudsurgeWindow(Adw.ApplicationWindow):
     providers_list = Gtk.Template.Child()
     machines_list = Gtk.Template.Child()
 
+    settings = Gtk.Template.Child()
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         #self.providers_button.set_active(True)
@@ -44,7 +48,8 @@ class CloudsurgeWindow(Adw.ApplicationWindow):
         self.providers_button.connect("clicked", self.show_providers)
         self.machines_button.connect("clicked", self.show_machines)
         self.home_button.connect("clicked", self.show_home)
-        self.save_zerotier_id_button.connect("clicked", self.save_zerotier_id)
+        self.save_zerotier_id_button.connect("activated", self.save_zerotier_id)
+        self.home_button.connect("clicked", self.show_vm_settings_dialog)
 
     def show_providers(self, _):
         self.machines_list.hide()
@@ -79,3 +84,8 @@ class CloudsurgeWindow(Adw.ApplicationWindow):
         with open(path, "w+") as f:
             f.write(t)
         self.zerotier_id.set_title("current: " + t)
+
+    def show_vm_settings_dialog(self, _):
+        dialog = VmSettingsDialog()
+        dialog.app = self.app
+        dialog.present()
