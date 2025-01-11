@@ -8,8 +8,6 @@ import subprocess
 
 import requests
 
-from backend.server_is_active import is_reachable
-
 
 def get_cloudsurge_script():
     """ Retrieves the CloudSurge script from the GitHub repository and saves it to the local filesystem. """

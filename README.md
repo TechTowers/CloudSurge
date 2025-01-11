@@ -1,5 +1,16 @@
 # ☁️⚡ CloudSurge
 
+<!--toc:start-->
+
+- [☁️⚡ CloudSurge](#️-cloudsurge)
+  - [🚀 Quick Start](#🚀-quick-start)
+    - [💲 CLI](#💲-cli)
+    - [🖱️ GUI (WIP)](#🖱️-gui-wip)
+  - [💽 Providers](#💽-providers)
+    - [DigitalOcean](#digitalocean)
+
+<!--toc:end-->
+
 CloudSurge is a program that you can use to set up GNS3 in the cloud
 automagically ✨. There are three main components:
 
@@ -18,10 +29,7 @@ decided on using ZeroTier to work around this restriction.
 
 There are two main ways you could use CloudSurge. Either you let us create a VM
 for you or you create one yourself and use our CLI to just set up GNS3 and
-ZeroTier.
-
-1. Create a [ZeroTier](https://www.zerotier.com/) account
-2. Create a ZeroTier network [here](https://my.zerotier.com/)
+[ZeroTier](https://www.zerotier.com/) (click for Documentation).
 
 ### 💲 CLI
 
@@ -49,4 +57,29 @@ chmod +x cloudsurge.sh
 ./cloudsurge.sh -h
 ```
 
+7. After you installed and configured the VM with our script you need to
+   [authorize](https://docs.zerotier.com/start#authorize-your-device-on-your-network)
+   the VM on the ZeroTier Network
+
 ### 🖱️ GUI (WIP)
+
+## 💽 Providers
+
+Currently, we support two Providers:
+
+1. [DigitalOcean](www.digitalocean.com/)
+2. [AWS](aws.amazon.com)
+
+If you already have an account you should still read the sections below to do some things you may not have done!
+
+### DigitalOcean
+
+First create a DigitalOcean account. It will ask you for a payment method and verify the payment method by charging you a little bit, but don't worry you'll get it refunded again!
+
+It will ask you some Question to create a Droplet yourself, but if you're here you probably want to let us do that for you, so just skip it.
+
+Open [this](https://cloud.digitalocean.com/account/api/tokens) page and generate a new API Token with **Full Access**.
+
+After that you will need to add an SSH key on [this](https://cloud.digitalocean.com/account/security) page. Click on the `Add SSH Key` button and follow the steps outlined there.
+
+After that you can add a DigitalOcean provider in CloudSurge. You will be asked for the API Token, the SSH fingerprint and the path of your SSH key: just put in the three things, and you're good to go :)
