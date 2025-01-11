@@ -8,10 +8,10 @@
     - [🖱️ GUI (WIP)](#🖱️-gui-wip)
   - [💽 Providers](#💽-providers)
     - [DigitalOcean](#digitalocean)
-    - [🌐 AWS Setup](#🌐-aws-setup)
+    - [AWS](#aws)
       - [Create a User](#create-a-user)
-    - [GUI Method:](#gui-method)
-      - [CLI Alternative:](#cli-alternative)
+        - [GUI Method:](#gui-method)
+        - [CLI Alternative:](#cli-alternative)
       - [Attach Policies](#attach-policies)
         - [GUI Method:](#gui-method)
         - [CLI Alternative:](#cli-alternative)
@@ -98,7 +98,7 @@ After that you will need to add an SSH key on [this](https://cloud.digitalocean.
 
 After that you can add a DigitalOcean provider in CloudSurge. You will be asked for the API Token, the SSH fingerprint and the path of your SSH key: just put in the three things, and you're good to go :)
 
-### 🌐 AWS Setup
+### AWS
 
 The first step is to create an AWS account. During the registration process, you’ll need to provide some personal information and set up a payment method. Don’t worry—while a small temporary charge may appear on your bank account, it won’t be deducted and is purely for verification purposes.
 
@@ -106,13 +106,13 @@ Once logged into your account, search for **“Users”** in the search bar and 
 
 #### Create a User
 
-### GUI Method:
+##### GUI Method:
 
 - Click on **“Create User”** and enter a username of your choice.
 - Enable the option **“Provide user access to the AWS Management Console”**.
 - Choose either a manually set password or the system-generated default.
 
-#### CLI Alternative:
+##### CLI Alternative:
 
 ```bash
 aws iam create-user --user-name <username>
@@ -120,12 +120,12 @@ aws iam create-user --user-name <username>
 
 #### Attach Policies
 
-###### GUI Method:
+##### GUI Method:
 
 - In the next step, select **“Attach policies directly”**.
 - Assign the **AmazonEC2FullAccess** policy to the user.
 
-###### CLI Alternative:
+##### CLI Alternative:
 
 ```bash
 aws iam attach-user-policy --user-name <username> --policy-arn arn:aws:iam::aws:policy/AmazonEC2FullAccess
