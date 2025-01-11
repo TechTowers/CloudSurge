@@ -1,5 +1,16 @@
 # ☁️⚡ CloudSurge
 
+<!--toc:start-->
+
+- [☁️⚡ CloudSurge](#️-cloudsurge)
+  - [🚀 Quick Start](#🚀-quick-start)
+    - [💲 CLI](#💲-cli)
+    - [🖱️ GUI (WIP)](#🖱️-gui-wip)
+  - [💽 Providers](#💽-providers)
+    - [DigitalOcean](#digitalocean)
+
+<!--toc:end-->
+
 CloudSurge is a program that you can use to set up GNS3 in the cloud
 automagically ✨. There are three main components:
 
@@ -69,14 +80,6 @@ It will ask you some Question to create a Droplet yourself, but if you're here y
 
 Open [this](https://cloud.digitalocean.com/account/api/tokens) page and generate a new API Token with **Full Access**.
 
-After that you'll need to add an SSH key. First create one by using this command in your terminal:
+After that you will need to add an SSH key on [this](https://cloud.digitalocean.com/account/security) page. Click on the `Add SSH Key` button and follow the steps outlined there.
 
-```bash
-ssh-keygen -t ed25519 -C "name@mail.com"
-```
-
-After that open [this](https://cloud.digitalocean.com/account/security) page and add your new SSH key by copying your public key like so:
-
-```bash
-
-```
+After that you can add a DigitalOcean provider in CloudSurge. You will be asked for the API Token, the SSH fingerprint and the path of your SSH key: just put in the three things, and you're good to go :)
