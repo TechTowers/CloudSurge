@@ -2,12 +2,16 @@
 name = "cloudsurge"
 version = "0.1.0"
 description = ""
-authors = ["DrPacar <lukapacar11@gmail.com>"]
+authors = ["Karun Sandhu <karun@sndh.dev>"]
 license = "GPLv3"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.13"
+python-digitalocean = "^1.17.0"
+requests = "^2.32.3"
+boto3 = "^1.35.97"
+pytz = "^2024.2"
 
 
 [build-system]
