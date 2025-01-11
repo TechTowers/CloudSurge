@@ -255,6 +255,20 @@ class DigitalOcean(Provider):
             print(f"Failed to retrieve cost for VM '{vm.get_vm_name()}': {e}")
             return 0.0
 
+    def is_active(self, vm: VirtualMachine) -> bool:
+        """Checks if the VM (droplet) is currently active (powered on)."""
+        try:
+            # Get the droplet corresponding to the VirtualMachine object
+            droplet = self._get_droplet(vm)
+
+            # Check if the droplet's status is 'active'
+            if droplet.status == 'active':
+                return True
+            return False
+        except Exception as e:
+            print(f"Error while checking if VM '{vm.get_vm_name()}' is active: {e}")
+            return False
+
     def _get_droplet(self, vm: VirtualMachine):
         """Finds and returns the droplet information."""
         droplets = self.client.get_all_droplets()

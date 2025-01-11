@@ -447,6 +447,35 @@ class AWS(Provider):
             print(f"Failed to get instance ID for '{instance_name}': {e}")
             return None
 
+    def is_active(self, vm: VirtualMachine) -> bool:
+        """
+        Checks if the VM is currently running on AWS.
+
+        :param vm: The virtual machine to check.
+        :return: True if the VM is running, False otherwise.
+        """
+        instance_name = vm.get_vm_name()
+
+        try:
+            # Get the instance ID by the VM name
+            instance_id = self.get_instance_id_by_name(instance_name)
+
+            # Fetch instance info from AWS EC2
+            instance_info = self.client.describe_instances(InstanceIds=[instance_id])['Reservations'][0]['Instances'][0]
+
+            # Get the current state of the instance
+            state = instance_info['State']['Name']
+
+            # Return True if the instance is running, False otherwise
+            if state == 'running':
+                return True
+            else:
+                return False
+
+        except ClientError as e:
+            print(f"Failed to check the status of VM '{instance_name}': {e}")
+            return False
+
     def __str__(self):
         return f"\n AWS Provider:\n" \
                f" Account Name: {self.get_account_name()}\n" \

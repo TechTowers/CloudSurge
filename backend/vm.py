@@ -4,6 +4,7 @@ from abc import abstractmethod, ABC
 from datetime import date
 from ipaddress import IPv4Address
 
+
 import subprocess
 
 import requests
@@ -72,6 +73,22 @@ class Provider(ABC):
         """Returns the name of this account"""
         return self._account_name
 
+    def is_active(self, vm):
+        """Check if the connection is active."""
+        pass
+
+    def get_vm_cost(self, vm):
+        """Get the cost of the virtual machine."""
+        pass
+
+    def get_vm_uptime(self, vm):
+        """Get the uptime of the virtual machine."""
+        pass
+
+    def get_vm_hourly_rate(self, vm):
+        """Get the hourly rate of the virtual machine."""
+        pass
+
     def __str__(self):
         return f"Account Name: {self._account_name}, Connection Date: {self._connection_date}"
 
@@ -96,6 +113,16 @@ class VirtualMachine:
         self._password = password
         self._zerotier_network = zerotier_network
         self._ssh_key = ssh_key
+
+    def is_reachable(self):
+        """Check if the virtual machine is reachable."""
+        process = subprocess.call([
+            "ssh", f"{self.get_root_username()}@{self.get_public_ip()}",
+            "-i", self.get_ssh_key(),
+            "echo"]
+            , timeout=5
+        )
+        return process == 0
 
     def install_vm(self):
         """Installs CloudSurge specific data on the virtual machine."""
