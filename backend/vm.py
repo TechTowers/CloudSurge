@@ -8,7 +8,7 @@ import subprocess
 
 import requests
 
-from backend import Database
+from backend.server_is_active import is_reachable
 
 
 def get_cloudsurge_script():
@@ -106,7 +106,7 @@ class Provider(ABC):
         pass
 
     @abstractmethod
-    def delete_vm(self, virtual_machine, db: Database) -> None:
+    def delete_vm(self, virtual_machine, db) -> None:
         """Delete the virtual machine."""
         pass
 
@@ -137,15 +137,27 @@ class VirtualMachine:
         self._password = password
         self._zerotier_network = zerotier_network
         self._ssh_key = ssh_key
+        if self.is_reachable():
+            self.install_vm()
+            self.configure_vm()
+
+
+    import subprocess
+
+    import subprocess
 
     def is_reachable(self):
         """Check if the virtual machine is reachable."""
         process = subprocess.call([
-            "ssh", f"{self.get_root_username()}@{self.get_public_ip()}",
-            "-i", self.get_ssh_key(),
-            "echo"]
-            , timeout=5
-        )
+            "ssh",
+            f"{self.get_root_username()}@{self.get_public_ip()}",
+            "-i", f"{self.get_ssh_key()}",
+            "-o", "StrictHostKeyChecking=no",
+            "-o", "UserKnownHostsFile=/dev/null",
+            "-o", "LogLevel=ERROR",  # Suppress warning messages
+            "echo exit"
+        ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=30)
+
         return process == 0
 
     def install_vm(self):
