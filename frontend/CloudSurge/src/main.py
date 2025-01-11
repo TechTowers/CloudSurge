@@ -17,6 +17,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import os
 import sys
 import gi
 
@@ -56,6 +57,11 @@ class CloudsurgeApplication(Adw.Application):
         win.present()
         self.main_window = win
         self.main_window.app = self
+
+        path = os.path.expanduser("~") + "/.cloudsurge_zerotierid"
+        if os.path.exists(path):
+            with open(path) as f:
+                self.main_window.zerotier_id.set_title("current: " + f.read())
 
     def on_about_action(self, *args):
         """Callback for the app.about action."""

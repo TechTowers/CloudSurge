@@ -14,6 +14,8 @@ template $CloudsurgeWindow : Adw.ApplicationWindow {
         ToggleButton home_button {
           tooltip-text: _("go to Home");
           label: "Home";
+
+          active: true;
         }
         ToggleButton providers_button {
           tooltip-text: _("go to Providers");
@@ -50,27 +52,6 @@ template $CloudsurgeWindow : Adw.ApplicationWindow {
               "title-1"
             ]
           }
-          Label zerotier_label {
-            halign: start;
-            label: "Configure your Zerotier ID:";
-            margin-top: 30;
-            styles [
-              "title-4"
-            ]
-          }
-          Box {
-            margin-top: 10;
-            Adw.EntryRow zerotier_id {
-              use-markup: false;
-              title: _("Zerotier ID");
-            }
-            Button save_zerotier_id {
-              label: "Save";
-              styles [
-                "suggested-action",
-              ]
-            }
-          }
           Label help_label {
             halign: start;
             label: "Help/Documentation:";
@@ -86,6 +67,27 @@ template $CloudsurgeWindow : Adw.ApplicationWindow {
             margin-top: 5;
           }
 
+          Label zerotier_label {
+            halign: start;
+            label: "Configure your Zerotier ID:";
+            margin-top: 30;
+            styles [
+              "title-4"
+            ]
+          }
+          Box {
+            margin-top: 10;
+            Adw.EntryRow zerotier_id {
+              use-markup: false;
+              title: _("Zerotier ID");
+            }
+            Button save_zerotier_id_button {
+              label: "Save";
+              styles [
+                "suggested-action",
+              ]
+            }
+          }
         }
 
         ListBox providers_list {
