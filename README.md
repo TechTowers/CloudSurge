@@ -143,7 +143,7 @@ The output will include the **Access Key** and **Secret Access Key**. Save them 
 ##### GUI Method:
 - Search for [**“Key Pairs”**](https://eu-north-1.console.aws.amazon.com/ec2/home?region=eu-north-1#KeyPairs:).
 - Create a new key pair using the **RSA** type and the private key format **.pem**.
-- Download the key file and save it under `~/.ssh/Filename.pem`.
+- Download the key file and save it under `~/.ssh/key-name.pem`.
 - Note the name of the key pair for future use.
 
 ##### CLI Alternative:
@@ -155,8 +155,8 @@ The output will include the **Access Key** and **Secret Access Key**. Save them 
    ```
 2. Create a new key pair and save it in the `.ssh` directory:
    ```bash
-   aws ec2 create-key-pair --key-name <key-name> --query "KeyMaterial" --output text > ~/.ssh/<Filename>.pem
-   chmod 400 ~/.ssh/<Filename>.pem
+   aws ec2 create-key-pair --key-name <key-name> --query "KeyMaterial" --output text > ~/.ssh/key-name.pem
+   chmod 400 ~/.ssh/key-name.pem
    ```
 
 ---
