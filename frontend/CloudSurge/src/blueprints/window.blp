@@ -9,6 +9,7 @@ template $CloudsurgeWindow : Adw.ApplicationWindow {
   Adw.ToolbarView {
     [top]
     Adw.HeaderBar {
+      show-start-title-buttons: false;
       title-widget: Box {
         spacing: 6;
         ToggleButton home_button {
@@ -32,6 +33,14 @@ template $CloudsurgeWindow : Adw.ApplicationWindow {
         icon-name: "list-add-symbolic";
         action-name: "app.new";
       }
+
+      [end]
+      MenuButton {
+        icon-name: "open-menu-symbolic";
+        menu-model: primary_menu;
+        tooltip-text: _("Main Menu");
+        primary: true;
+      }
     }
 
     content: Adw.Clamp {
@@ -43,6 +52,7 @@ template $CloudsurgeWindow : Adw.ApplicationWindow {
           orientation: vertical;
           valign: center;
           halign: center;
+          //visible: false;
 
 
           Label thank_you_label {
@@ -97,60 +107,168 @@ template $CloudsurgeWindow : Adw.ApplicationWindow {
           }
         }
 
-        ListBox providers_list {
-          //orientation: vertical;
-          //spacing: 12;
+        ScrolledWindow providers_window {
           visible: false;
-          selection-mode: none;
-          css-classes: ["boxed-list"];
+          propagate-natural-height: true;
+          child: ListBox providers_list {
+            //orientation: vertical;
+            //spacing: 12;
 
-          Adw.ActionRow Azure1 {
-            title: "Azure1";
-            subtitle: "10.0.0.1";
+            selection-mode: none;
+            css-classes: ["boxed-list"];
 
-            Button settings {
-              valign: center;
+            Adw.ActionRow Azure1 {
+              title: "Azure1";
+              subtitle: "10.0.0.1";
 
-              child: Box {
-                spacing: 6;
-                Image {
-                  icon-name: "applications-system-symbolic";
-                }
-              };
+              Button settings {
+                valign: center;
+
+                child: Box {
+                  spacing: 6;
+                  Image {
+                    icon-name: "applications-system-symbolic";
+                  }
+                };
+              }
             }
-          }
-          Adw.ActionRow Azure2 {
-            title: "Azure2";
-            subtitle: "10.0.0.2";
-          }
-          Adw.ActionRow DigitalOcean1 {
-            title: "DigitalOcean1";
-            subtitle: "10.0.0.3";
-          }
+            Adw.ActionRow Azure2 {
+              title: "Azure2";
+              subtitle: "10.0.0.2";
+            }
+            Adw.ActionRow DigitalOcean1 {
+              title: "DigitalOcean1";
+              subtitle: "10.0.0.3";
+            }
+            Adw.ActionRow {
+              title: "DigitalOcean1";
+              subtitle: "10.0.0.3";
+            }
+            Adw.ActionRow {
+              title: "DigitalOcean1";
+              subtitle: "10.0.0.3";
+            }
+            Adw.ActionRow {
+              title: "DigitalOcean1";
+              subtitle: "10.0.0.3";
+            }
+            Adw.ActionRow {
+              title: "DigitalOcean1";
+              subtitle: "10.0.0.3";
+            }
+            Adw.ActionRow {
+              title: "DigitalOcean1";
+              subtitle: "10.0.0.3";
+            }
+            Adw.ActionRow {
+              title: "DigitalOcean1";
+              subtitle: "10.0.0.3";
+            }
+            Adw.ActionRow {
+              title: "DigitalOcean1";
+              subtitle: "10.0.0.3";
+            }
+            Adw.ActionRow {
+              title: "DigitalOcean1";
+              subtitle: "10.0.0.3";
+            }
+            Adw.ActionRow {
+              title: "DigitalOcean1";
+              subtitle: "10.0.0.3";
+            }
+            Adw.ActionRow {
+              title: "DigitalOcean1";
+              subtitle: "10.0.0.3";
+            }
+          };
         }
 
-        ListBox machines_list {
-          //orientation: vertical;
-          //spacing: 12;
+        ScrolledWindow machines_window {
           visible: false;
+          propagate-natural-height: true;
+          child: ListBox machines_list {
+            //orientation: vertical;
+            //spacing: 12;
 
-          selection-mode: none;
-          css-classes: ["boxed-list"];
 
-          Adw.ActionRow vm1 {
-            title: "VM1";
-            subtitle: "10.0.0.1";
-          }
-          Adw.ActionRow vm2 {
-            title: "VM2";
-            subtitle: "10.0.0.2";
-          }
-          Adw.ActionRow vm3 {
-            title: "VM3";
-            subtitle: "10.0.0.3";
-          }
+            selection-mode: none;
+            css-classes: ["boxed-list"];
+
+            Adw.ActionRow vm1 {
+              title: "VM1";
+              subtitle: "10.0.0.1";
+
+              Button vm_settings_button {
+                valign: center;
+
+                child: Box {
+                  spacing: 6;
+                  Image {
+                    icon-name: "applications-system-symbolic";
+                  }
+                };
+              }
+            }
+            Adw.ActionRow vm2 {
+              title: "VM2";
+              subtitle: "10.0.0.2";
+            }
+            Adw.ActionRow vm3 {
+              title: "VM3";
+              subtitle: "10.0.0.3";
+            }
+            Adw.ActionRow {
+              title: "VM3";
+              subtitle: "10.0.0.3";
+            }
+            Adw.ActionRow {
+              title: "VM3";
+              subtitle: "10.0.0.3";
+            }
+            Adw.ActionRow {
+              title: "VM3";
+              subtitle: "10.0.0.3";
+            }
+            Adw.ActionRow {
+              title: "VM3";
+              subtitle: "10.0.0.3";
+            }
+            Adw.ActionRow {
+              title: "VM3";
+              subtitle: "10.0.0.3";
+            }
+            Adw.ActionRow {
+              title: "VM3";
+              subtitle: "10.0.0.3";
+            }
+            Adw.ActionRow {
+              title: "VM3";
+              subtitle: "10.0.0.3";
+            }
+            Adw.ActionRow {
+              title: "VM3";
+              subtitle: "10.0.0.3";
+            }
+          };
         }
       }
     };
+  }
+}
+
+
+menu primary_menu {
+  section {
+    item {
+      label: _("_How to");
+      action: "app.howto";
+    }
+  }
+
+  section {
+    item {
+      label: _("_About us");
+      action: "app.aboutus";
+    }
   }
 }

@@ -22,9 +22,9 @@ from gi.repository import Adw
 from gi.repository import Gtk
 #import backend.db
 
-@Gtk.Template(resource_path='/org/gnome/Example/blueprints/vm_settings_dialog.ui')
-class VmSettingsDialog(Adw.Dialog):
-    __gtype_name__ = 'VmSettingsDialog'
+@Gtk.Template(resource_path='/org/gnome/Example/blueprints/vm_settings_window.ui')
+class VmSettingsWindow(Adw.Window):
+    __gtype_name__ = 'VmSettingsWindow'
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
