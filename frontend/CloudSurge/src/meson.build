@@ -5,7 +5,10 @@ gnome = import('gnome')
 blueprints = custom_target('blueprints',
   input: files(
     # LIST YOUR BLUEPRINT FILES HERE
-    'blueprints/window.blp'
+    'blueprints/window.blp',
+    'blueprints/new.blp',
+    'blueprints/vm_settings_window.blp',
+    'blueprints/provider_settings_window.blp',
   ),
   output: '.',
   command: [find_program('blueprint-compiler'), 'batch-compile', '@OUTPUT@', '@CURRENT_SOURCE_DIR@', '@INPUT@'],
@@ -40,6 +43,13 @@ cloudsurge_sources = [
   '__init__.py',
   'main.py',
   'window.py',
+  'new.py',
+  'vm_settings_window.py',
+  'provider_settings_window.py',
+  'backend/db.py',
+  'backend/aws_provider.py',
+  'backend/digitalocean_provider.py',
+  'backend/vm.py',
 ]
 
 install_data(cloudsurge_sources, install_dir: moduledir)

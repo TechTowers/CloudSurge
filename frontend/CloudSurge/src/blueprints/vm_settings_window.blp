@@ -1,0 +1,67 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $VmSettingsWindow: Adw.Window {
+  modal: true;
+  resizable: false;
+  default-width: 600;
+  default-height: 500;
+  hide-on-close: true;
+  title: _("Machine Settings");
+
+  ShortcutController {
+    Shortcut shortcut_escape {
+      trigger: "Escape";
+      action: "action(window.close)";
+    }
+  }
+
+  Box {
+    orientation: vertical;
+
+    Adw.HeaderBar headerbar {
+      show-start-title-buttons: false;
+      show-end-title-buttons: false;
+
+      Button btn_cancel {
+        label: _("_Cancel");
+        use-underline: true;
+        action-name: "window.close";
+      }
+    }
+
+    Adw.Clamp {
+      margin-top: 30;
+      Box {
+        orientation: vertical;
+
+        ListBox {
+          selection-mode: none;
+
+          styles [
+            "boxed-list-separate"
+          ]
+
+          Adw.ButtonRow start_machine {
+            title: _("Start Machine");
+
+            styles [
+              "suggested-action"
+            ]
+          }
+          Adw.ButtonRow stop_machine {
+            title: _("Stop Machine");
+            sensitive: false;
+          }
+          Adw.ButtonRow delete_machine {
+            title: _("Delete Machine");
+
+            styles [
+              "destructive-action"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

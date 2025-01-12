@@ -17,6 +17,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import os
 import sys
 import gi
 
@@ -25,17 +26,36 @@ gi.require_version('Adw', '1')
 
 from gi.repository import Gtk, Gio, Adw
 from .window import CloudsurgeWindow
+from .new import NewView
+
+#from .db import Database
 
 
 class CloudsurgeApplication(Adw.Application):
     """The main application singleton class."""
+    main_window: CloudsurgeWindow
+    main_listbox: Gtk.ListBox
+    providers: list[Adw.ActionRow] = []
+
+    #db: Database
 
     def __init__(self):
         super().__init__(application_id='org.gnome.Example',
                          flags=Gio.ApplicationFlags.DEFAULT_FLAGS)
+
+        #self.db = Database()
+        #self.db.init()
+
+        # prov = self.db.read_provider()
+        # vm = self.db.read_vm(prov)
+        # print(prov)
+        # print(vm)
+
         self.create_action('quit', lambda *_: self.quit(), ['<primary>q'])
         self.create_action('about', self.on_about_action)
         self.create_action('preferences', self.on_preferences_action)
+        self.create_action('new', self.show_add_view)
+        self.create_action('test', self.test)
 
     def do_activate(self):
         """Called when the application is activated.
@@ -46,7 +66,15 @@ class CloudsurgeApplication(Adw.Application):
         win = self.props.active_window
         if not win:
             win = CloudsurgeWindow(application=self)
+            self.main_listbox = win.get_content().get_content().get_first_child()
         win.present()
+        self.main_window = win
+        self.main_window.app = self
+
+        path = os.path.expanduser("~") + "/.cloudsurge_zerotierid"
+        if os.path.exists(path):
+            with open(path) as f:
+                self.main_window.zerotier_id.set_title("current: " + f.read())
 
     def on_about_action(self, *args):
         """Callback for the app.about action."""
@@ -78,6 +106,24 @@ class CloudsurgeApplication(Adw.Application):
         self.add_action(action)
         if shortcuts:
             self.set_accels_for_action(f"app.{name}", shortcuts)
+
+    def test(self, button, huh):
+        print(button.get_name())
+
+    def show_providers(self):
+        print(providers)
+
+    def add_provider(self, name: str, _):
+        row = Adw.ActionRow()
+        row.set_title("Azure")
+        self.providers.append(row)
+        self.main_listbox.append(row)
+        print(self.main_listbox)
+
+    def show_add_view(self, _, widget=False):
+        new_window = NewView(self.main_window)
+        new_window.app = self
+        new_window.present()
 
 
 def main(version):

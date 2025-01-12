@@ -1,0 +1,56 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $ProviderSettingsWindow: Adw.Window {
+  modal: true;
+  resizable: false;
+  default-width: 600;
+  default-height: 500;
+  hide-on-close: true;
+  title: _("Provider Settings");
+
+  ShortcutController {
+    Shortcut shortcut_escape {
+      trigger: "Escape";
+      action: "action(window.close)";
+    }
+  }
+
+  Box {
+    orientation: vertical;
+
+    Adw.HeaderBar headerbar {
+      show-start-title-buttons: false;
+      show-end-title-buttons: false;
+
+      Button btn_cancel {
+        label: _("_Cancel");
+        use-underline: true;
+        action-name: "window.close";
+      }
+    }
+
+    Adw.Clamp {
+      margin-top: 30;
+      Box {
+        orientation: vertical;
+
+        ListBox {
+          selection-mode: none;
+
+          styles [
+            "boxed-list-separate"
+          ]
+
+          Adw.ButtonRow delete_machine {
+            title: _("Delete Provider and all related Machines");
+
+            styles [
+              "destructive-action"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
