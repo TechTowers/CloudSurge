@@ -4,6 +4,8 @@ subprojects/blueprint-compiler
 
 __pycache__
 
+.idea
+
 ### Nix Stuff ###
 # Devenv
 .devenv*
