@@ -23,29 +23,32 @@ import gi
 import requests
 import subprocess
 
-gi.require_version('Gtk', '4.0')
-gi.require_version('Adw', '1')
+gi.require_version("Gtk", "4.0")
+gi.require_version("Adw", "1")
 
 from gi.repository import Gtk, Gio, Adw
 from .window import CloudsurgeWindow
 from .new import NewView
 from .db import Database
 
-#from .db import Database
+# from .db import Database
 
 class CloudsurgeApplication(Adw.Application):
     """The main application singleton class."""
+
     main_window: CloudsurgeWindow
     main_listbox: Gtk.ListBox
-    #providers: list[Adw.ActionRow] = []
+    # providers: list[Adw.ActionRow] = []
     vms = []
     providers = []
 
-    #db: Database
+    # db: Database
 
     def __init__(self):
-        super().__init__(application_id='org.gnome.Example',
-                         flags=Gio.ApplicationFlags.DEFAULT_FLAGS)
+        super().__init__(
+            application_id="org.techtowers.CloudSurge",
+            flags=Gio.ApplicationFlags.DEFAULT_FLAGS,
+        )
 
         get_cloudsurge_script()
 
@@ -60,12 +63,11 @@ class CloudsurgeApplication(Adw.Application):
         # print(prov)
         # print(vm)
 
-
-        self.create_action('quit', lambda *_: self.quit(), ['<primary>q'])
-        self.create_action('about', self.on_about_action)
-        self.create_action('preferences', self.on_preferences_action)
-        self.create_action('new', self.show_add_view)
-        self.create_action('test', self.test)
+        self.create_action("quit", lambda *_: self.quit(), ["<primary>q"])
+        self.create_action("about", self.on_about_action)
+        self.create_action("preferences", self.on_preferences_action)
+        self.create_action("new", self.show_add_view)
+        self.create_action("test", self.test)
 
     def do_activate(self):
         """Called when the application is activated.
@@ -75,8 +77,12 @@ class CloudsurgeApplication(Adw.Application):
         """
         win = self.props.active_window
         if not win:
-            win = CloudsurgeWindow(self.db, self.vms, self.providers, application=self)
-            self.main_listbox = win.get_content().get_content().get_first_child()
+            win = CloudsurgeWindow(
+                self.db, self.vms, self.providers, application=self
+            )
+            self.main_listbox = (
+                win.get_content().get_content().get_first_child()
+            )
         win.present()
         self.main_window = win
         self.main_window.app = self
@@ -86,23 +92,23 @@ class CloudsurgeApplication(Adw.Application):
         if zerotier_id:
             self.main_window.zerotier_id.set_title("current: " + zerotier_id)
 
-
-
     def on_about_action(self, *args):
         """Callback for the app.about action."""
-        about = Adw.AboutDialog(application_name='cloudsurge',
-                                application_icon='org.gnome.Example',
-                                developer_name='Benedikt',
-                                version='0.1.0',
-                                developers=['Benedikt'],
-                                copyright='© 2024 Benedikt')
+        about = Adw.AboutDialog(
+            application_name="cloudsurge",
+            application_icon="org.techtowers.CloudSurge",
+            developer_name="Benedikt",
+            version="0.1.0",
+            developers=["Benedikt"],
+            copyright="© 2024 Benedikt",
+        )
         # Translators: Replace "translator-credits" with your name/username, and optionally an email or URL.
-        about.set_translator_credits(_('translator-credits'))
+        about.set_translator_credits(_("translator-credits"))
         about.present(self.props.active_window)
 
     def on_preferences_action(self, widget, _):
         """Callback for the app.preferences action."""
-        print('app.preferences action activated')
+        print("app.preferences action activated")
 
     def create_action(self, name, callback, shortcuts=None):
         """Add an application action.
@@ -134,7 +140,9 @@ class CloudsurgeApplication(Adw.Application):
         print(self.main_listbox)
 
     def show_add_view(self, _, widget=False):
-        new_window = NewView(self.main_window, self.vms, self.providers, self.db)
+        new_window = NewView(
+            self.main_window, self.vms, self.providers, self.db
+        )
         new_window.app = self
         new_window.present()
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist gettext-domain="cloudsurge">
-	<schema id="org.gnome.Example" path="/org/gnome/Example/">
+	<schema id="org.techtowers.CloudSurge" path="/org/techtowers/CloudSurge/">
 	</schema>
 </schemalist>

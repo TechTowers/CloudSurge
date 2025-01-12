@@ -21,13 +21,18 @@ from gi.repository import Adw
 from gi.repository import Gtk
 
 from .db import Database
-#import backend.db
+
+# import backend.db
 from .vm import Provider
 
-@Gtk.Template(resource_path='/org/gnome/Example/blueprints/provider_settings_window.ui')
+
+@Gtk.Template(
+    resource_path="/org/techtowers/CloudSurge/blueprints/provider_settings_window.ui"
+)
 class ProviderSettingsWindow(Adw.Window):
-    __gtype_name__ = 'ProviderSettingsWindow'
+    __gtype_name__ = "ProviderSettingsWindow"
     delete_machine = Gtk.Template.Child()
+
 
     def __init__(self, provider: Provider, provider_gui_widget, db: Database, window, all_vms, providers, **kwargs):
         self.provider = provider

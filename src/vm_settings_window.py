@@ -19,15 +19,17 @@
 
 from gi.repository import Adw
 from gi.repository import Gtk
-
 from .wait_popup_window import WaitPopupWindow
 
 
 #import backend.db
 
-@Gtk.Template(resource_path='/org/gnome/Example/blueprints/vm_settings_window.ui')
+
+@Gtk.Template(
+    resource_path="/org/techtowers/CloudSurge/blueprints/vm_settings_window.ui"
+)
 class VmSettingsWindow(Adw.Window):
-    __gtype_name__ = 'VmSettingsWindow'
+    __gtype_name__ = "VmSettingsWindow"
 
     start_machine = Gtk.Template.Child()
     stop_machine = Gtk.Template.Child()
