@@ -19,7 +19,10 @@
 
 from gi.repository import Adw
 from gi.repository import Gtk
-# import backend.db
+from .wait_popup_window import WaitPopupWindow
+
+
+#import backend.db
 
 
 @Gtk.Template(
@@ -28,5 +31,47 @@ from gi.repository import Gtk
 class VmSettingsWindow(Adw.Window):
     __gtype_name__ = "VmSettingsWindow"
 
-    def __init__(self, vm, provider_gui_widget, db, window, **kwargs):
+    start_machine = Gtk.Template.Child()
+    stop_machine = Gtk.Template.Child()
+    delete_machine = Gtk.Template.Child()
+    update_machine = Gtk.Template.Child()
+
+    def __init__(self, vm, vm_gui_widget, db, window, all_vms, **kwargs):
+        self.vm = vm
+        self.all_vms = all_vms
+        self.vm_gui_widget = vm_gui_widget
+        self.db = db
+        self.window = window
         super().__init__(**kwargs)
+
+        self.start_machine.connect("activated", self.start_vm)
+        self.stop_machine.connect("activated", self.stop_vm)
+        self.delete_machine.connect("activated", self.delete_vm)
+        self.update_machine.connect("activated", self.update_vm)
+
+
+    def start_vm(self, _):
+        self.vm.get_provider().start_vm(self.vm)
+        self.close()
+
+    def stop_vm(self, _):
+        self.vm.get_provider().stop_vm(self.vm)
+        self.close()
+
+    def delete_vm(self, _):
+        self.vm.get_provider().delete_vm(self.vm, self.db)
+        self.all_vms.remove(self.vm)
+        self.window.machines_list.remove(self.vm_gui_widget)
+        self.close()
+
+    def update_vm(self, _):
+        def action():
+            if self.vm.is_reachable():
+                print("Updating VM")
+                self.vm.configure_vm()
+                self.close()
+            else:
+                print("VM not reachable")
+        dialog = WaitPopupWindow(action)
+        dialog.app = self.app
+        dialog.present()

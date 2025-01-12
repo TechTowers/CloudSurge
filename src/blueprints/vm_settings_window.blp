@@ -51,7 +51,7 @@ template $VmSettingsWindow: Adw.Window {
           }
           Adw.ButtonRow stop_machine {
             title: _("Stop Machine");
-            sensitive: false;
+            //sensitive: false;
           }
           Adw.ButtonRow delete_machine {
             title: _("Delete Machine");
@@ -59,6 +59,9 @@ template $VmSettingsWindow: Adw.Window {
             styles [
               "destructive-action"
             ]
+          }
+          Adw.ButtonRow update_machine {
+            title: _("Update Machine");
           }
         }
       }

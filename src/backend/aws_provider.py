@@ -162,9 +162,10 @@ class AWS(Provider):
         vm_name: str,
         aws_ssh_key_name: str,
         zerotier_network: str,
+        cost_limit: int = -1,
         ssh_key_path: str = "EvaluateSelf",
-        location: str = "eu-central-1",
-        vm_size: str = "r5.large",
+        location: str = "us-east-1",
+        vm_size: str = "t3.micro",
         admin_password: str = "YourSecurePassword!",
         image_reference: str = "ami-079cb33ef719a7b78",
         max_retries: int = 1000,
@@ -177,6 +178,7 @@ class AWS(Provider):
         :param vm_name: Name of the VM.
         :param aws_ssh_key_name: Name of the SSH key pair used. public key has to be on AWS. private key has to be under ~/.ssh/.
         :param zerotier_network: ZeroTier network ID.
+        :param cost_limit: Cost limit for the VM.
         :param ssh_key_path: Path to the SSH key file. (default: ~/.ssh/[aws_ssh_key_name].pem)
         :param location: AWS region (default: eu-central-1, Frankfurt region).
         :param vm_size: Instance type (default: t3.micro, free-tier eligible).
@@ -266,7 +268,7 @@ class AWS(Provider):
             return VirtualMachine(
                 vm_name,
                 self,
-                -1,
+                cost_limit,
                 public_ip,
                 date.today(),
                 "ubuntu",
@@ -381,6 +383,13 @@ class AWS(Provider):
         "x1e.2xlarge": 7.996,  # High memory (8 vCPUs, 244 GB RAM)
         "x1e.4xlarge": 15.992,  # High memory (16 vCPUs, 488 GB RAM)
         "x1e.16xlarge": 63.968,  # High memory (64 vCPUs, 1952 GB RAM)
+        "m5.metal": 4.608,  # General purpose (96 vCPUs, 384 GB RAM)
+        "i3.metal": 7.936,  # Storage-optimized (72 vCPUs, 512 GB RAM)
+        "c5.metal": 3.456,  # Compute optimized (72 vCPUs, 144 GB RAM)
+        "r5.metal": 4.608,  # Memory optimized (96 vCPUs, 768 GB RAM)
+        "p3dn.metal": 31.212,  # GPU-optimized (8 GPUs, 96 vCPUs, 768 GB RAM)
+        "z1d.metal": 5.424,  # High-frequency compute (48 vCPUs, 384 GB RAM)
+        "mac1.metal": 1.083  # macOS dedicated (12 vCPUs, 32 GB RAM)
     }
 
     def get_vm_hourly_rate(

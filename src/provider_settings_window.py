@@ -33,18 +33,14 @@ class ProviderSettingsWindow(Adw.Window):
     __gtype_name__ = "ProviderSettingsWindow"
     delete_machine = Gtk.Template.Child()
 
-    def __init__(
-        self,
-        provider: Provider,
-        provider_gui_widget,
-        db: Database,
-        window,
-        **kwargs,
-    ):
+
+    def __init__(self, provider: Provider, provider_gui_widget, db: Database, window, all_vms, providers, **kwargs):
         self.provider = provider
+        self.providers = providers
         self.provider_gui_widget = provider_gui_widget
         self.db = db
         self.window = window
+        self.all_vms = all_vms
         super().__init__(**kwargs)
 
         self.delete_machine.connect("activated", self.delete_provider)
@@ -52,4 +48,20 @@ class ProviderSettingsWindow(Adw.Window):
     def delete_provider(self, _):
         self.db.delete_provider(self.provider)
         self.window.providers_list.remove(self.provider_gui_widget)
+        self.providers.remove(self.provider)
         print("Deleted provider " + self.provider.get_account_name())
+
+        print("Trying to delete associated VMs:")
+        for vm in self.all_vms:
+            print(vm.get_provider().get_account_name())
+            if vm.get_provider().get_account_name() == self.provider.get_account_name():
+                # VM Found
+                try:
+                    vm.get_provider().delete_vm(vm, self.db)
+                    self.all_vms.remove(vm)
+                    for gui_vm in self.window.machines_list:
+                        if gui_vm.get_title() == vm.get_vm_name():
+                            self.window.machines_list.remove(gui_vm)
+                except Exception as e:
+                    print("VM Could not be deleted:" + f'{e}')
+        self.close()
