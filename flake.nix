@@ -50,6 +50,7 @@
 
                 gnome-builder
                 meson
+                ninja
                 flatpak
                 flatpak-builder
               ];
