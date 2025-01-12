@@ -1,6 +1,16 @@
 test_env
 
-.idea
-
 frontend/CloudSurge/subprojects/blueprint-compiler
-frontend/CloudSurge/.flatpak-builder/
+
+__pycache__
+
+### Nix Stuff ###
+# Devenv
+.devenv*
+devenv.local.nix
+
+# direnv
+.direnv
+
+# pre-commit
+.pre-commit-config.yaml
