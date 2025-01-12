@@ -44,9 +44,14 @@
           inherit inputs pkgs;
           modules = [
             {
-              packages = [
-                pkgs.git # duh
-                pkgs.helix # the best code editor
+              packages = with pkgs; [
+                git # duh
+                helix # the best code editor
+
+                gnome-builder
+                meson
+                flatpak
+                flatpak-builder
               ];
 
               languages.python = {
