@@ -1,13 +1,14 @@
 {
-  "id": "org.gnome.Example",
+  "id": "org.techtowers.CloudSurge",
   "runtime": "org.gnome.Platform",
-  "runtime-version": "master",
+  "runtime-version": "47",
   "sdk": "org.gnome.Sdk",
   "command": "cloudsurge",
   "finish-args": [
     "--share=network",
     "--share=ipc",
     "--socket=fallback-x11",
+    "--socket=session-bus",
     "--device=dri",
     "--socket=wayland"
   ],
@@ -45,13 +46,7 @@
           "branch": "development",
           "url": "https://github.com/TechTowers/CloudSurge"
         }
-      ],
-      "config-opts": [
-        "--libdir=lib"
       ]
     }
-  ],
-  "build-options": {
-    "env": {}
-  }
+  ]
 }

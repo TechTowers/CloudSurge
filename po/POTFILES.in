@@ -1,8 +1,8 @@
 # List of source files containing translatable strings.
 # Please keep this file sorted alphabetically.
-data/org.gnome.Example.desktop.in
-data/org.gnome.Example.metainfo.xml.in
-data/org.gnome.Example.gschema.xml
+data/org.techtowers.CloudSurge.desktop.in
+data/org.techtowers.CloudSurge.metainfo.xml.in
+data/org.techtowers.CloudSurge.gschema.xml
 src/main.py
 src/new.py
 src/window.py

@@ -22,14 +22,15 @@ from gi.repository import Adw
 from gi.repository import Gtk
 
 from .db import Database
-#import backend.db
+
+# import backend.db
 from .vm_settings_window import VmSettingsWindow
 from .provider_settings_window import ProviderSettingsWindow
 
 
-@Gtk.Template(resource_path='/org/gnome/Example/blueprints/window.ui')
+@Gtk.Template(resource_path="/org/techtowers/CloudSurge/blueprints/window.ui")
 class CloudsurgeWindow(Adw.ApplicationWindow):
-    __gtype_name__ = 'CloudsurgeWindow'
+    __gtype_name__ = "CloudsurgeWindow"
 
     db: Database
 
@@ -56,7 +57,7 @@ class CloudsurgeWindow(Adw.ApplicationWindow):
 
     def __init__(self, db, vms, providers, **kwargs):
         super().__init__(**kwargs)
-        #self.providers_button.set_active(True)
+        # self.providers_button.set_active(True)
 
         self.vms = vms
         self.providers = providers
@@ -69,7 +70,9 @@ class CloudsurgeWindow(Adw.ApplicationWindow):
         self.cost_button.connect("clicked", self.show_cost)
         self.save_zerotier_id_button.connect("activated", self.save_zerotier_id)
         self.vm_settings_button.connect("clicked", self.show_vm_settings_window)
-        self.provider_settings_button.connect("clicked", self.show_provider_settings_window)
+        self.provider_settings_button.connect(
+            "clicked", self.show_provider_settings_window
+        )
 
     def show_home(self, _):
         self.providers_window.hide()
@@ -128,7 +131,9 @@ class CloudsurgeWindow(Adw.ApplicationWindow):
         dialog.present()
 
     def show_provider_settings_window(self, _, provider, provider_gui_widget):
-        dialog = ProviderSettingsWindow(provider, provider_gui_widget, self.db, self)
+        dialog = ProviderSettingsWindow(
+            provider, provider_gui_widget, self.db, self
+        )
         dialog.app = self.app
         dialog.present()
 
@@ -143,8 +148,10 @@ class CloudsurgeWindow(Adw.ApplicationWindow):
 
         # Create the button and add the desired child elements
         button = Gtk.Button()
-        #button.set_action_name("app.test")
-        button.connect("clicked", self.show_provider_settings_window, provider, row)
+        # button.set_action_name("app.test")
+        button.connect(
+            "clicked", self.show_provider_settings_window, provider, row
+        )
         # Define the Box to hold the child widget, with appropriate spacing
         box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
 
@@ -160,6 +167,7 @@ class CloudsurgeWindow(Adw.ApplicationWindow):
         # Add the button to the ActionRow
         row.add_suffix(button)
         return row
+
     # VM-Methods
     def add_vm_to_gui(self, vm):
         self.machines_list.append(self.vm_to_widget(vm))
@@ -189,4 +197,3 @@ class CloudsurgeWindow(Adw.ApplicationWindow):
         # Add the button to the ActionRow
         row.add_suffix(button)
         return row
-

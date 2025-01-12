@@ -19,11 +19,14 @@
 
 from gi.repository import Adw
 from gi.repository import Gtk
-#import backend.db
+# import backend.db
 
-@Gtk.Template(resource_path='/org/gnome/Example/blueprints/vm_settings_window.ui')
+
+@Gtk.Template(
+    resource_path="/org/techtowers/CloudSurge/blueprints/vm_settings_window.ui"
+)
 class VmSettingsWindow(Adw.Window):
-    __gtype_name__ = 'VmSettingsWindow'
+    __gtype_name__ = "VmSettingsWindow"
 
     def __init__(self, vm, provider_gui_widget, db, window, **kwargs):
         super().__init__(**kwargs)

@@ -20,19 +20,17 @@
 from gi.repository import Adw
 from gi.repository import Gtk
 
-from time import time
 from datetime import date
 
-from .db import Database
 from .aws_provider import AWS
-from .digitalocean_provider import DigitalOcean
 
-@Gtk.Template(resource_path='/org/gnome/Example/blueprints/new.ui')
+
+@Gtk.Template(resource_path="/org/techtowers/CloudSurge/blueprints/new.ui")
 class NewView(Adw.Window):
     def test(self, jojo, _):
         print(self.provider_dropdown.get_selected_item().get_string())
 
-    __gtype_name__ = 'NewView'
+    __gtype_name__ = "NewView"
 
     check_provider = Gtk.Template.Child()
     check_machine = Gtk.Template.Child()
@@ -56,7 +54,7 @@ class NewView(Adw.Window):
     access_key_string: str
     secret_key_string: str
     region_string: str
-    #aws_fields = [access_key, secret_key, region, vpc_id , subnet_id, security_group_id]
+    # aws_fields = [access_key, secret_key, region, vpc_id , subnet_id, security_group_id]
 
     # DigitalOcean
     token = Gtk.Template.Child()
@@ -69,15 +67,22 @@ class NewView(Adw.Window):
         self.db = db
         self.app = window.app
         self.window = window
-        #self.manager = window.manager
+        # self.manager = window.manager
         self.is_closable = True
 
-        self.aws_fields = [self.provider_name, self.account_name, self.access_key, self.secret_key, self.region]
+        self.aws_fields = [
+            self.provider_name,
+            self.account_name,
+            self.access_key,
+            self.secret_key,
+            self.region,
+        ]
         self.check_provider.connect("activate", self.show_provider_settings)
         self.check_machine.connect("activate", self.show_machine_settings)
-        self.provider_dropdown.connect("notify::selected-item", self.change_provider)
+        self.provider_dropdown.connect(
+            "notify::selected-item", self.change_provider
+        )
         self.btn_create.connect("clicked", self.submit)
-
 
     def show_provider_settings(self, _):
         self.machine_settings.hide()
@@ -95,7 +100,10 @@ class NewView(Adw.Window):
             self.secret_key.show()
             self.region.show()
 
-        elif self.provider_dropdown.get_selected_item().get_string() == "DigitalOcean":
+        elif (
+            self.provider_dropdown.get_selected_item().get_string()
+            == "DigitalOcean"
+        ):
             self.access_key.hide()
             self.secret_key.hide()
             self.region.hide()
@@ -110,7 +118,10 @@ class NewView(Adw.Window):
             self.secret_key.show()
             self.region.show()
 
-        elif self.provider_dropdown.get_selected_item().get_string() == "DigitalOcean":
+        elif (
+            self.provider_dropdown.get_selected_item().get_string()
+            == "DigitalOcean"
+        ):
             self.access_key.hide()
             self.secret_key.hide()
             self.region.hide()
@@ -124,14 +135,16 @@ class NewView(Adw.Window):
             self.process_machine_input()
 
     def process_provider_input(self) -> bool:
-        provider:str = self.provider_dropdown.get_selected_item().get_string()
+        provider: str = self.provider_dropdown.get_selected_item().get_string()
         acc_name = self.account_name.get_text()
         creation_time = date.today()
         if provider == "Aws":
             access_key = self.access_key.get_text()
             secret_key = self.secret_key.get_text()
             region = self.region.get_text()
-            provider_connection = AWS(acc_name, creation_time, access_key, secret_key, region)
+            provider_connection = AWS(
+                acc_name, creation_time, access_key, secret_key, region
+            )
             if provider_connection.connection_is_alive():
                 self.db.insert_provider(provider_connection, print_output=False)
                 self.providers.append(provider_connection)
@@ -145,7 +158,6 @@ class NewView(Adw.Window):
                 return False
         elif provider == "DigitalOcean":
             pass
-
 
     def process_machine_input(self):
         pass
