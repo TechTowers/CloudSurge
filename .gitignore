@@ -1,6 +1,6 @@
 test_env
 
-frontend/CloudSurge/subprojects/blueprint-compiler
+subprojects/blueprint-compiler
 
 __pycache__
 
