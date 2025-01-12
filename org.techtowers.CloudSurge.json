@@ -43,7 +43,7 @@
       "sources": [
         {
           "type": "git",
-          "branch": "development",
+          "branch": "main",
           "url": "https://github.com/TechTowers/CloudSurge"
         }
       ]
