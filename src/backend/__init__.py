@@ -3,10 +3,10 @@ import os
 import requests
 
 import subprocess
-from backend.aws_provider import AWS
-from backend.db import Database
-from backend.digitalocean_provider import DigitalOcean
-from backend.vm import VirtualMachine
+from .aws_provider import AWS
+from .db import Database
+from .digitalocean_provider import DigitalOcean
+from .vm import VirtualMachine
 
 
 def get_cloudsurge_script():

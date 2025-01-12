@@ -20,6 +20,13 @@
 from gi.repository import Adw
 from gi.repository import Gtk
 
+from time import time
+from datetime import date
+
+from .db import Database
+from .aws_provider import AWS
+from .digitalocean_provider import DigitalOcean
+
 @Gtk.Template(resource_path='/org/gnome/Example/blueprints/new.ui')
 class NewView(Adw.Window):
     def test(self, jojo, _):
@@ -54,8 +61,12 @@ class NewView(Adw.Window):
     # DigitalOcean
     token = Gtk.Template.Child()
 
-    def __init__(self, window, **kwargs):
+    def __init__(self, window, vms, providers, db, **kwargs):
         super().__init__(**kwargs)
+
+        self.vms = vms
+        self.providers = providers
+        self.db = db
         self.app = window.app
         self.window = window
         #self.manager = window.manager
@@ -108,19 +119,33 @@ class NewView(Adw.Window):
 
     def submit(self, _):
         if self.check_provider.get_active():
-            self.check_provider_input()
+            self.process_provider_input()
         elif self.check_machine.get_active():
-            self.check_machine_input()
-        if self.provider_dropdown.get_selected_item().get_string() == "Aws":
-            for field in self.aws_fields:
-                if field.get_text() == "":
-                    print("empty")
-                    return
-        elif self.provider_dropdown.get_selected_item().get_string() == "DigitalOcean":
+            self.process_machine_input()
+
+    def process_provider_input(self) -> bool:
+        provider:str = self.provider_dropdown.get_selected_item().get_string()
+        acc_name = self.account_name.get_text()
+        creation_time = date.today()
+        if provider == "Aws":
+            access_key = self.access_key.get_text()
+            secret_key = self.secret_key.get_text()
+            region = self.region.get_text()
+            provider_connection = AWS(acc_name, creation_time, access_key, secret_key, region)
+            if provider_connection.connection_is_alive():
+                self.db.insert_provider(provider_connection, print_output=False)
+                self.providers.append(provider_connection)
+                print("inserted Successfully")
+                self.window.add_provider_to_gui(provider_connection)
+
+                self.close()
+                return True
+            else:
+                print("Connection Failed")
+                return False
+        elif provider == "DigitalOcean":
             pass
 
-    def check_provider_input(self):
-        pass
 
-    def check_machine_input(self):
+    def process_machine_input(self):
         pass

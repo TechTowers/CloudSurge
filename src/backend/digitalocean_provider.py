@@ -3,8 +3,8 @@ import time
 import digitalocean  # From python-digitalocean
 from datetime import date, datetime, timedelta, timezone
 
-from backend import Database
-from vm import VirtualMachine, Provider
+from .db import Database
+from .vm import VirtualMachine, Provider
 
 
 class DigitalOcean(Provider):

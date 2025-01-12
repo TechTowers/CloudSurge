@@ -27,6 +27,7 @@ gi.require_version('Adw', '1')
 from gi.repository import Gtk, Gio, Adw
 from .window import CloudsurgeWindow
 from .new import NewView
+from .db import Database
 
 #from .db import Database
 
@@ -35,7 +36,9 @@ class CloudsurgeApplication(Adw.Application):
     """The main application singleton class."""
     main_window: CloudsurgeWindow
     main_listbox: Gtk.ListBox
-    providers: list[Adw.ActionRow] = []
+    #providers: list[Adw.ActionRow] = []
+    vms = []
+    providers = []
 
     #db: Database
 
@@ -43,13 +46,17 @@ class CloudsurgeApplication(Adw.Application):
         super().__init__(application_id='org.gnome.Example',
                          flags=Gio.ApplicationFlags.DEFAULT_FLAGS)
 
-        #self.db = Database()
-        #self.db.init()
+        self.db = Database()
+        self.db.init()
+
+        self.providers = self.db.read_provider()
+        self.vms = self.db.read_vm(self.providers)
 
         # prov = self.db.read_provider()
         # vm = self.db.read_vm(prov)
         # print(prov)
         # print(vm)
+
 
         self.create_action('quit', lambda *_: self.quit(), ['<primary>q'])
         self.create_action('about', self.on_about_action)
@@ -65,7 +72,7 @@ class CloudsurgeApplication(Adw.Application):
         """
         win = self.props.active_window
         if not win:
-            win = CloudsurgeWindow(application=self)
+            win = CloudsurgeWindow(self.db, self.vms, self.providers, application=self)
             self.main_listbox = win.get_content().get_content().get_first_child()
         win.present()
         self.main_window = win
@@ -75,6 +82,8 @@ class CloudsurgeApplication(Adw.Application):
         if os.path.exists(path):
             with open(path) as f:
                 self.main_window.zerotier_id.set_title("current: " + f.read())
+
+
 
     def on_about_action(self, *args):
         """Callback for the app.about action."""
@@ -109,6 +118,7 @@ class CloudsurgeApplication(Adw.Application):
 
     def test(self, button, huh):
         print(button.get_name())
+        print(huh)
 
     def show_providers(self):
         print(providers)
@@ -121,7 +131,7 @@ class CloudsurgeApplication(Adw.Application):
         print(self.main_listbox)
 
     def show_add_view(self, _, widget=False):
-        new_window = NewView(self.main_window)
+        new_window = NewView(self.main_window, self.vms, self.providers, self.db)
         new_window.app = self
         new_window.present()
 

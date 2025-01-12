@@ -1,7 +1,7 @@
 # author: Luka Pacar
 from subprocess import TimeoutExpired
-from backend import VirtualMachine
-from backend import Database
+from .vm import VirtualMachine
+from .db import Database
 
 def get_active_servers():
     """Returns a list of virtual machines that have reached their cost limits."""

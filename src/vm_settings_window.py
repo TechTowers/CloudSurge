@@ -25,5 +25,5 @@ from gi.repository import Gtk
 class VmSettingsWindow(Adw.Window):
     __gtype_name__ = 'VmSettingsWindow'
 
-    def __init__(self, **kwargs):
+    def __init__(self, vm, provider_gui_widget, db, window, **kwargs):
         super().__init__(**kwargs)

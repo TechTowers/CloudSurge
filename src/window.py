@@ -20,6 +20,8 @@
 import os
 from gi.repository import Adw
 from gi.repository import Gtk
+
+from .db import Database
 #import backend.db
 from .vm_settings_window import VmSettingsWindow
 from .provider_settings_window import ProviderSettingsWindow
@@ -28,6 +30,11 @@ from .provider_settings_window import ProviderSettingsWindow
 @Gtk.Template(resource_path='/org/gnome/Example/blueprints/window.ui')
 class CloudsurgeWindow(Adw.ApplicationWindow):
     __gtype_name__ = 'CloudsurgeWindow'
+
+    db: Database
+
+    curr_selected_provider = None
+    curr_selected_vm = None
 
     home_button = Gtk.Template.Child()
     providers_button = Gtk.Template.Child()
@@ -47,10 +54,15 @@ class CloudsurgeWindow(Adw.ApplicationWindow):
     vm_settings_button = Gtk.Template.Child()
     provider_settings_button = Gtk.Template.Child()
 
-    def __init__(self, **kwargs):
+    def __init__(self, db, vms, providers, **kwargs):
         super().__init__(**kwargs)
         #self.providers_button.set_active(True)
-        
+
+        self.vms = vms
+        self.providers = providers
+        for provider in self.providers:
+            self.add_provider_to_gui(provider)
+        self.db = db
         self.home_button.connect("clicked", self.show_home)
         self.providers_button.connect("clicked", self.show_providers)
         self.machines_button.connect("clicked", self.show_machines)
@@ -110,12 +122,71 @@ class CloudsurgeWindow(Adw.ApplicationWindow):
             f.write(t)
         self.zerotier_id.set_title("current: " + t)
 
-    def show_vm_settings_window(self, _):
-        dialog = VmSettingsWindow()
+    def show_vm_settings_window(self, _, vm, vm_gui_widget):
+        dialog = VmSettingsWindow(vm, vm_gui_widget, self.db, self)
         dialog.app = self.app
         dialog.present()
 
-    def show_provider_settings_window(self, _):
-        dialog = ProviderSettingsWindow()
+    def show_provider_settings_window(self, _, provider, provider_gui_widget):
+        dialog = ProviderSettingsWindow(provider, provider_gui_widget, self.db, self)
         dialog.app = self.app
         dialog.present()
+
+    # Provider-Methods
+    def add_provider_to_gui(self, provider):
+        self.providers_list.append(self.provider_to_widget(provider))
+
+    def provider_to_widget(self, provider) -> Adw.ActionRow:
+        row = Adw.ActionRow()
+        row.set_title(provider.get_account_name())
+        row.set_subtitle(provider.get_provider_name())
+
+        # Create the button and add the desired child elements
+        button = Gtk.Button()
+        #button.set_action_name("app.test")
+        button.connect("clicked", self.show_provider_settings_window, provider, row)
+        # Define the Box to hold the child widget, with appropriate spacing
+        box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
+
+        # Create the Image widget with the icon
+        image = Gtk.Image(icon_name="applications-system-symbolic")
+
+        # Add the image to the box
+        box.append(image)
+
+        # Set the Box as the child of the button
+        button.set_child(box)
+
+        # Add the button to the ActionRow
+        row.add_suffix(button)
+        return row
+    # VM-Methods
+    def add_vm_to_gui(self, vm):
+        self.machines_list.append(self.vm_to_widget(vm))
+
+    def vm_to_widget(self, vm) -> Adw.ActionRow:
+        row = Adw.ActionRow()
+        row.set_title(vm.get_vm_name())
+        row.set_subtitle(vm.get_provider().get_account_name())
+
+        # Create the button and add the desired child elements
+        button = Gtk.Button()
+        button.set_action_name("app.test")
+        button.connect("clicked", self.show_vm_settings_window, vm, row)
+
+        # Define the Box to hold the child widget, with appropriate spacing
+        box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
+
+        # Create the Image widget with the icon
+        image = Gtk.Image(icon_name="applications-system-symbolic")
+
+        # Add the image to the box
+        box.append(image)
+
+        # Set the Box as the child of the button
+        button.set_child(box)
+
+        # Add the button to the ActionRow
+        row.add_suffix(button)
+        return row
+

@@ -1,6 +1,6 @@
 # author: Luka Pacar
-from backend import VirtualMachine
-from backend import Database
+from .vm import VirtualMachine
+from .db import Database
 
 def get_reached_cost_limits():
     """Prints a list of virtual machines that have reached their cost limits."""

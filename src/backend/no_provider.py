@@ -1,5 +1,5 @@
 # author: Luka Pacar
-from vm import Provider
+from .vm import Provider
 from datetime import date
 
 class NoProvider(Provider):

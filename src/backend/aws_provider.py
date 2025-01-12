@@ -6,7 +6,7 @@ import pytz
 import boto3
 from botocore.exceptions import ClientError
 
-from vm import VirtualMachine, Provider
+from .vm import VirtualMachine, Provider
 
 
 class AWS(Provider):

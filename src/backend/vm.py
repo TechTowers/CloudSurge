@@ -104,7 +104,7 @@ class VirtualMachine:
         new_vm: bool = True,
     ):
         self._vm_name = vm_name
-        from backend import Database
+        from .db import Database
 
         if provider is None:
             self._provider = Database.no_provider

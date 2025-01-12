@@ -50,6 +50,9 @@ cloudsurge_sources = [
   'backend/aws_provider.py',
   'backend/digitalocean_provider.py',
   'backend/vm.py',
+  'backend/no_provider.py',
+  'backend/reached_cost_limits.py',
+  'backend/server_is_active.py',
 ]
 
 install_data(cloudsurge_sources, install_dir: moduledir)

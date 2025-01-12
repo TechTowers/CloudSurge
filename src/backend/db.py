@@ -4,9 +4,8 @@ from datetime import date
 import re
 import os
 
-from backend import AWS
-from backend.no_provider import NoProvider
-
+from .aws_provider import AWS
+from .no_provider import NoProvider
 
 # author: Luka Pacar
 class Database:
@@ -106,7 +105,7 @@ class Database:
 
     def read_provider(self):
         """Reads and returns all provider information from the database."""
-        from backend import DigitalOcean
+        from .digitalocean_provider import DigitalOcean
 
         try:
             self.cursor.execute("SELECT * FROM provider")
@@ -256,7 +255,7 @@ class Database:
                 }
 
                 # Find the corresponding provider for the VM
-                from backend import VirtualMachine
+                from .vm import VirtualMachine
 
                 for provider_account in available_provider_accounts:
                     if (
