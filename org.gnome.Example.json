@@ -1,44 +1,57 @@
 {
-    "id" : "org.gnome.Example",
-    "runtime" : "org.gnome.Platform",
-    "runtime-version" : "master",
-    "sdk" : "org.gnome.Sdk",
-    "command" : "cloudsurge",
-    "finish-args" : [
-        "--share=network",
-        "--share=ipc",
-        "--socket=fallback-x11",
-        "--device=dri",
-        "--socket=wayland"
-    ],
-    "cleanup" : [
-        "/include",
-        "/lib/pkgconfig",
-        "/man",
-        "/share/doc",
-        "/share/gtk-doc",
-        "/share/man",
-        "/share/pkgconfig",
-        "*.la",
-        "*.a"
-    ],
-    "modules" : [
+  "id": "org.gnome.Example",
+  "runtime": "org.gnome.Platform",
+  "runtime-version": "master",
+  "sdk": "org.gnome.Sdk",
+  "command": "cloudsurge",
+  "finish-args": [
+    "--share=network",
+    "--share=ipc",
+    "--socket=fallback-x11",
+    "--device=dri",
+    "--socket=wayland"
+  ],
+  "cleanup": [
+    "/include",
+    "/lib/pkgconfig",
+    "/man",
+    "/share/doc",
+    "/share/gtk-doc",
+    "/share/man",
+    "/share/pkgconfig",
+    "*.la",
+    "*.a"
+  ],
+  "modules": [
+    "python3-requirements.json",
+    {
+      "name": "blueprint-compiler",
+      "buildsystem": "meson",
+      "sources": [
         {
-            "name" : "cloudsurge",
-            "builddir" : true,
-            "buildsystem" : "meson",
-            "sources" : [
-                {
-                    "type" : "git",
-                    "url" : "file:///home/benedikt/Projects"
-                }
-            ],
-            "config-opts" : [
-                "--libdir=lib"
-            ]
+          "type": "git",
+          "url": "https://gitlab.gnome.org/jwestman/blueprint-compiler",
+          "tag": "v0.14.0"
         }
-    ],
-    "build-options" : {
-        "env" : {        }
+      ]
+    },
+    {
+      "name": "cloudsurge",
+      "builddir": true,
+      "buildsystem": "meson",
+      "sources": [
+        {
+          "type": "git",
+          "branch": "development",
+          "url": "https://github.com/TechTowers/CloudSurge"
+        }
+      ],
+      "config-opts": [
+        "--libdir=lib"
+      ]
     }
+  ],
+  "build-options": {
+    "env": {}
+  }
 }
