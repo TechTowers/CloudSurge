@@ -107,6 +107,10 @@ class NewView(Adw.Window):
             self.token.show()
 
     def submit(self, _):
+        if self.check_provider.get_active():
+            self.check_provider_input()
+        elif self.check_machine.get_active():
+            self.check_machine_input()
         if self.provider_dropdown.get_selected_item().get_string() == "Aws":
             for field in self.aws_fields:
                 if field.get_text() == "":
@@ -114,3 +118,9 @@ class NewView(Adw.Window):
                     return
         elif self.provider_dropdown.get_selected_item().get_string() == "DigitalOcean":
             pass
+
+    def check_provider_input(self):
+        pass
+
+    def check_machine_input(self):
+        pass

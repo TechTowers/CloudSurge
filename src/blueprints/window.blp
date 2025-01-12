@@ -26,6 +26,10 @@ template $CloudsurgeWindow : Adw.ApplicationWindow {
           tooltip-text: _("go to Machines");
           label: "Machines";
         }
+        ToggleButton cost_button {
+          tooltip-text: _("go to Cost");
+          label: "Cost";
+        }
       };
       [start]
       Button btn_add {
@@ -248,6 +252,59 @@ template $CloudsurgeWindow : Adw.ApplicationWindow {
             Adw.ActionRow {
               title: "VM3";
               subtitle: "10.0.0.3";
+            }
+          };
+        }
+
+        ScrolledWindow cost_window {
+          visible: false;
+          propagate-natural-height: true;
+          child: ListBox {
+            selection-mode: none;
+            css-classes: ["boxed-list"];
+
+            Adw.ExpanderRow {
+              title: "Azure";
+              subtitle: "total-cost: 50$";
+
+              Adw.ActionRow {
+                title: "Average cost: 1$/h";
+              }
+              Adw.ActionRow {
+                title: "Estimated cost: 2$/h";
+              }
+            }
+            Adw.ExpanderRow {
+              title: "test";
+
+              Adw.ActionRow {
+                title: "VM3";
+                subtitle: "10.0.0.3";
+              }
+              Adw.ActionRow {
+                title: "VM3";
+                subtitle: "10.0.0.3";
+              }
+              Adw.ActionRow {
+                title: "VM3";
+                subtitle: "10.0.0.3";
+              }
+            }
+            Adw.ExpanderRow {
+              title: "test";
+
+              Adw.ActionRow {
+                title: "VM3";
+                subtitle: "10.0.0.3";
+              }
+              Adw.ActionRow {
+                title: "VM3";
+                subtitle: "10.0.0.3";
+              }
+              Adw.ActionRow {
+                title: "VM3";
+                subtitle: "10.0.0.3";
+              }
             }
           };
         }
