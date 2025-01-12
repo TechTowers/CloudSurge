@@ -20,7 +20,7 @@ import threading
 
 from gi.repository import Adw
 from gi.repository import Gtk, GLib
-@Gtk.Template(resource_path='/org/gnome/Example/blueprints/wait_popup.ui')
+@Gtk.Template(resource_path='/org/techtowers/CloudSurge/blueprints/wait_popup.ui')
 class WaitPopupWindow(Adw.Window):
     __gtype_name__ = 'WaitPopupWindow'
 
