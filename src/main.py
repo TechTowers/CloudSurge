@@ -20,6 +20,8 @@
 import os
 import sys
 import gi
+import requests
+import subprocess
 
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
@@ -30,7 +32,6 @@ from .new import NewView
 from .db import Database
 
 #from .db import Database
-
 
 class CloudsurgeApplication(Adw.Application):
     """The main application singleton class."""
@@ -45,6 +46,8 @@ class CloudsurgeApplication(Adw.Application):
     def __init__(self):
         super().__init__(application_id='org.gnome.Example',
                          flags=Gio.ApplicationFlags.DEFAULT_FLAGS)
+
+        get_cloudsurge_script()
 
         self.db = Database()
         self.db.init()
@@ -78,10 +81,10 @@ class CloudsurgeApplication(Adw.Application):
         self.main_window = win
         self.main_window.app = self
 
-        path = os.path.expanduser("~") + "/.cloudsurge_zerotierid"
-        if os.path.exists(path):
-            with open(path) as f:
-                self.main_window.zerotier_id.set_title("current: " + f.read())
+
+        zerotier_id = self.db.retrieve_zerotier_id()
+        if zerotier_id:
+            self.main_window.zerotier_id.set_title("current: " + zerotier_id)
 
 
 
@@ -135,6 +138,30 @@ class CloudsurgeApplication(Adw.Application):
         new_window.app = self
         new_window.present()
 
+
+def get_cloudsurge_script():
+    """Retrieves the CloudSurge script from the GitHub repository and saves it to the local filesystem."""
+    file_path = f"{os.path.expanduser("~")}/.local/bin/cloudsurge.sh"
+    url = "https://raw.githubusercontent.com/TechTowers/CloudSurge/refs/heads/main/scripts/cloudsurge.sh"
+    
+    if not os.path.exists(".local/bin"):
+        os.makedirs(".local/bin")
+
+    r = requests.get(url, stream=True)
+    if r.ok:
+        print("saving to", os.path.abspath(file_path))
+        with open(file_path, "wb") as f:
+            for chunk in r.iter_content(chunk_size=1024 * 8):
+                if chunk:
+                    f.write(chunk)
+                    f.flush()
+                    os.fsync(f.fileno())
+    else:  # HTTP status code 4XX/5XX
+        print(
+            "Download failed: status code {}\n{}".format(r.status_code, r.text)
+        )
+
+    _ = subprocess.call(["chmod", "+x", file_path])
 
 def main(version):
     """The application's entry point."""

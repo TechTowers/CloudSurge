@@ -215,47 +215,26 @@ template $CloudsurgeWindow : Adw.ApplicationWindow {
             selection-mode: none;
             css-classes: ["boxed-list"];
 
-            Adw.ExpanderRow {
+            Adw.ExpanderRow aws_totalcost{
               title: "Azure";
               subtitle: "total-cost: 50$";
 
-              Adw.ActionRow {
+              Adw.ActionRow aws_avgcost {
                 title: "Average cost: 1$/h";
               }
-              Adw.ActionRow {
-                title: "Estimated cost: 2$/h";
+              Adw.ActionRow aws_estcost {
+                title: "Estimated cost: 4.608$/h";
               }
             }
-            Adw.ExpanderRow {
-              title: "test";
+            Adw.ExpanderRow do_totalcost {
+              title: "DigitalOcean";
+              subtitle: "total-cost: 50$";
 
-              Adw.ActionRow {
-                title: "VM3";
-                subtitle: "10.0.0.3";
+              Adw.ActionRow do_avgcost {
+                title: "Average cost: 1$/h";
               }
-              Adw.ActionRow {
-                title: "VM3";
-                subtitle: "10.0.0.3";
-              }
-              Adw.ActionRow {
-                title: "VM3";
-                subtitle: "10.0.0.3";
-              }
-            }
-            Adw.ExpanderRow {
-              title: "test";
-
-              Adw.ActionRow {
-                title: "VM3";
-                subtitle: "10.0.0.3";
-              }
-              Adw.ActionRow {
-                title: "VM3";
-                subtitle: "10.0.0.3";
-              }
-              Adw.ActionRow {
-                title: "VM3";
-                subtitle: "10.0.0.3";
+              Adw.ActionRow do_estcost {
+                title: "Estimated cost: 0.038$/h";
               }
             }
           };

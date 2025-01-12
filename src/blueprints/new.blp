@@ -139,13 +139,8 @@ template $NewView : Adw.Window {
               model: StringList vm_provider_choice {
                 strings [
                   _("SSH (No provider)"),
-                  _("DigitalOcean1"),
                 ]
               };
-            }
-            Adw.EntryRow provider {
-              use-markup: false;
-              title: _("Provider");
             }
             Adw.EntryRow cost_limit {
               use-markup: false;
@@ -163,9 +158,21 @@ template $NewView : Adw.Window {
               use-markup: false;
               title: _("Password");
             }
+            Adw.EntryRow do_key_id {
+              use-markup: false;
+              title: _("DigitalOcean key id");
+
+              visible: false;
+            }
+            Adw.EntryRow aws_key_name {
+              use-markup: false;
+              title: _("Aws key name");
+
+              visible: false;
+            }
             Adw.EntryRow ssh_key {
               use-markup: false;
-              title: _("SSH Key");
+              title: _("SSH Key path");
             }
           }
         };

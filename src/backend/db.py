@@ -30,6 +30,7 @@ class Database:
 
             self.create_table_provider()
             self.create_table_vm()
+            self.create_table_zerotier_id()
         except sqlite3.Error as e:
             print(f"Error initializing database: {e}")
         except Exception as e:
@@ -285,6 +286,75 @@ class Database:
             raise
         except Exception as e:
             print(f"Unexpected error while reading VMs: {e}")
+            raise
+
+    # ZeroTier ID Methods
+
+    def create_table_zerotier_id(self):
+        """Creates the ZeroTier ID table with one entry."""
+        try:
+            self.cursor.execute("""
+                   CREATE TABLE IF NOT EXISTS zerotier_id (
+                       id INTEGER PRIMARY KEY AUTOINCREMENT,
+                       zerotier_id TEXT NOT NULL
+                   );
+               """)
+            self.connection.commit()
+        except sqlite3.Error as e:
+            print(f"Error creating ZeroTier ID table: {e}")
+        except Exception as e:
+            print(f"Unexpected error: {e}")
+
+    def insert_zerotier_id(self, zerotier_id: str, print_output=True) -> None:
+        """Inserts or updates the ZeroTier ID in the zerotier_id table."""
+        try:
+            # Check if there is already an entry in the table
+            self.cursor.execute("SELECT id FROM zerotier_id LIMIT 1")
+            result = self.cursor.fetchone()
+
+            if result:
+                # Update the existing ZeroTier ID
+                self.cursor.execute(
+                    """
+                    UPDATE zerotier_id
+                    SET zerotier_id = ?
+                    WHERE id = 1;
+                    """,
+                    (zerotier_id,)
+                )
+                if print_output:
+                    print(f"ZeroTier ID updated to '{zerotier_id}'") if print_output else None
+            else:
+                # Insert the new ZeroTier ID if the table is empty
+                self.cursor.execute(
+                    """
+                    INSERT INTO zerotier_id (zerotier_id)
+                    VALUES (?);
+                    """,
+                    (zerotier_id,)
+                )
+                if print_output:
+                    print(f"ZeroTier ID '{zerotier_id}' inserted successfully.") if print_output else None
+
+            self.connection.commit()
+        except sqlite3.Error as e:
+            print(f"Error inserting or updating ZeroTier ID: {e}")
+        except Exception as e:
+            print(f"Unexpected error while inserting or updating ZeroTier ID: {e}")
+
+    def retrieve_zerotier_id(self):
+        """Retrieves the ZeroTier ID from the database."""
+        try:
+            self.cursor.execute("SELECT zerotier_id FROM zerotier_id LIMIT 1")
+            result = self.cursor.fetchone()
+            if result:
+                return result[0]
+            else:
+                return None
+        except sqlite3.Error as e:
+            print(f"Error retrieving ZeroTier ID: {e}")
+        except Exception as e:
+            print(f"Unexpected error while retrieving ZeroTier ID: {e}")
             raise
 
     # Database Ending-Methods

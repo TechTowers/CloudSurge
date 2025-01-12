@@ -120,8 +120,11 @@ class VirtualMachine:
         if new_vm:
             for _ in range(10):
                 if self.is_reachable():
+                    print("Starting Install..")
                     self.install_vm()
+                    print("Starting Configuring..")
                     self.configure_vm()
+                    print("Finished Configuring")
                     break
                 else:
                     sleep(2)
@@ -140,7 +143,7 @@ class VirtualMachine:
             ],
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
-            timeout=30,
+            timeout=15,
         )
 
         return process == 0
@@ -155,7 +158,6 @@ class VirtualMachine:
                 "-k",
                 self.get_ssh_key(),
                 "-i",
-                self.get_zerotier_network(),
                 "-p",
             ],
             input=f"{self.get_password()}\n",

@@ -65,8 +65,9 @@ class DigitalOcean(Provider):
         ssh_key_ids: list,
         zerotier_network: str,
         ssh_key_path: str,
+        cost_limit: int = -1,
         location: str = "fra1",
-        vm_size: str = "s-1vcpu-1gb",
+        vm_size: str = "g-2vcpu-8gb",
         admin_password: str = "YourSecurePassword!",
         image_reference: str = "ubuntu-20-04-x64",
         max_retries: int = 10,  # Maximum retries for load
@@ -79,6 +80,7 @@ class DigitalOcean(Provider):
             location (str): Location of the VM.
             vm_name (str): Name of the VM.
             vm_size (str): Size of the VM.
+            cost_limit (int): Cost limit for the VM.
             admin_password (str): Admin password.
             image_reference (str): Image reference.
             ssh_key_ids (list): List of SSH key IDs.
@@ -149,7 +151,7 @@ class DigitalOcean(Provider):
             return VirtualMachine(
                 vm_name,
                 self,
-                -1,
+                cost_limit,
                 droplet.ip_address,
                 date.today(),
                 "root",

@@ -1,0 +1,37 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $WaitPopupWindow: Adw.Window {
+  title: _("Wait");
+  default-width: 200;
+  default-height: 150;
+
+  Box {
+    orientation: vertical;
+
+    Adw.HeaderBar {
+      show-start-title-buttons: false;
+      show-end-title-buttons: false;
+    }
+
+    Label {
+      margin-top: 10;
+      margin-start: 10;
+      margin-end: 10;
+      wrap: true;
+      label: _("Wait!");
+
+      styles ["title-1"]
+    }
+    Label {
+      margin-top: 20;
+      margin-bottom: 20;
+      margin-start: 10;
+      margin-end: 10;
+      wrap: true;
+      label: _("This action will take a while.");
+    }
+
+    Adw.Spinner {}
+  }
+}
