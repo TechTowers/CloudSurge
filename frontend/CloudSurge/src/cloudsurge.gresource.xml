@@ -5,6 +5,7 @@
     <file preprocess="xml-stripblanks">blueprints/window.ui</file>
     <file preprocess="xml-stripblanks">blueprints/new.ui</file>
     <file preprocess="xml-stripblanks">blueprints/vm_settings_window.ui</file>
+    <file preprocess="xml-stripblanks">blueprints/provider_settings_window.ui</file>
     <file preprocess="xml-stripblanks">gtk/help-overlay.ui</file>
   </gresource>
 </gresources>

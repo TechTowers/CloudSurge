@@ -22,6 +22,7 @@ from gi.repository import Adw
 from gi.repository import Gtk
 #import backend.db
 from .vm_settings_window import VmSettingsWindow
+from .provider_settings_window import ProviderSettingsWindow
 
 
 @Gtk.Template(resource_path='/org/gnome/Example/blueprints/window.ui')
@@ -41,8 +42,8 @@ class CloudsurgeWindow(Adw.ApplicationWindow):
     machines_list = Gtk.Template.Child()
     machines_window = Gtk.Template.Child()
 
-    settings = Gtk.Template.Child()
     vm_settings_button = Gtk.Template.Child()
+    provider_settings_button = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -53,6 +54,7 @@ class CloudsurgeWindow(Adw.ApplicationWindow):
         self.home_button.connect("clicked", self.show_home)
         self.save_zerotier_id_button.connect("activated", self.save_zerotier_id)
         self.vm_settings_button.connect("clicked", self.show_vm_settings_window)
+        self.provider_settings_button.connect("clicked", self.show_provider_settings_window)
 
     def show_providers(self, _):
         self.machines_window.hide()
@@ -90,5 +92,10 @@ class CloudsurgeWindow(Adw.ApplicationWindow):
 
     def show_vm_settings_window(self, _):
         dialog = VmSettingsWindow()
+        dialog.app = self.app
+        dialog.present()
+
+    def show_provider_settings_window(self, _):
+        dialog = ProviderSettingsWindow()
         dialog.app = self.app
         dialog.present()
