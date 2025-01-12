@@ -1,6 +1,7 @@
 {
   inputs = {
     nixpkgs.url = "github:cachix/devenv-nixpkgs/rolling";
+    nixpkgs-unstable.url = "nixpkgs/nixos-unstable";
     systems.url = "github:nix-systems/default";
 
     devenv = {
@@ -24,6 +25,7 @@
   outputs = {
     self,
     nixpkgs,
+    nixpkgs-unstable,
     devenv,
     systems,
     ...
@@ -39,19 +41,20 @@
       forEachSystem
       (system: let
         pkgs = nixpkgs.legacyPackages.${system};
+        pkgs-unstable = nixpkgs-unstable.legacyPackages.${system};
       in {
         default = devenv.lib.mkShell {
           inherit inputs pkgs;
           modules = [
             {
-              packages = with pkgs; [
+              packages = with pkgs-unstable; [
                 git # duh
-                helix # the best code editor
 
                 gnome-builder
                 meson
                 flatpak
                 flatpak-builder
+                appstream
               ];
 
               languages.python = {
