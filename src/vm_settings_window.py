@@ -17,7 +17,6 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import os
 from gi.repository import Adw
 from gi.repository import Gtk
 #import backend.db

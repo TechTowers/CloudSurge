@@ -32,23 +32,18 @@ class NoProvider(Provider):
 
     def connection_is_alive(self) -> str:
         """Does Nothing."""
-        pass
 
     def create_vm(self):
         """Does Nothing."""
-        pass
 
     def start_vm(self, virtual_machine) -> None:
         """Does Nothing."""
-        pass
 
     def stop_vm(self, virtual_machine) -> None:
         """Does Nothing."""
-        pass
 
     def delete_vm(self, virtual_machine) -> None:
         """Does Nothing."""
-        pass
 
     def is_active(self, vm):
         """Check if the connection is active."""
