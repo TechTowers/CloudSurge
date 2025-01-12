@@ -310,7 +310,7 @@ if [[ $INSTALL -eq 1 ]]; then
 
   success "Downloading CloudSurge SystemdD service..."
   sleep 1
-  run "curl -s https://raw.githubusercontent.com/TechTowers/CloudSurge/refs/heads/development/services/cloudsurge.service > cloudsurge.service" ||
+  run "curl -s https://raw.githubusercontent.com/TechTowers/CloudSurge/refs/heads/main/services/cloudsurge.service > cloudsurge.service" ||
     fail "Downloading CloudSurge service failed!"
   success "Moving cloudsurge service to correct place..."
   sleep 1
