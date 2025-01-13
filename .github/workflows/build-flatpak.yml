@@ -16,11 +16,20 @@ jobs:
       image: bilelmoussaoui/flatpak-github-actions:gnome-47
       options: --privileged
     steps:
-      - uses: actions/checkout@v4
-      - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Build flatpak
+        uses: flatpak/flatpak-github-actions/flatpak-builder@v6
         with:
           bundle: palette.flatpak
           manifest-path: org.techtowers.CloudSurge.json
+
+      - name: Set up GitHub CLI
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: cli/gh-action@v2
+        with:
+          version: latest
 
       - name: Create Release on Tag Push
         if: startsWith(github.ref, 'refs/tags/')
