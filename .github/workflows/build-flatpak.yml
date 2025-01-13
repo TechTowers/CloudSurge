@@ -25,6 +25,10 @@ jobs:
           bundle: cloudsurge.flatpak
           manifest-path: org.techtowers.CloudSurge.json
 
+  release:
+    name: "Release a tag"
+    runs-on: ubuntu-latest
+    steps:
       - name: Create Release on Tag Push
         if: startsWith(github.ref, 'refs/tags/')
         env:
