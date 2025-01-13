@@ -121,9 +121,9 @@ class VirtualMachine:
             for _ in range(10):
                 if self.is_reachable():
                     print("Starting Install..")
-                    self.install_vm()
+                    #self.install_vm()
                     print("Starting Configuring..")
-                    self.configure_vm()
+                    #self.configure_vm()
                     print("Finished Configuring")
                     break
                 else:

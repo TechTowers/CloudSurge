@@ -5,6 +5,7 @@ template $CloudsurgeWindow : Adw.ApplicationWindow {
   default-width: 600;
   default-height: 400;
   title: _("CloudSurge");
+  resizable: true;
 
   Adw.ToolbarView {
     [top]
@@ -76,8 +77,8 @@ template $CloudsurgeWindow : Adw.ApplicationWindow {
           }
           LinkButton help_links {
             halign: start;
-            label: "https://www.helpazure.com";
-            uri: "https://www.helpazure.com";
+            label: "https://github.com/TechTowers/CloudSurge";
+            uri: "https://github.com/TechTowers/CloudSurge?tab=readme-ov-file#%EF%B8%8F-cloudsurge";
             margin-top: 5;
           }
 
@@ -120,22 +121,6 @@ template $CloudsurgeWindow : Adw.ApplicationWindow {
 
             selection-mode: none;
             css-classes: ["boxed-list"];
-
-            Adw.ActionRow Azure1 {
-              title: "Azure1";
-              subtitle: "10.0.0.1";
-
-              Button provider_settings_button {
-                valign: center;
-
-                child: Box {
-                  spacing: 6;
-                  Image {
-                    icon-name: "applications-system-symbolic";
-                  }
-                };
-              }
-            }
           };
         }
 
@@ -149,62 +134,6 @@ template $CloudsurgeWindow : Adw.ApplicationWindow {
 
             selection-mode: none;
             css-classes: ["boxed-list"];
-
-            Adw.ActionRow vm1 {
-              title: "VM1";
-              subtitle: "10.0.0.1";
-
-              Button vm_settings_button {
-                valign: center;
-
-                child: Box {
-                  spacing: 6;
-                  Image {
-                    icon-name: "applications-system-symbolic";
-                  }
-                };
-              }
-            }
-            Adw.ActionRow vm2 {
-              title: "VM2";
-              subtitle: "10.0.0.2";
-            }
-            Adw.ActionRow vm3 {
-              title: "VM3";
-              subtitle: "10.0.0.3";
-            }
-            Adw.ActionRow {
-              title: "VM3";
-              subtitle: "10.0.0.3";
-            }
-            Adw.ActionRow {
-              title: "VM3";
-              subtitle: "10.0.0.3";
-            }
-            Adw.ActionRow {
-              title: "VM3";
-              subtitle: "10.0.0.3";
-            }
-            Adw.ActionRow {
-              title: "VM3";
-              subtitle: "10.0.0.3";
-            }
-            Adw.ActionRow {
-              title: "VM3";
-              subtitle: "10.0.0.3";
-            }
-            Adw.ActionRow {
-              title: "VM3";
-              subtitle: "10.0.0.3";
-            }
-            Adw.ActionRow {
-              title: "VM3";
-              subtitle: "10.0.0.3";
-            }
-            Adw.ActionRow {
-              title: "VM3";
-              subtitle: "10.0.0.3";
-            }
           };
         }
 
@@ -217,10 +146,10 @@ template $CloudsurgeWindow : Adw.ApplicationWindow {
 
             Adw.ExpanderRow aws_totalcost{
               title: "Azure";
-              subtitle: "total-cost: 50$";
+              subtitle: "total cost: 0$";
 
               Adw.ActionRow aws_avgcost {
-                title: "Average cost: 1$/h";
+                title: "Average cost: 0$/h";
               }
               Adw.ActionRow aws_estcost {
                 title: "Estimated cost: 4.608$/h";
@@ -228,10 +157,10 @@ template $CloudsurgeWindow : Adw.ApplicationWindow {
             }
             Adw.ExpanderRow do_totalcost {
               title: "DigitalOcean";
-              subtitle: "total-cost: 50$";
+              subtitle: "total cost: 0$";
 
               Adw.ActionRow do_avgcost {
-                title: "Average cost: 1$/h";
+                title: "Average cost: 0$/h";
               }
               Adw.ActionRow do_estcost {
                 title: "Estimated cost: 0.038$/h";
@@ -251,9 +180,6 @@ menu primary_menu {
       label: _("_How to");
       action: "app.howto";
     }
-  }
-
-  section {
     item {
       label: _("_About us");
       action: "app.aboutus";

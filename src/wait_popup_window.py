@@ -24,14 +24,18 @@ from gi.repository import Gtk, GLib
 class WaitPopupWindow(Adw.Window):
     __gtype_name__ = 'WaitPopupWindow'
 
-    def __init__(self, action, **kwargs):
+    def __init__(self, action, parent, **kwargs):
         super().__init__(**kwargs)
+        if parent:
+            self.set_transient_for(parent)
+            self.set_modal(True)
         self.execute_in_thread(action)
 
     def execute_in_thread(self, action):
         def wrapper():
             # Execute the passed code block
-            action()
+            #print(str(action))
+            action(self)
             # Close Window after Block is finished. Resuming GUI
             GLib.idle_add(self.close)
 

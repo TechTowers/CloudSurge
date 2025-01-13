@@ -7,7 +7,7 @@ template $VmSettingsWindow: Adw.Window {
   default-width: 600;
   default-height: 500;
   hide-on-close: true;
-  title: _("Machine Settings");
+  title: _("Calculating...");
 
   ShortcutController {
     Shortcut shortcut_escape {
@@ -62,6 +62,15 @@ template $VmSettingsWindow: Adw.Window {
           }
           Adw.ButtonRow update_machine {
             title: _("Update Machine");
+          }
+          Adw.ActionRow provider_acc {
+            title: "Provider account: not avaliable";
+          }
+          Adw.ActionRow curr_cost {
+            title: "Current cost: trying to fetch";
+          }
+          Adw.ActionRow cost_limit {
+            title: "Cost limit: trying to fetch";
           }
         }
       }

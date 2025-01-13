@@ -5,13 +5,28 @@ template $ErrorWindow: Adw.Window {
   title: _("Error");
   default-width: 200;
   default-height: 150;
+  hide-on-close: true;
+
+  ShortcutController {
+    Shortcut shortcut_escape {
+      trigger: "Escape";
+      action: "action(window.close)";
+    }
+  }
 
   Box {
     orientation: vertical;
 
     Adw.HeaderBar {
       show-start-title-buttons: false;
-      show-end-title-buttons: true;
+      show-end-title-buttons: false;
+
+      Button btn_cancel {
+        label: _("_Close");
+        use-underline: true;
+        action-name: "window.close";
+      }
+      // Ensure window close button will trigger close
     }
 
     Label {
@@ -23,16 +38,18 @@ template $ErrorWindow: Adw.Window {
 
       styles ["title-1"]
     }
-    Label {
+    Label err_message {
       margin-top: 20;
       margin-bottom: 20;
       margin-start: 10;
       margin-end: 10;
       wrap: true;
-      label: _("An Error Occured");
+      label: _("An Error Occurred");
       styles [
-              "color: red"
-            ]
+        "color: red"
+      ]
     }
   }
+
+  // Ensure the window can be closed properly by connecting the 'destroy' signal
 }

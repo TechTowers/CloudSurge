@@ -18,6 +18,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import os
+import threading
+
 from gi.repository import Adw
 from gi.repository import Gtk
 
@@ -52,8 +54,8 @@ class CloudsurgeWindow(Adw.ApplicationWindow):
     machines_window = Gtk.Template.Child()
     cost_window = Gtk.Template.Child()
 
-    vm_settings_button = Gtk.Template.Child()
-    provider_settings_button = Gtk.Template.Child()
+    #vm_settings_button = Gtk.Template.Child()
+    #provider_settings_button = Gtk.Template.Child()
 
     aws_totalcost = Gtk.Template.Child()
     aws_avgcost = Gtk.Template.Child()
@@ -78,10 +80,6 @@ class CloudsurgeWindow(Adw.ApplicationWindow):
         self.machines_button.connect("clicked", self.show_machines)
         self.cost_button.connect("clicked", self.show_cost)
         self.save_zerotier_id_button.connect("activated", self.save_zerotier_id)
-        self.vm_settings_button.connect("clicked", self.show_vm_settings_window)
-        self.provider_settings_button.connect(
-            "clicked", self.show_provider_settings_window
-        )
 
     def show_home(self, _):
         self.providers_window.hide()
@@ -127,7 +125,8 @@ class CloudsurgeWindow(Adw.ApplicationWindow):
         self.machines_button.set_active(False)
         self.cost_button.set_active(True)
 
-        self.update_cost()
+        thread_values = threading.Thread(target=self.update_cost)
+        thread_values.start()
 
     def save_zerotier_id(self, _):
         zero_tier_id = self.zerotier_id.get_text()
@@ -179,11 +178,11 @@ class CloudsurgeWindow(Adw.ApplicationWindow):
 
     def update_cost_gui(self, aws_total_cost, aws_avg_cost, do_total_cost, do_avg_cost):
         print(aws_total_cost, aws_avg_cost, do_total_cost, do_avg_cost)
-        self.aws_totalcost.set_subtitle("total-cost: " + str(aws_total_cost))
-        self.aws_avgcost.set_title("average-cost: " + str(aws_avg_cost))
+        self.aws_totalcost.set_subtitle("total cost: " + str(aws_total_cost) + "$")
+        self.aws_avgcost.set_title("Current cost: " + str(aws_avg_cost) + "$/h")
 
-        self.do_totalcost.set_subtitle("total-cost: " + str(do_total_cost))
-        self.do_avgcost.set_title("average-cost: " + str(do_avg_cost))
+        self.do_totalcost.set_subtitle("total cost: " + str(do_total_cost) + "$")
+        self.do_avgcost.set_title("Current cost: " + str(do_avg_cost) + "$/h")
 
     # Provider-Methods
     def add_provider_to_gui(self, provider):

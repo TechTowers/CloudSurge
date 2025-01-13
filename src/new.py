@@ -22,6 +22,7 @@ from gi.repository import Gtk
 
 from datetime import date
 
+from .error_window import ErrorWindow
 from .vm import VirtualMachine
 from .no_provider import NoProvider
 from .db import Database
@@ -96,6 +97,8 @@ class NewView(Adw.Window):
         self.provider_dropdown.connect("notify::selected-item", self.change_provider)
         self.vm_provider_dropdown.connect("notify::selected-item", self.change_vm_provider)
         self.btn_create.connect("clicked", self.submit)
+        self.set_transient_for(window)
+        self.set_modal(True)
 
     def show_provider_settings(self, _):
         self.machine_settings.hide()
@@ -114,8 +117,8 @@ class NewView(Adw.Window):
             self.region.show()
 
         elif (
-            self.provider_dropdown.get_selected_item().get_string()
-            == "DigitalOcean"
+                self.provider_dropdown.get_selected_item().get_string()
+                == "DigitalOcean"
         ):
             self.access_key.hide()
             self.secret_key.hide()
@@ -148,20 +151,26 @@ class NewView(Adw.Window):
                     self.password.hide()
 
     def submit(self, _):
-        def submit_block():
+        def submit_block(pop_up_window):
             if self.check_provider.get_active():
-                if not self.process_provider_input():
+                if not self.process_provider_input(pop_up_window):
                     pass
             elif self.check_machine.get_active():
-                if not self.process_machine_input():
+                if not self.process_machine_input(pop_up_window):
                     pass
+
         self.show_popup_window(submit_block)
 
-    def process_provider_input(self) -> bool:
+    def process_provider_input(self, pop_up_window) -> bool:
         db = Database()
         db.init()
-        provider:str = self.provider_dropdown.get_selected_item().get_string()
+        provider: str = self.provider_dropdown.get_selected_item().get_string()
         acc_name = self.account_name.get_text()
+        all_providers = db.read_provider()
+        for prov_conn in all_providers:
+            if prov_conn.get_account_name() == acc_name:
+                self.show_error_window(ValueError("Provider with that Account-Name already exists."), pop_up_window)
+                return False
         creation_time = date.today()
         if provider == "Aws":
             access_key = self.access_key.get_text()
@@ -179,7 +188,7 @@ class NewView(Adw.Window):
                 self.close()
                 return True
             else:
-                print("Connection Failed")
+                self.show_error_window(ValueError("Could not Connect - Invalid Credentials?"), pop_up_window)
                 return False
         elif provider == "DigitalOcean":
             token = self.token.get_text()
@@ -192,12 +201,12 @@ class NewView(Adw.Window):
                 self.close()
                 return True
             else:
-                print("Connection Failed")
+                self.show_error_window(ValueError("Could not Connect - Invalid Credentials?"), pop_up_window)
                 return False
         return False
 
-    def show_popup_window(self, action):
-        dialog = WaitPopupWindow(action)
+    def show_popup_window(self, action, ):
+        dialog = WaitPopupWindow(action, self)
         dialog.app = self.app
         dialog.present()
 
@@ -210,11 +219,27 @@ class NewView(Adw.Window):
         db.insert_vm(vm)
         self.close()
 
-    def process_machine_input(self):
+    def show_error_window(self, exception, pop_up_window):
+        pop_up_window.close()
+        dialog = ErrorWindow(str(exception), self)
+
+        #self.children().push(dialog)
+        dialog.app = self.app
+        dialog.present()
+        dialog.set_focus()
+        print("showing error")
+
+    def process_machine_input(self, pop_up_window):
         db = Database()
         db.init()
         selected_provider = self.vm_provider_dropdown.get_selected_item().get_string()
         vm_name = self.vm_name.get_text()
+        all_providers = db.read_provider()
+        all_vms = db.read_vm(all_providers)
+        for vm in all_vms:
+            if vm.get_vm_name() == vm_name:
+                self.show_error_window(ValueError("VM with that Name already exists."), pop_up_window)
+                return False
         cost_limit = self.cost_limit.get_text()
         ssh_key = self.ssh_key.get_text()
         if selected_provider.lower().startswith("ssh"):
@@ -227,25 +252,29 @@ class NewView(Adw.Window):
 
             zerotier_network = db.retrieve_zerotier_id()
             if not zerotier_network:
+                self.show_error_window(ValueError("ZeroTier-ID not set"), pop_up_window)
                 return False
-            vm = VirtualMachine(vm_name=vm_name,
-                                provider=provider,
-                                cost_limit=cost_limit,
-                                public_ip=public_ip,
-                                first_connection_date=first_connection_date,
-                                root_username=root_username,
-                                password=password,
-                                zerotier_network=zerotier_network,
-                                ssh_key=ssh_key)
-            self.add_vm(vm, db)
+            try:
+                vm = VirtualMachine(vm_name=vm_name,
+                                    provider=provider,
+                                    cost_limit=cost_limit,
+                                    public_ip=public_ip,
+                                    first_connection_date=first_connection_date,
+                                    root_username=root_username,
+                                    password=password,
+                                    zerotier_network=zerotier_network,
+                                    ssh_key=ssh_key)
+                self.add_vm(vm, db)
+            except Exception as e:
+                self.show_error_window(e, pop_up_window)
         else:
             found_provider = None
             for prov_connection in self.providers:
                 if prov_connection.get_account_name() == selected_provider:
-                        found_provider = prov_connection
-                        break
+                    found_provider = prov_connection
+                    break
 
-            if not found_provider: # Provider not found in db
+            if not found_provider:  # Provider not found in db
                 return False
 
             if found_provider.get_provider_name() == "AWS":
@@ -253,38 +282,48 @@ class NewView(Adw.Window):
                 aws_ssh_key_name = self.aws_key_name.get_text()
                 zerotier_network = db.retrieve_zerotier_id()
                 if not zerotier_network:
+                    self.show_error_window(ValueError("ZeroTier-ID not set"), pop_up_window)
                     return False
                 if len(ssh_key) != 0:
-                    vm = found_provider.create_vm(
-                        vm_name=vm_name,
-                        aws_ssh_key_name=aws_ssh_key_name,
-                        zerotier_network=zerotier_network,
-                        cost_limit=cost_limit,
-                        ssh_key_path=ssh_key,
-                    )
-                    self.add_vm(vm, db)
+                    try:
+                        vm = found_provider.create_vm(
+                            vm_name=vm_name,
+                            aws_ssh_key_name=aws_ssh_key_name,
+                            zerotier_network=zerotier_network,
+                            cost_limit=cost_limit,
+                            ssh_key_path=ssh_key,
+                        )
+                        self.add_vm(vm, db)
+                    except Exception as e:
+                        self.show_error_window(e, pop_up_window)
                 else:
-                    vm = found_provider.create_vm(
-                        vm_name=vm_name,
-                        aws_ssh_key_name = aws_ssh_key_name,
-                        zerotier_network=zerotier_network,
-                        cost_limit=cost_limit,
-                    )
-                    self.add_vm(vm, db)
+                    try:
+                        vm = found_provider.create_vm(
+                            vm_name=vm_name,
+                            aws_ssh_key_name=aws_ssh_key_name,
+                            zerotier_network=zerotier_network,
+                            cost_limit=cost_limit,
+                        )
+                        self.add_vm(vm, db)
+                    except Exception as e:
+                        self.show_error_window(e, pop_up_window)
 
             elif found_provider.get_provider_name() == "DigitalOcean":
                 print("Creating VM using DigitalOcean")
                 ssh_key_ids = [self.do_key_id.get_text()]
                 zerotier_network = db.retrieve_zerotier_id()
                 if not zerotier_network:
+                    self.show_error_window(ValueError("ZeroTier-ID not set"), pop_up_window)
                     return False
-                vm = found_provider.create_vm(
-                    vm_name=vm_name,
-                    ssh_key_ids=ssh_key_ids,
-                    zerotier_network=zerotier_network,
-                    cost_limit=cost_limit,
-                    ssh_key_path=ssh_key,
-                )
-                self.add_vm(vm, db)
 
-
+                try:
+                    vm = found_provider.create_vm(
+                        vm_name=vm_name,
+                        ssh_key_ids=ssh_key_ids,
+                        zerotier_network=zerotier_network,
+                        cost_limit=cost_limit,
+                        ssh_key_path=ssh_key,
+                    )
+                    self.add_vm(vm, db)
+                except Exception as e:
+                    self.show_error_window(e, pop_up_window)

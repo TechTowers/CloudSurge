@@ -30,6 +30,7 @@ from gi.repository import Gtk, Gio, Adw
 from .window import CloudsurgeWindow
 from .new import NewView
 from .db import Database
+import webbrowser
 
 # from .db import Database
 
@@ -68,29 +69,33 @@ class CloudsurgeApplication(Adw.Application):
         self.create_action("preferences", self.on_preferences_action)
         self.create_action("new", self.show_add_view)
         self.create_action("test", self.test)
+        self.create_action("howto", self.howto)
+        self.create_action("aboutus", self.aboutus)
+
+
 
     def do_activate(self):
-        """Called when the application is activated.
+            """Called when the application is activated.
 
-        We raise the application's main window, creating it if
-        necessary.
-        """
-        win = self.props.active_window
-        if not win:
-            win = CloudsurgeWindow(
-                self.db, self.vms, self.providers, application=self
-            )
-            self.main_listbox = (
-                win.get_content().get_content().get_first_child()
-            )
-        win.present()
-        self.main_window = win
-        self.main_window.app = self
+            We raise the application's main window, creating it if
+            necessary.
+            """
+            win = self.props.active_window
+            if not win:
+                win = CloudsurgeWindow(
+                    self.db, self.vms, self.providers, application=self
+                )
+                self.main_listbox = (
+                    win.get_content().get_content().get_first_child()
+                )
+            win.present()
+            self.main_window = win
+            self.main_window.app = self
 
 
-        zerotier_id = self.db.retrieve_zerotier_id()
-        if zerotier_id:
-            self.main_window.zerotier_id.set_title("current: " + zerotier_id)
+            zerotier_id = self.db.retrieve_zerotier_id()
+            if zerotier_id:
+                self.main_window.zerotier_id.set_title("current: " + zerotier_id)
 
     def on_about_action(self, *args):
         """Callback for the app.about action."""
@@ -145,6 +150,12 @@ class CloudsurgeApplication(Adw.Application):
         )
         new_window.app = self
         new_window.present()
+
+    def howto(self, *_):
+        webbrowser.open_new_tab("https://github.com/TechTowers/CloudSurge?tab=readme-ov-file#%EF%B8%8F-cloudsurge")
+
+    def aboutus(self, *_):
+        webbrowser.open_new_tab("https://github.com/TechTowers")
 
 
 def get_cloudsurge_script():

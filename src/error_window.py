@@ -24,12 +24,17 @@ from gi.repository import Gtk, GLib
 class ErrorWindow(Adw.Window):
     __gtype_name__ = 'ErrorWindow'
 
-    def __init__(self, text, **kwargs):
-        super().__init__(**kwargs)
-        self.show_window(text)
+    err_message = Gtk.Template.Child()
 
-    def show_window(self, text):
-        pass
+    def __init__(self, text, parent, **kwargs):
+        super().__init__(**kwargs)
+        self.show_error(text)
+        if parent:
+            self.set_transient_for(parent)
+            self.set_modal(True)
+
+    def show_error(self, text):
+        self.err_message.set_label(text)
 
 
 
