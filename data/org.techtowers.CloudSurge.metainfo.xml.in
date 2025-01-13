@@ -7,7 +7,8 @@
   <name>CloudSurge</name>
   <summary>Keep the summary shorter, between 10 and 35 characters</summary>
   <description>
-    <p>No description</p>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Felis volutpat semper curabitur pellentesque litora viverra eu venenatis. Ut molestie hac ut id vulputate eleifend metus dui mauris auctor. Magna curabitur lorem fringilla vitae proin aenean gravida nisl eu congue vehicula ante. Eget sit feugiat himenaeos et diam. Tempor eget etiam lobortis posuere facilisis sed ornare et etiam lacus vel blandit nullam.
+Pretium sodales taciti molestie egestas ipsum sollicitudin nisi condimentum donec eleifend justo sociosqu nec consequat himenaeos. Ultricies sociosqu velit mattis etiam lacinia sit justo lacinia sapien erat fames. Risus est tortor enim condimentum et vitae suspendisse aenean. Auctor torquent imperdiet urna phasellus mauris litora phasellus malesuada ac curae metus tincidunt curae. Pulvinar nisl ultrices class mi sagittis posuere sagittis dolor maximus donec consequat sollicitudin lacinia.</p>
   </description>
 
   <developer id="tld.vendor">
@@ -15,23 +16,17 @@
   </developer>
 
   <!-- Requered: Should be a link to the upstream homepage for the component -->
-  <url type="homepage">https://example.org/</url>
+  <url type="homepage">https://github.com/TechTowers/CloudSurge/</url>
   <!-- Recommended: It is highly recommended for open-source projects to display the source code repository -->
-  <url type="vcs-browser">https://example.org/repository</url>
+  <url type="vcs-browser">https://github.com/TechTowers/CloudSurge</url>
   <!-- Should point to the software's bug tracking system, for users to report new bugs -->
-  <url type="bugtracker">https://example.org/issues</url>
-  <!-- Should link a FAQ page for this software, to answer some of the most-asked questions in detail -->
-  <!-- URLs of this type should point to a webpage where users can submit or modify translations of the upstream project -->
-  <url type="translate">https://example.org/translate</url>
-  <url type="faq">https://example.org/faq</url>
+  <url type="bugtracker">https://github.com/TechTowers/CloudSurge</url>
   <!--Sould provide a web link to an online user's reference, a software manual or help page -->
-  <url type="help">https://example.org/help</url>
-  <!-- URLs of this type should point to a webpage showing information on how to donate to the described software project -->
-  <url type="donation">https://example.org/donate</url>
+  <url type="help">https://github.com/TechTowers/CloudSurge</url>
   <!--This could for example be an HTTPS URL to an online form or a page describing how to contact the developer -->
-  <url type="contact">https://example.org/contact</url>
+  <url type="contact">https://github.com/TechTowers/CloudSurge</url>
   <!--URLs of this type should point to a webpage showing information on how to contribute to the described software project -->
-  <url type="contribute">https://example.org/contribute</url>
+  <url type="contribute">https://github.com/TechTowers/CloudSurge</url>
 
   <translation type="gettext">cloudsurge</translation>
   <!-- All graphical applications having a desktop file must have this tag in the MetaInfo.
@@ -46,16 +41,16 @@
     <color type="primary" scheme_preference="dark">#993d3d</color>
   </branding>
 
-  <screenshots>
-    <screenshot type="default">
-      <image>https://example.org/example1.png</image>
-      <caption>A caption</caption>
-    </screenshot>
-    <screenshot>
-      <image>https://example.org/example2.png</image>
-      <caption>A caption</caption>
-    </screenshot>
-  </screenshots>
+  <!-- <screenshots> -->
+    <!-- <screenshot type="default"> -->
+      <!-- <image>https://example.org/example1.png</image> -->
+      <!-- <caption>A caption</caption> -->
+    <!-- </screenshot> -->
+    <!-- <screenshot> -->
+      <!-- <image>https://example.org/example2.png</image> -->
+      <!-- <caption>A caption</caption> -->
+    <!-- </screenshot> -->
+  <!-- </screenshots> -->
 
   <releases>
     <release version="1.0.1" date="2024-01-18">
