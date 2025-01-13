@@ -1,4 +1,5 @@
 alias b := build
+alias i := install
 
 default:
     @just --list
