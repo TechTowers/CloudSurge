@@ -193,7 +193,7 @@ class CloudsurgeApplication(Adw.Application):
 
 def get_cloudsurge_script():
     """Retrieves the CloudSurge script from the GitHub repository and saves it to the local filesystem."""
-    file_path = f"{os.path.expanduser('~')}/.local/bin/cloudsurge.sh"
+    file_path = os.path.expanduser("~/.local/bin/cloudsurge.sh")
     url = "https://raw.githubusercontent.com/TechTowers/CloudSurge/refs/heads/main/scripts/cloudsurge.sh"
 
     if not os.path.exists(".local/bin"):
@@ -201,7 +201,6 @@ def get_cloudsurge_script():
 
     r = requests.get(url, stream=True)
     if r.ok:
-        print("saving to", os.path.abspath(file_path))
         with open(file_path, "wb") as f:
             for chunk in r.iter_content(chunk_size=1024 * 8):
                 if chunk:
