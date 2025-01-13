@@ -1,0 +1,38 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $ErrorWindow: Adw.Window {
+  title: _("Error");
+  default-width: 200;
+  default-height: 150;
+
+  Box {
+    orientation: vertical;
+
+    Adw.HeaderBar {
+      show-start-title-buttons: false;
+      show-end-title-buttons: true;
+    }
+
+    Label {
+      margin-top: 10;
+      margin-start: 10;
+      margin-end: 10;
+      wrap: true;
+      label: _("Error!");
+
+      styles ["title-1"]
+    }
+    Label {
+      margin-top: 20;
+      margin-bottom: 20;
+      margin-start: 10;
+      margin-end: 10;
+      wrap: true;
+      label: _("An Error Occured");
+      styles [
+              "color: red"
+            ]
+    }
+  }
+}

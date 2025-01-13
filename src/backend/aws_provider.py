@@ -1,6 +1,8 @@
 # author: Luka Pacar
 import time
 from datetime import date, datetime
+from multiprocessing.managers import Value
+
 import pytz
 
 import boto3
@@ -259,10 +261,12 @@ class AWS(Provider):
                 time.sleep(retry_interval)
 
             if not public_ip:
-                print(
-                    f"Failed to get public IP for instance '{vm_name}' after {max_retries} retries."
-                ) if print_output else None
-                return None
+                # Terminate the instance
+                try:
+                    self.client.terminate_instances(InstanceIds=[instance_id])
+                except Exception as e:
+                    raise ValueError("Could not retrieve Public-IP for VM. - failed deleting invalid vm")
+                raise ValueError("Could not retrieve Public-IP for VM. - vm was deleted")
 
             # Return the VirtualMachine object
             return VirtualMachine(
@@ -278,8 +282,7 @@ class AWS(Provider):
             )
 
         except ClientError as e:
-            print(f"Failed to create VM '{vm_name}': {e}")
-            return None
+            raise ValueError(f"Failed to create VM '{vm_name}': {e}")
 
     def stop_vm(self, vm: VirtualMachine, print_output=True):
         """Stops an EC2 instance on AWS."""

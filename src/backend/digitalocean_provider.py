@@ -104,8 +104,7 @@ class DigitalOcean(Provider):
             }
 
             if not self.token:
-                print("\033[31mAPI token is missing.\033[0m")
-                return None
+                raise ValueError("API token is missing.")
 
             # Create the vm
             droplet = digitalocean.Droplet(**req)
@@ -142,10 +141,11 @@ class DigitalOcean(Provider):
                 time.sleep(retry_interval)  # Wait before retrying
 
             if retries == max_retries:
-                print(
-                    f"\033[31mFailed to load droplet after {max_retries} retries.f\033[0m"
-                ) if print_output else None
-                return None
+                try:
+                    droplet.destroy()
+                except Exception:
+                    raise ValueError("Could not retrieve Public-IP for VM. - failed deleting invalid vm")
+                raise ValueError("Could not retrieve Public-IP for VM. - vm was deleted")
 
             # Return the VirtualMachine object after creation
             return VirtualMachine(
@@ -161,8 +161,7 @@ class DigitalOcean(Provider):
             )
 
         except Exception as e:  # General exception to catch all errors
-            print(f"Failed to create VM '{vm_name}': {e}")
-            return None
+            raise ValueError(f"Failed to create VM '{vm_name}': {e}")
 
     def stop_vm(self, vm: VirtualMachine, print_output=True):
         """Stops (powers off) a VM on DigitalOcean."""
