@@ -23,16 +23,18 @@ import gi
 import requests
 import subprocess
 
-gi.require_version("Gtk", "4.0")
-gi.require_version("Adw", "1")
-
-from gi.repository import Gtk, Gio, Adw
-from .window import CloudsurgeWindow
-from .new import NewView
+from .reached_cost_limits import get_reached_cost_limits
+from .server_is_active import get_active_servers
 from .db import Database
 import webbrowser
 
-# from .db import Database
+gi.require_version("Gtk", "4.0")
+gi.require_version("Adw", "1")
+
+from gi.repository import Gtk, Gio, Adw, GLib
+from .window import CloudsurgeWindow
+from .new import NewView
+
 
 class CloudsurgeApplication(Adw.Application):
     """The main application singleton class."""
@@ -48,7 +50,7 @@ class CloudsurgeApplication(Adw.Application):
     def __init__(self):
         super().__init__(
             application_id="org.techtowers.CloudSurge",
-            flags=Gio.ApplicationFlags.DEFAULT_FLAGS,
+            flags=Gio.ApplicationFlags.HANDLES_COMMAND_LINE,
         )
 
         get_cloudsurge_script()
@@ -72,30 +74,59 @@ class CloudsurgeApplication(Adw.Application):
         self.create_action("howto", self.howto)
         self.create_action("aboutus", self.aboutus)
 
+        self.__register_arguments()
 
+    def __register_arguments(self):
+        self.add_main_option(
+            "costs",
+            ord("c"),
+            GLib.OptionFlags.NONE,
+            GLib.OptionArg.NONE,
+            _("Displays all VMs that overrun the cost limit"),
+            None,
+        )
+        self.add_main_option(
+            "online",
+            ord("o"),
+            GLib.OptionFlags.NONE,
+            GLib.OptionArg.NONE,
+            _("Shows the count of the currently online VMs"),
+            None,
+        )
+
+    def do_command_line(self, command):
+        commands = command.get_options_dict()
+        if commands.contains("costs"):
+            get_reached_cost_limits()
+            quit()
+        if commands.contains("online"):
+            get_active_servers()
+            quit()
+
+        self.do_activate()
+        return 0
 
     def do_activate(self):
-            """Called when the application is activated.
+        """Called when the application is activated.
 
-            We raise the application's main window, creating it if
-            necessary.
-            """
-            win = self.props.active_window
-            if not win:
-                win = CloudsurgeWindow(
-                    self.db, self.vms, self.providers, application=self
-                )
-                self.main_listbox = (
-                    win.get_content().get_content().get_first_child()
-                )
-            win.present()
-            self.main_window = win
-            self.main_window.app = self
+        We raise the application's main window, creating it if
+        necessary.
+        """
+        win = self.props.active_window
+        if not win:
+            win = CloudsurgeWindow(
+                self.db, self.vms, self.providers, application=self
+            )
+            self.main_listbox = (
+                win.get_content().get_content().get_first_child()
+            )
+        win.present()
+        self.main_window = win
+        self.main_window.app = self
 
-
-            zerotier_id = self.db.retrieve_zerotier_id()
-            if zerotier_id:
-                self.main_window.zerotier_id.set_title("current: " + zerotier_id)
+        zerotier_id = self.db.retrieve_zerotier_id()
+        if zerotier_id:
+            self.main_window.zerotier_id.set_title("current: " + zerotier_id)
 
     def on_about_action(self, *args):
         """Callback for the app.about action."""
@@ -152,7 +183,9 @@ class CloudsurgeApplication(Adw.Application):
         new_window.present()
 
     def howto(self, *_):
-        webbrowser.open_new_tab("https://github.com/TechTowers/CloudSurge?tab=readme-ov-file#%EF%B8%8F-cloudsurge")
+        webbrowser.open_new_tab(
+            "https://github.com/TechTowers/CloudSurge?tab=readme-ov-file#%EF%B8%8F-cloudsurge"
+        )
 
     def aboutus(self, *_):
         webbrowser.open_new_tab("https://github.com/TechTowers")
@@ -160,9 +193,9 @@ class CloudsurgeApplication(Adw.Application):
 
 def get_cloudsurge_script():
     """Retrieves the CloudSurge script from the GitHub repository and saves it to the local filesystem."""
-    file_path = f"{os.path.expanduser("~")}/.local/bin/cloudsurge.sh"
+    file_path = f"{os.path.expanduser('~')}/.local/bin/cloudsurge.sh"
     url = "https://raw.githubusercontent.com/TechTowers/CloudSurge/refs/heads/main/scripts/cloudsurge.sh"
-    
+
     if not os.path.exists(".local/bin"):
         os.makedirs(".local/bin")
 
@@ -181,6 +214,7 @@ def get_cloudsurge_script():
         )
 
     _ = subprocess.call(["chmod", "+x", file_path])
+
 
 def main(version):
     """The application's entry point."""
