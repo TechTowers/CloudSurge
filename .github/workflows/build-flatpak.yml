@@ -22,7 +22,7 @@ jobs:
       - name: Build flatpak
         uses: flatpak/flatpak-github-actions/flatpak-builder@v6
         with:
-          bundle: palette.flatpak
+          bundle: cloudsurge.flatpak
           manifest-path: org.techtowers.CloudSurge.json
 
       - name: Set up GitHub CLI
