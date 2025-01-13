@@ -6,7 +6,10 @@ __pycache__
 
 .idea
 
+# flatpak
 .flatpak-builder
+repo
+builddir
 
 ### Nix Stuff ###
 # Devenv
