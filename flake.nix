@@ -49,6 +49,7 @@
             {
               packages = with pkgs-unstable; [
                 git # duh
+                just
 
                 gnome-builder
                 meson
