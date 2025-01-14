@@ -121,9 +121,9 @@ class VirtualMachine:
             for _ in range(10):
                 if self.is_reachable():
                     print("Starting Install..")
-                    #self.install_vm()
+                    # self.install_vm()
                     print("Starting Configuring..")
-                    #self.configure_vm()
+                    # self.configure_vm()
                     print("Finished Configuring")
                     break
                 else:
@@ -152,7 +152,7 @@ class VirtualMachine:
         """Installs CloudSurge specific data on the virtual machine."""
         _ = subprocess.run(
             [
-                f"{os.path.expanduser("~")}/.local/bin/cloudsurge.sh",
+                os.path.expandvars("$XDG_DATA_HOME/cloudsurge.sh"),
                 "-s",
                 f"{self.get_root_username()}@{self.get_public_ip()}",
                 "-k",
@@ -170,7 +170,7 @@ class VirtualMachine:
         """Configures the virtual machine using the cloudsurge-script."""
         _ = subprocess.run(
             [
-                f"{os.path.expanduser("~")}/.local/bin/cloudsurge.sh",
+                os.path.expandvars("$XDG_DATA_HOME/cloudsurge.sh"),
                 "-s",
                 f"{self.get_root_username()}@{self.get_public_ip()}",
                 "-k",
