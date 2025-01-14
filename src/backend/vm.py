@@ -142,6 +142,8 @@ class VirtualMachine:
         """Installs CloudSurge specific data on the virtual machine."""
         _ = subprocess.run(
             [
+                "flatpak-spawn",
+                "--host",
                 os.path.expandvars("$XDG_DATA_HOME/cloudsurge.sh"),
                 "-s",
                 f"{self.get_root_username()}@{str(self.get_public_ip())}",
@@ -160,6 +162,8 @@ class VirtualMachine:
         """Configures the virtual machine using the cloudsurge-script."""
         _ = subprocess.run(
             [
+                "flatpak-spawn",
+                "--host",
                 os.path.expandvars("$XDG_DATA_HOME/cloudsurge.sh"),
                 "-s",
                 f"{self.get_root_username()}@{str(self.get_public_ip())}",
