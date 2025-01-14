@@ -16,13 +16,13 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
-import threading
-
 from gi.repository import Adw
-from gi.repository import Gtk, GLib
-@Gtk.Template(resource_path='/org/techtowers/CloudSurge/blueprints/error.ui')
+from gi.repository import Gtk
+
+
+@Gtk.Template(resource_path="/org/techtowers/CloudSurge/blueprints/error.ui")
 class ErrorWindow(Adw.Window):
-    __gtype_name__ = 'ErrorWindow'
+    __gtype_name__ = "ErrorWindow"
 
     err_message = Gtk.Template.Child()
 
@@ -35,6 +35,3 @@ class ErrorWindow(Adw.Window):
 
     def show_error(self, text):
         self.err_message.set_label(text)
-
-
-

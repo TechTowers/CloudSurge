@@ -1,7 +1,6 @@
 # author: Luka Pacar
 import time
 from datetime import date, datetime
-from multiprocessing.managers import Value
 
 import pytz
 
@@ -56,9 +55,9 @@ class AWS(Provider):
     ):
         """Creates a Provider object from the provider information."""
         access_key, secret_key, region, vpc_id, subnet_id, security_group_id = (
-            provider_info.split(
-                Provider.starting_character
-            )[1].split(Provider.delimiter)
+            provider_info.split(Provider.starting_character)[1].split(
+                Provider.delimiter
+            )
         )
         return AWS(
             account_name,
@@ -264,9 +263,13 @@ class AWS(Provider):
                 # Terminate the instance
                 try:
                     self.client.terminate_instances(InstanceIds=[instance_id])
-                except Exception as e:
-                    raise ValueError("Could not retrieve Public-IP for VM. - failed deleting invalid vm")
-                raise ValueError("Could not retrieve Public-IP for VM. - vm was deleted")
+                except Exception:
+                    raise ValueError(
+                        "Could not retrieve Public-IP for VM. - failed deleting invalid vm"
+                    )
+                raise ValueError(
+                    "Could not retrieve Public-IP for VM. - vm was deleted"
+                )
 
             # Return the VirtualMachine object
             return VirtualMachine(
@@ -392,7 +395,7 @@ class AWS(Provider):
         "r5.metal": 4.608,  # Memory optimized (96 vCPUs, 768 GB RAM)
         "p3dn.metal": 31.212,  # GPU-optimized (8 GPUs, 96 vCPUs, 768 GB RAM)
         "z1d.metal": 5.424,  # High-frequency compute (48 vCPUs, 384 GB RAM)
-        "mac1.metal": 1.083  # macOS dedicated (12 vCPUs, 32 GB RAM)
+        "mac1.metal": 1.083,  # macOS dedicated (12 vCPUs, 32 GB RAM)
     }
 
     def get_vm_hourly_rate(

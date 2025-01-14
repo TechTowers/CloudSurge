@@ -82,7 +82,7 @@ class CloudsurgeApplication(Adw.Application):
             ord("c"),
             GLib.OptionFlags.NONE,
             GLib.OptionArg.NONE,
-            _("Displays all VMs that overrun the cost limit"),
+            ("Displays all VMs that overrun the cost limit"),
             None,
         )
         self.add_main_option(
@@ -90,7 +90,7 @@ class CloudsurgeApplication(Adw.Application):
             ord("o"),
             GLib.OptionFlags.NONE,
             GLib.OptionArg.NONE,
-            _("Shows the count of the currently online VMs"),
+            ("Shows the count of the currently online VMs"),
             None,
         )
 
@@ -139,7 +139,7 @@ class CloudsurgeApplication(Adw.Application):
             copyright="© 2024 Benedikt",
         )
         # Translators: Replace "translator-credits" with your name/username, and optionally an email or URL.
-        about.set_translator_credits(_("translator-credits"))
+        about.set_translator_credits(("translator-credits"))
         about.present(self.props.active_window)
 
     def on_preferences_action(self, widget, _):
@@ -166,7 +166,7 @@ class CloudsurgeApplication(Adw.Application):
         print(huh)
 
     def show_providers(self):
-        print(providers)
+        print(self.providers)
 
     def add_provider(self, name: str, _):
         row = Adw.ActionRow()

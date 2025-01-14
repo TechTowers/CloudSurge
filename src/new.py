@@ -16,7 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
-from dateutil.utils import today
 from gi.repository import Adw
 from gi.repository import Gtk
 
@@ -91,11 +90,21 @@ class NewView(Adw.Window):
         for prov in providers:
             self.vm_provider_choice.append(prov.get_account_name())
 
-        self.aws_fields = [self.provider_name, self.account_name, self.access_key, self.secret_key, self.region]
+        self.aws_fields = [
+            self.provider_name,
+            self.account_name,
+            self.access_key,
+            self.secret_key,
+            self.region,
+        ]
         self.check_provider.connect("activate", self.show_provider_settings)
         self.check_machine.connect("activate", self.show_machine_settings)
-        self.provider_dropdown.connect("notify::selected-item", self.change_provider)
-        self.vm_provider_dropdown.connect("notify::selected-item", self.change_vm_provider)
+        self.provider_dropdown.connect(
+            "notify::selected-item", self.change_provider
+        )
+        self.vm_provider_dropdown.connect(
+            "notify::selected-item", self.change_vm_provider
+        )
         self.btn_create.connect("clicked", self.submit)
         self.set_transient_for(window)
         self.set_modal(True)
@@ -117,8 +126,8 @@ class NewView(Adw.Window):
             self.region.show()
 
         elif (
-                self.provider_dropdown.get_selected_item().get_string()
-                == "DigitalOcean"
+            self.provider_dropdown.get_selected_item().get_string()
+            == "DigitalOcean"
         ):
             self.access_key.hide()
             self.secret_key.hide()
@@ -127,7 +136,9 @@ class NewView(Adw.Window):
             self.token.show()
 
     def change_vm_provider(self, obj, _):
-        account_name = self.vm_provider_dropdown.get_selected_item().get_string()
+        account_name = (
+            self.vm_provider_dropdown.get_selected_item().get_string()
+        )
         if account_name == "SSH (No provider)":
             self.do_key_id.hide()
             self.aws_key_name.hide()
@@ -169,7 +180,12 @@ class NewView(Adw.Window):
         all_providers = db.read_provider()
         for prov_conn in all_providers:
             if prov_conn.get_account_name() == acc_name:
-                self.show_error_window(ValueError("Provider with that Account-Name already exists."), pop_up_window)
+                self.show_error_window(
+                    ValueError(
+                        "Provider with that Account-Name already exists."
+                    ),
+                    pop_up_window,
+                )
                 return False
         creation_time = date.today()
         if provider == "Aws":
@@ -188,7 +204,10 @@ class NewView(Adw.Window):
                 self.close()
                 return True
             else:
-                self.show_error_window(ValueError("Could not Connect - Invalid Credentials?"), pop_up_window)
+                self.show_error_window(
+                    ValueError("Could not Connect - Invalid Credentials?"),
+                    pop_up_window,
+                )
                 return False
         elif provider == "DigitalOcean":
             token = self.token.get_text()
@@ -201,11 +220,17 @@ class NewView(Adw.Window):
                 self.close()
                 return True
             else:
-                self.show_error_window(ValueError("Could not Connect - Invalid Credentials?"), pop_up_window)
+                self.show_error_window(
+                    ValueError("Could not Connect - Invalid Credentials?"),
+                    pop_up_window,
+                )
                 return False
         return False
 
-    def show_popup_window(self, action, ):
+    def show_popup_window(
+        self,
+        action,
+    ):
         dialog = WaitPopupWindow(action, self)
         dialog.app = self.app
         dialog.present()
@@ -223,7 +248,7 @@ class NewView(Adw.Window):
         pop_up_window.close()
         dialog = ErrorWindow(str(exception), self)
 
-        #self.children().push(dialog)
+        # self.children().push(dialog)
         dialog.app = self.app
         dialog.present()
         dialog.set_focus()
@@ -232,13 +257,18 @@ class NewView(Adw.Window):
     def process_machine_input(self, pop_up_window):
         db = Database()
         db.init()
-        selected_provider = self.vm_provider_dropdown.get_selected_item().get_string()
+        selected_provider = (
+            self.vm_provider_dropdown.get_selected_item().get_string()
+        )
         vm_name = self.vm_name.get_text()
         all_providers = db.read_provider()
         all_vms = db.read_vm(all_providers)
         for vm in all_vms:
             if vm.get_vm_name() == vm_name:
-                self.show_error_window(ValueError("VM with that Name already exists."), pop_up_window)
+                self.show_error_window(
+                    ValueError("VM with that Name already exists."),
+                    pop_up_window,
+                )
                 return False
         cost_limit = self.cost_limit.get_text()
         ssh_key = self.ssh_key.get_text()
@@ -252,18 +282,22 @@ class NewView(Adw.Window):
 
             zerotier_network = db.retrieve_zerotier_id()
             if not zerotier_network:
-                self.show_error_window(ValueError("ZeroTier-ID not set"), pop_up_window)
+                self.show_error_window(
+                    ValueError("ZeroTier-ID not set"), pop_up_window
+                )
                 return False
             try:
-                vm = VirtualMachine(vm_name=vm_name,
-                                    provider=provider,
-                                    cost_limit=cost_limit,
-                                    public_ip=public_ip,
-                                    first_connection_date=first_connection_date,
-                                    root_username=root_username,
-                                    password=password,
-                                    zerotier_network=zerotier_network,
-                                    ssh_key=ssh_key)
+                vm = VirtualMachine(
+                    vm_name=vm_name,
+                    provider=provider,
+                    cost_limit=cost_limit,
+                    public_ip=public_ip,
+                    first_connection_date=first_connection_date,
+                    root_username=root_username,
+                    password=password,
+                    zerotier_network=zerotier_network,
+                    ssh_key=ssh_key,
+                )
                 self.add_vm(vm, db)
             except Exception as e:
                 self.show_error_window(e, pop_up_window)
@@ -282,7 +316,9 @@ class NewView(Adw.Window):
                 aws_ssh_key_name = self.aws_key_name.get_text()
                 zerotier_network = db.retrieve_zerotier_id()
                 if not zerotier_network:
-                    self.show_error_window(ValueError("ZeroTier-ID not set"), pop_up_window)
+                    self.show_error_window(
+                        ValueError("ZeroTier-ID not set"), pop_up_window
+                    )
                     return False
                 if len(ssh_key) != 0:
                     try:
@@ -313,7 +349,9 @@ class NewView(Adw.Window):
                 ssh_key_ids = [self.do_key_id.get_text()]
                 zerotier_network = db.retrieve_zerotier_id()
                 if not zerotier_network:
-                    self.show_error_window(ValueError("ZeroTier-ID not set"), pop_up_window)
+                    self.show_error_window(
+                        ValueError("ZeroTier-ID not set"), pop_up_window
+                    )
                     return False
 
                 try:
