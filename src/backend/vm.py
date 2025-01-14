@@ -134,7 +134,7 @@ class VirtualMachine:
         process = subprocess.call(
             [
                 "ssh",
-                f"{self.get_root_username()}@{self.get_public_ip()}",
+                f"{self.get_root_username()}@{str(self.get_public_ip())}",
                 "-i",
                 f"{self.get_ssh_key()}",
                 "-o",
@@ -154,7 +154,7 @@ class VirtualMachine:
             [
                 os.path.expandvars("$XDG_DATA_HOME/cloudsurge.sh"),
                 "-s",
-                f"{self.get_root_username()}@{self.get_public_ip()}",
+                f"{self.get_root_username()}@{str(self.get_public_ip())}",
                 "-k",
                 self.get_ssh_key(),
                 "-i",
@@ -172,7 +172,7 @@ class VirtualMachine:
             [
                 os.path.expandvars("$XDG_DATA_HOME/cloudsurge.sh"),
                 "-s",
-                f"{self.get_root_username()}@{self.get_public_ip()}",
+                f"{self.get_root_username()}@{str(self.get_public_ip())}",
                 "-k",
                 self.get_ssh_key(),
                 "-c",
