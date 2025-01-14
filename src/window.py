@@ -17,7 +17,6 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import os
 import threading
 
 from gi.repository import Adw
@@ -54,8 +53,8 @@ class CloudsurgeWindow(Adw.ApplicationWindow):
     machines_window = Gtk.Template.Child()
     cost_window = Gtk.Template.Child()
 
-    #vm_settings_button = Gtk.Template.Child()
-    #provider_settings_button = Gtk.Template.Child()
+    # vm_settings_button = Gtk.Template.Child()
+    # provider_settings_button = Gtk.Template.Child()
 
     aws_totalcost = Gtk.Template.Child()
     aws_avgcost = Gtk.Template.Child()
@@ -139,7 +138,14 @@ class CloudsurgeWindow(Adw.ApplicationWindow):
         dialog.present()
 
     def show_provider_settings_window(self, _, provider, provider_gui_widget):
-        dialog = ProviderSettingsWindow(provider, provider_gui_widget, self.db, self, self.vms, self.providers)
+        dialog = ProviderSettingsWindow(
+            provider,
+            provider_gui_widget,
+            self.db,
+            self,
+            self.vms,
+            self.providers,
+        )
         dialog.app = self.app
         dialog.present()
 
@@ -162,10 +168,14 @@ class CloudsurgeWindow(Adw.ApplicationWindow):
             elif vm_provider_name == "DigitalOcean":
                 digitalocean_total_cost += vm.get_provider().get_vm_cost(vm)
                 total_digitalocean_instances += 1
-                hourly_rates_digitalocean += vm.get_provider().get_vm_hourly_rate(vm)
+                hourly_rates_digitalocean += (
+                    vm.get_provider().get_vm_hourly_rate(vm)
+                )
 
         try:
-            avg_hourly_cost_digitalocean = hourly_rates_digitalocean / total_digitalocean_instances
+            avg_hourly_cost_digitalocean = (
+                hourly_rates_digitalocean / total_digitalocean_instances
+            )
         except ZeroDivisionError:
             avg_hourly_cost_digitalocean = 0
 
@@ -174,14 +184,24 @@ class CloudsurgeWindow(Adw.ApplicationWindow):
         except ZeroDivisionError:
             avg_hourly_cost_aws = 0
 
-        self.update_cost_gui(aws_total_cost, avg_hourly_cost_aws, digitalocean_total_cost, avg_hourly_cost_digitalocean)
+        self.update_cost_gui(
+            aws_total_cost,
+            avg_hourly_cost_aws,
+            digitalocean_total_cost,
+            avg_hourly_cost_digitalocean,
+        )
 
-    def update_cost_gui(self, aws_total_cost, aws_avg_cost, do_total_cost, do_avg_cost):
-        print(aws_total_cost, aws_avg_cost, do_total_cost, do_avg_cost)
-        self.aws_totalcost.set_subtitle("total cost: " + str(aws_total_cost) + "$")
+    def update_cost_gui(
+        self, aws_total_cost, aws_avg_cost, do_total_cost, do_avg_cost
+    ):
+        self.aws_totalcost.set_subtitle(
+            "total cost: " + str(aws_total_cost) + "$"
+        )
         self.aws_avgcost.set_title("Current cost: " + str(aws_avg_cost) + "$/h")
 
-        self.do_totalcost.set_subtitle("total cost: " + str(do_total_cost) + "$")
+        self.do_totalcost.set_subtitle(
+            "total cost: " + str(do_total_cost) + "$"
+        )
         self.do_avgcost.set_title("Current cost: " + str(do_avg_cost) + "$/h")
 
     # Provider-Methods
