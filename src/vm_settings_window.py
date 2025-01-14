@@ -23,7 +23,7 @@ from .wait_popup_window import WaitPopupWindow
 import threading
 
 
-#import backend.db
+# import backend.db
 
 
 @Gtk.Template(
@@ -53,7 +53,9 @@ class VmSettingsWindow(Adw.Window):
         self.delete_machine.connect("activated", self.delete_vm)
         self.update_machine.connect("activated", self.update_vm)
 
-        thread_values = threading.Thread(target=self.update_vm_value, args=(vm,))
+        thread_values = threading.Thread(
+            target=self.update_vm_value, args=(vm,)
+        )
         thread_values.start()
 
         thread_running = threading.Thread(target=self.update_state, args=(vm,))
@@ -68,11 +70,10 @@ class VmSettingsWindow(Adw.Window):
     def update_vm_value(self, vm):
         self.provider_acc.set_title(vm.get_provider().get_account_name())
         self.provider_acc.set_subtitle("Linked Provider Account")
-        self.cost_limit.set_title(f"{vm.get_cost_limit():.4f}$")
+        self.cost_limit.set_title(f"{vm.get_cost_limit()}$")
         self.cost_limit.set_subtitle("Cost Limit")
         self.curr_cost.set_title(f"{vm.get_provider().get_vm_cost(vm):.2f}$")
         self.curr_cost.set_subtitle("Current Cost")
-
 
     def start_vm(self, _):
         self.vm.get_provider().start_vm(self.vm)
@@ -96,6 +97,7 @@ class VmSettingsWindow(Adw.Window):
                 self.close()
             else:
                 print("VM not reachable")
+
         dialog = WaitPopupWindow(action)
         dialog.app = self.app
         dialog.present()
