@@ -140,7 +140,7 @@ class VirtualMachine:
 
     def install_vm(self):
         """Installs CloudSurge specific data on the virtual machine."""
-        _ = subprocess.run(
+        proc = subprocess.run(
             [
                 "flatpak-spawn",
                 "--host",
@@ -157,10 +157,11 @@ class VirtualMachine:
             check=True,
             text=True,
         )
+        print(proc.stdout)
 
     def configure_vm(self):
         """Configures the virtual machine using the cloudsurge-script."""
-        _ = subprocess.run(
+        proc = subprocess.run(
             [
                 "flatpak-spawn",
                 "--host",
@@ -179,6 +180,7 @@ class VirtualMachine:
             check=True,
             text=True,
         )
+        print(proc.stdout)
 
     # Setters
     def set_zerotier_network(self, zerotier_network: str):
