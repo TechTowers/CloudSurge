@@ -48,7 +48,7 @@ class NewView(Adw.Window):
     btn_create = Gtk.Template.Child()
 
     account_name = Gtk.Template.Child()
-    #provider_name = Gtk.Template.Child()
+    # provider_name = Gtk.Template.Child()
 
     # Machine fields
     vm_name = Gtk.Template.Child()
@@ -314,6 +314,8 @@ class NewView(Adw.Window):
                 self.add_vm(vm, db)
             except Exception as e:
                 self.show_error_window(e, pop_up_window)
+                if vm:
+                    vm.get_provider().delete_vm(vm)
         else:
             found_provider = None
             for prov_connection in self.providers:
@@ -345,6 +347,8 @@ class NewView(Adw.Window):
                         self.add_vm(vm, db)
                     except Exception as e:
                         self.show_error_window(e, pop_up_window)
+                        if vm:
+                            vm.get_provider().delete_vm(vm)
                 else:
                     try:
                         vm = found_provider.create_vm(
@@ -356,6 +360,8 @@ class NewView(Adw.Window):
                         self.add_vm(vm, db)
                     except Exception as e:
                         self.show_error_window(e, pop_up_window)
+                        if vm:
+                            vm.get_provider().delete_vm(vm)
 
             elif found_provider.get_provider_name() == "DigitalOcean":
                 print("Creating VM using DigitalOcean")

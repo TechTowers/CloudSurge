@@ -1,6 +1,7 @@
 # author: Luka Pacar
 import os
 from abc import abstractmethod, ABC
+from time import sleep
 from datetime import date
 from ipaddress import IPv4Address
 
@@ -115,6 +116,17 @@ class VirtualMachine:
         self._password = password
         self._zerotier_network = zerotier_network
         self._ssh_key = ssh_key
+
+        if new_vm:
+            for i in range(8):
+                if i >= 7:
+                    raise ValueError(
+                        "SSH connection failed (maybe due to SSH key error)"
+                    )
+                elif self.is_reachable():
+                    break
+                else:
+                    sleep(2)
 
     def is_reachable(self):
         """Check if the virtual machine is reachable."""
