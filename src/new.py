@@ -240,7 +240,7 @@ class NewView(Adw.Window):
             print("Error Creating VM")
             return
         for i in range(10):
-            if i == 10:
+            if i == 9:
                 raise ValueError("Could not reach VM")
             elif vm.is_reachable():
                 print("Starting Install..")
