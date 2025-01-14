@@ -82,7 +82,7 @@ template $NewView : Adw.Window {
             title: _("Settings");
             sensitive: true;
 
-            Adw.EntryRow provider_name {
+            Adw.EntryRow account_name {
               use-markup: false;
               title: _("Name");
             }
@@ -99,10 +99,7 @@ template $NewView : Adw.Window {
               };
             }
 
-            Adw.EntryRow account_name {
-              use-markup: false;
-              title: _("Account name");
-            }
+
             Adw.EntryRow access_key {
               use-markup: false;
               title: _("Access key");

@@ -48,7 +48,7 @@ class NewView(Adw.Window):
     btn_create = Gtk.Template.Child()
 
     account_name = Gtk.Template.Child()
-    provider_name = Gtk.Template.Child()
+    #provider_name = Gtk.Template.Child()
 
     # Machine fields
     vm_name = Gtk.Template.Child()
@@ -92,7 +92,6 @@ class NewView(Adw.Window):
             self.vm_provider_choice.append(prov.get_account_name())
 
         self.aws_fields = [
-            self.provider_name,
             self.account_name,
             self.access_key,
             self.secret_key,
