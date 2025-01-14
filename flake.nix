@@ -75,7 +75,10 @@
 
               pre-commit.hooks = {
                 autoflake.enable = true;
-                ruff.enable = true;
+                ruff = {
+                  enable = true;
+                  args = ["--ignore" "E402"];
+                };
               };
 
               env.PYTHONPATH = ./.;
