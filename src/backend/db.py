@@ -7,6 +7,7 @@ import os
 from .aws_provider import AWS
 from .no_provider import NoProvider
 
+
 # author: Luka Pacar
 class Database:
     """Simulates a SQLite database and provides methods to interact with it."""
@@ -15,7 +16,9 @@ class Database:
 
     def __init__(
         self,
-        db_file: str = os.path.expanduser("~") + "/cloud_provider_db.sqlite",
+        db_file: str = os.path.expandvars(
+            "$XDG_DATA_HOME/cloud_provider_db.sqlite"
+        ),
     ):
         self.db_file = db_file
         self.connection = None
@@ -320,10 +323,12 @@ class Database:
                     SET zerotier_id = ?
                     WHERE id = 1;
                     """,
-                    (zerotier_id,)
+                    (zerotier_id,),
                 )
                 if print_output:
-                    print(f"ZeroTier ID updated to '{zerotier_id}'") if print_output else None
+                    print(
+                        f"ZeroTier ID updated to '{zerotier_id}'"
+                    ) if print_output else None
             else:
                 # Insert the new ZeroTier ID if the table is empty
                 self.cursor.execute(
@@ -331,16 +336,20 @@ class Database:
                     INSERT INTO zerotier_id (zerotier_id)
                     VALUES (?);
                     """,
-                    (zerotier_id,)
+                    (zerotier_id,),
                 )
                 if print_output:
-                    print(f"ZeroTier ID '{zerotier_id}' inserted successfully.") if print_output else None
+                    print(
+                        f"ZeroTier ID '{zerotier_id}' inserted successfully."
+                    ) if print_output else None
 
             self.connection.commit()
         except sqlite3.Error as e:
             print(f"Error inserting or updating ZeroTier ID: {e}")
         except Exception as e:
-            print(f"Unexpected error while inserting or updating ZeroTier ID: {e}")
+            print(
+                f"Unexpected error while inserting or updating ZeroTier ID: {e}"
+            )
 
     def retrieve_zerotier_id(self):
         """Retrieves the ZeroTier ID from the database."""
