@@ -6,7 +6,6 @@ from ipaddress import IPv4Address
 
 import subprocess
 
-from time import sleep
 
 
 class Provider(ABC):
@@ -117,17 +116,6 @@ class VirtualMachine:
         self._password = password
         self._zerotier_network = zerotier_network
         self._ssh_key = ssh_key
-        if new_vm:
-            for _ in range(10):
-                if self.is_reachable():
-                    print("Starting Install..")
-                    # self.install_vm()
-                    print("Starting Configuring..")
-                    # self.configure_vm()
-                    print("Finished Configuring")
-                    break
-                else:
-                    sleep(2)
 
     def is_reachable(self):
         """Check if the virtual machine is reachable."""

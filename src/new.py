@@ -20,6 +20,7 @@ from gi.repository import Adw
 from gi.repository import Gtk
 
 from datetime import date
+from time import sleep
 
 from .error_window import ErrorWindow
 from .vm import VirtualMachine
@@ -239,6 +240,19 @@ class NewView(Adw.Window):
         if vm is None:
             print("Error Creating VM")
             return
+        for i in range(10):
+            if i == 10:
+                raise ValueError("Could not reach VM")
+            elif vm.is_reachable():
+                print("Starting Install..")
+                vm.install_vm()
+                print("Starting Configuring..")
+                vm.configure_vm()
+                print("Finished Configuring")
+                break
+            else:
+                sleep(2)
+
         self.window.add_vm_to_gui(vm)
         self.vms.append(vm)
         db.insert_vm(vm)
