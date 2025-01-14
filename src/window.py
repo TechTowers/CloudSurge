@@ -242,7 +242,7 @@ class CloudsurgeWindow(Adw.ApplicationWindow):
     def vm_to_widget(self, vm) -> Adw.ActionRow:
         row = Adw.ActionRow()
         row.set_title(vm.get_vm_name())
-        row.set_subtitle(vm.get_provider().get_account_name())
+        row.set_subtitle(vm.get_public_ip())
 
         # Create the button and add the desired child elements
         button = Gtk.Button()
