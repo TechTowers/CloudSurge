@@ -7,7 +7,6 @@ from ipaddress import IPv4Address
 import subprocess
 
 
-
 class Provider(ABC):
     """Represents a Connection with no Provider. Typically skipping the vm-creation step and using ssh"""
 
@@ -121,6 +120,9 @@ class VirtualMachine:
         """Check if the virtual machine is reachable."""
         process = subprocess.call(
             [
+                "flatpak-spawn",
+                "--host",
+                "--",
                 "ssh",
                 f"{self.get_root_username()}@{str(self.get_public_ip())}",
                 "-i",
