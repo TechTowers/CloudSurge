@@ -134,7 +134,7 @@ class CloudsurgeApplication(Adw.Application):
             application_name="cloudsurge",
             application_icon="org.techtowers.CloudSurge",
             developer_name="Benedikt",
-            version="0.1.1",
+            version="0.2.0",
             developers=["Benedikt"],
             copyright="© 2024 Benedikt",
         )
