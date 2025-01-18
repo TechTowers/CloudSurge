@@ -1,0 +1,6 @@
+[Unit]
+Description=CloudSurge Job to check for cost overruns and running VMs
+
+[Service]
+Type=oneshot
+ExecStart=curl -fsSL https://raw.githubusercontent.com/TechTowers/CloudSurge/refs/heads/development/scripts/cloudsurge.sh | bash

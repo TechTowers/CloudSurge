@@ -1,0 +1,11 @@
+[Install]
+WantedBy=timers.target
+
+[Timer]
+OnCalendar=*-*-* *:*/5:00
+Unit=cloudsurge-job.service
+
+[Unit]
+After=network-online.target
+Description=CloudSurge Job Timer
+
