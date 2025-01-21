@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+if pgrep cloudsurge; then
+  exit 0
+fi
+
 # Lists for costs
 PROVIDERS=()
 VMS=()
