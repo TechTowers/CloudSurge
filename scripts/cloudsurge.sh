@@ -180,6 +180,9 @@ install_gns3() {
 update() {
   success "Updating system packages..."
   sleep 1
+  while run "pgrep apt"; do
+    sleep 1
+  done
   apt "update" ||
     fail "Updating system packages failed!"
 
