@@ -29,13 +29,15 @@ for INDEX in $(seq ${#PROVIDERS[@]}); do
   BODY+="$VM ($PROVIDER) exceeds the cost limit of $LIMIT by $EXCEED\n"
 done
 
-ACTION=$(
-  notify-send -a "CloudSurge" \
-    "One or more VMs exceeded the cost limit!" \
-    "$BODY" \
-    -u critical \
-    -A default="Open CloudSurge"
-)
+if [[ -n $BODY ]]; then
+  ACTION=$(
+    notify-send -a "CloudSurge" \
+      "One or more VMs exceeded the cost limit!" \
+      "$BODY" \
+      -u critical \
+      -A default="Open CloudSurge"
+  )
+fi
 
 if [[ "$ACTION" == default ]]; then
   flatpak run org.techtowers.CloudSurge
