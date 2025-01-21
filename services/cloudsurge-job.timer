@@ -2,7 +2,7 @@
 WantedBy=timers.target
 
 [Timer]
-OnCalendar=*-*-* *:*/5:00
+OnCalendar=*:0/5
 Unit=cloudsurge-job.service
 
 [Unit]
