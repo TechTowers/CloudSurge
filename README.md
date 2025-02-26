@@ -1,5 +1,9 @@
 # ☁️⚡ CloudSurge
 
+> [!CAUTION]
+> CloudSurge currently save your API keys in CLEARTEXT. Please do not use this
+> program for anything besides testing it!
+
 <!--toc:start-->
 
 - [☁️⚡ CloudSurge](#️-cloudsurge)
